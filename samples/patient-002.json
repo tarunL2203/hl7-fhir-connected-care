@@ -1,0 +1,19 @@
+{
+  "resourceType": "Patient",
+  "id": "demo-patient-002",
+  "identifier": [
+    {
+      "system": "https://example.org/training/mrn",
+      "value": "SYN002"
+    }
+  ],
+  "name": [
+    {
+      "family": "Demo",
+      "given": [
+        "Ravi"
+      ]
+    }
+  ],
+  "birthDate": "1985-05-12"
+}

@@ -1,0 +1,20 @@
+{
+  "resourceType": "Patient",
+  "id": "patient-6759bc60-35bd-5ba8-a9a9-c6371e4af050",
+  "identifier": [
+    {
+      "system": "https://example.org/training/mrn",
+      "value": "SYN003"
+    }
+  ],
+  "name": [
+    {
+      "family": "Demo",
+      "given": [
+        "Meera"
+      ]
+    }
+  ],
+  "birthDate": "1992-07-18",
+  "gender": "female"
+}
