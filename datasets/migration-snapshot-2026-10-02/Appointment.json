@@ -1,0 +1,22 @@
+[
+  {
+    "resourceType": "Appointment",
+    "id": "demo-appointment-002",
+    "meta": {
+      "versionId": "8faf30e7-81e2-4f7f-9461-a2ac290e2f94",
+      "lastUpdated": "2026-10-02T02:59:00.429+00:00"
+    },
+    "status": "booked",
+    "description": "Fictional training visit",
+    "start": "2026-10-06T09:00:00-04:00",
+    "end": "2026-10-06T09:30:00-04:00",
+    "participant": [
+      {
+        "actor": {
+          "reference": "http://localhost:8080/Patient/demo-patient-002"
+        },
+        "status": "accepted"
+      }
+    ]
+  }
+]

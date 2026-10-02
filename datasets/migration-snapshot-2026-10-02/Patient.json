@@ -1,0 +1,44 @@
+[
+  {
+    "resourceType": "Patient",
+    "id": "demo-patient-002",
+    "meta": {
+      "versionId": "793df069-7f15-4ab6-a527-7a977f9c2f97",
+      "lastUpdated": "2026-10-01T00:38:12.832+00:00"
+    },
+    "identifier": [
+      {
+        "system": "https://example.org/training/mrn",
+        "value": "SYN002"
+      }
+    ],
+    "name": [
+      {
+        "family": "Demo",
+        "given": [
+          "Ravi"
+        ]
+      }
+    ],
+    "birthDate": "1985-05-12"
+  },
+  {
+    "resourceType": "Patient",
+    "id": "demo-patient-001",
+    "meta": {
+      "versionId": "acca481e-4d78-4a19-a61e-060f17738cc4",
+      "lastUpdated": "2026-09-30T23:28:01.327+00:00"
+    },
+    "active": true,
+    "name": [
+      {
+        "family": "Demo",
+        "given": [
+          "Anita"
+        ]
+      }
+    ],
+    "gender": "female",
+    "birthDate": "1990-01-01"
+  }
+]
