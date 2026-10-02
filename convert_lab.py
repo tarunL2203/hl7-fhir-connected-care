@@ -1,12 +1,14 @@
 import json
+import sys
 import math
 from datetime import datetime
 from pathlib import Path
 from hl7apy.parser import parse_message
 
 folder = Path.home() / "firely-learning" / "samples"
+source = Path(sys.argv[1]).expanduser() if len(sys.argv) > 1 else folder / "lab-002.hl7"
 message = parse_message(
-    (folder / "lab-002.hl7").read_bytes().decode("utf-8"),
+    source.read_bytes().decode("utf-8"),
     find_groups=False
 )
 
@@ -61,7 +63,7 @@ observation = {
     }
 }
 
-path = folder / "lab-002.fhir.json"
+path = source.with_suffix(".fhir.json")
 path.write_text(json.dumps(observation, indent=2), encoding="utf-8")
 print("Saved:", path)
 print(json.dumps(observation, indent=2))
