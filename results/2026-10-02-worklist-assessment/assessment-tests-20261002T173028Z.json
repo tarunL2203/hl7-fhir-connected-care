@@ -1,0 +1,312 @@
+{
+  "executed_at": "2026-10-02T17:30:28.481523+00:00",
+  "policy_id": "demo-previsit-v2",
+  "results": [
+    {
+      "case_id": "T01",
+      "expected": "information_complete",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p01",
+        "appointment_id": "fixture-v2-a01",
+        "outcome": "information_complete",
+        "reason": "All configured requirements satisfied",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_complete",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [
+              "fixture-t01-result"
+            ],
+            "rejected_records": [],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T02",
+      "expected": "information_gap",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p02",
+        "appointment_id": "fixture-v2-a02",
+        "outcome": "information_gap",
+        "reason": "A configured requirement has no qualifying record",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_gap",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T03",
+      "expected": "information_gap",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p03",
+        "appointment_id": "fixture-v2-a03",
+        "outcome": "information_gap",
+        "reason": "A configured requirement has no qualifying record",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_gap",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [
+              {
+                "id": "fixture-t03-result",
+                "reason": "Outside configured window"
+              }
+            ],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T04",
+      "expected": "information_complete",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p04",
+        "appointment_id": "fixture-v2-a04",
+        "outcome": "information_complete",
+        "reason": "All configured requirements satisfied",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_complete",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [
+              "fixture-t04-result"
+            ],
+            "rejected_records": [],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T05",
+      "expected": "information_gap",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p05",
+        "appointment_id": "fixture-v2-a05",
+        "outcome": "information_gap",
+        "reason": "A configured requirement has no qualifying record",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_gap",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [
+              {
+                "id": "fixture-t05-result",
+                "reason": "Outside configured window"
+              }
+            ],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T06",
+      "expected": "requirements_not_configured",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p06",
+        "appointment_id": "fixture-v2-a06",
+        "outcome": "requirements_not_configured",
+        "reason": "No configured requirements for this visit profile",
+        "requirements": [],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T07",
+      "expected": "unable_to_assess",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p07",
+        "appointment_id": "fixture-v2-a07",
+        "outcome": "unable_to_assess",
+        "reason": "Retrieval failed or not all search pages were retrieved",
+        "requirements": [],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T08",
+      "expected": "unable_to_assess",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p08",
+        "appointment_id": "fixture-v2-a08",
+        "outcome": "unable_to_assess",
+        "reason": "Retrieval failed or not all search pages were retrieved",
+        "requirements": [],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T10",
+      "expected": "unable_to_assess",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p09",
+        "appointment_id": "fixture-v2-a09",
+        "outcome": "unable_to_assess",
+        "reason": "Patient identity mapping is unresolved",
+        "requirements": [],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T13",
+      "expected": "information_gap",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p10",
+        "appointment_id": "fixture-v2-a10",
+        "outcome": "information_gap",
+        "reason": "A configured requirement has no qualifying record",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_gap",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [
+              {
+                "id": "fixture-t13-result",
+                "reason": "Status not accepted"
+              }
+            ],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T14",
+      "expected": "information_gap",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p01",
+        "appointment_id": "fixture-v2-a01",
+        "outcome": "information_gap",
+        "reason": "A configured requirement has no qualifying record",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "information_gap",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [
+              {
+                "id": "fixture-t14-result",
+                "reason": "Status not accepted"
+              }
+            ],
+            "uncertain_records": []
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T15",
+      "expected": "unable_to_assess",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p02",
+        "appointment_id": "fixture-v2-a02",
+        "outcome": "unable_to_assess",
+        "reason": "Relevant data could not be assessed",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "unable_to_assess",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [],
+            "uncertain_records": [
+              {
+                "id": "fixture-t15-result",
+                "reason": "Missing or invalid result date"
+              }
+            ]
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    },
+    {
+      "case_id": "T20",
+      "expected": "unable_to_assess",
+      "passed": true,
+      "actual": {
+        "policy_id": "demo-previsit-v2",
+        "patient_id": "fixture-v2-p03",
+        "appointment_id": "fixture-v2-a03",
+        "outcome": "unable_to_assess",
+        "reason": "Relevant data could not be assessed",
+        "requirements": [
+          {
+            "requirement_id": "glucose-result",
+            "outcome": "unable_to_assess",
+            "window_start": "2026-09-29T12:00:00+00:00",
+            "window_end": "2026-10-06T12:00:00+00:00",
+            "matched_record_ids": [],
+            "rejected_records": [],
+            "uncertain_records": [
+              {
+                "id": "fixture-t20-result",
+                "reason": "Missing or invalid numeric value"
+              }
+            ]
+          }
+        ],
+        "interpretation": "Information availability, not clinical clearance"
+      }
+    }
+  ]
+}

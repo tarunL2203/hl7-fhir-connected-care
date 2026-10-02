@@ -1,0 +1,13 @@
+{
+  "assignment_basis": "Explicit synthetic demo assignments",
+  "appointments": {
+    "demo-appointment-002": {
+      "patient_id": "demo-patient-002",
+      "profile_id": "demo-lab-review"
+    },
+    "fixture-v2-a02": {
+      "patient_id": "fixture-v2-p02",
+      "profile_id": "demo-lab-review"
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "policy_id": "demo-previsit-v2",
+  "planned_patient_count": 10,
+  "cases": [
+    {
+      "case_id": "T01",
+      "scenario": "Valid expected result",
+      "expected_outcome": "information_complete",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T02",
+      "scenario": "No matching result after complete retrieval",
+      "expected_outcome": "information_gap",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T03",
+      "scenario": "Matching result before window",
+      "expected_outcome": "information_gap",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T04",
+      "scenario": "Matching result exactly at window start",
+      "expected_outcome": "information_complete",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T05",
+      "scenario": "Matching result exactly at appointment start",
+      "expected_outcome": "information_gap",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T06",
+      "scenario": "No visit profile configured",
+      "expected_outcome": "requirements_not_configured",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T07",
+      "scenario": "FHIR request fails",
+      "expected_outcome": "unable_to_assess",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T08",
+      "scenario": "Later search page fails",
+      "expected_outcome": "unable_to_assess",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T09",
+      "scenario": "Same name, different source identifiers",
+      "expected_outcome": "identities_separate",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T10",
+      "scenario": "Patient mapping ambiguous",
+      "expected_outcome": "unable_to_assess",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T11",
+      "scenario": "Replay identical source message",
+      "expected_outcome": "no_extra_records_or_items",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T12",
+      "scenario": "Correction to existing source result",
+      "expected_outcome": "history_preserved_and_reassessed",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T13",
+      "scenario": "Only qualifying result cancelled",
+      "expected_outcome": "information_gap",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T14",
+      "scenario": "Only matching result preliminary",
+      "expected_outcome": "information_gap",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T15",
+      "scenario": "Required result date absent",
+      "expected_outcome": "unable_to_assess",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T16",
+      "scenario": "Expected document inaccessible",
+      "expected_outcome": "document_access_issue",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T17",
+      "scenario": "Attempt resolution without fresh reassessment",
+      "expected_outcome": "resolution_rejected",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T18",
+      "scenario": "Previously resolved gap reappears",
+      "expected_outcome": "existing_item_reopened",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T19",
+      "scenario": "User lacks permission to resolve",
+      "expected_outcome": "access_denied",
+      "status": "definition_only"
+    },
+    {
+      "case_id": "T20",
+      "scenario": "Matching result missing required value or unit",
+      "expected_outcome": "unable_to_assess",
+      "status": "definition_only"
+    }
+  ]
+}

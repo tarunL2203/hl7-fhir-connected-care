@@ -1,0 +1,81 @@
+{
+  "assessed_at": "2026-10-02T17:42:48.201129+00:00",
+  "source": "http://localhost:8081",
+  "profile_assignment": "Explicit synthetic demo assignment",
+  "input": {
+    "patient_id": "fixture-v2-p02",
+    "appointment": {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a02",
+      "meta": {
+        "versionId": "d2212a0d-8d08-4087-8b24-9608f50812a6",
+        "lastUpdated": "2026-10-02T17:39:00.111+00:00"
+      },
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "http://localhost:8081/Patient/fixture-v2-p02"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    "profile_id": "demo-lab-review",
+    "identity_state": "resolved",
+    "retrieval_state": "complete",
+    "observations": [
+      {
+        "resourceType": "Observation",
+        "id": "fixture-v2-p02-glucose-001",
+        "meta": {
+          "versionId": "b643b54b-3d5e-4ad2-a8b6-987d6d779d23",
+          "lastUpdated": "2026-10-02T17:42:37.237+00:00"
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "2345-7",
+              "display": "Glucose"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://localhost:8081/Patient/fixture-v2-p02"
+        },
+        "effectiveDateTime": "2026-10-05T12:00:00Z",
+        "valueQuantity": {
+          "value": 95,
+          "unit": "mg/dL",
+          "system": "http://unitsofmeasure.org",
+          "code": "mg/dL"
+        }
+      }
+    ]
+  },
+  "result": {
+    "policy_id": "demo-previsit-v2",
+    "patient_id": "fixture-v2-p02",
+    "appointment_id": "fixture-v2-a02",
+    "outcome": "information_complete",
+    "reason": "All configured requirements satisfied",
+    "requirements": [
+      {
+        "requirement_id": "glucose-result",
+        "outcome": "information_complete",
+        "window_start": "2026-09-29T12:00:00+00:00",
+        "window_end": "2026-10-06T12:00:00+00:00",
+        "matched_record_ids": [
+          "fixture-v2-p02-glucose-001"
+        ],
+        "rejected_records": [],
+        "uncertain_records": []
+      }
+    ],
+    "interpretation": "Information availability, not clinical clearance"
+  }
+}

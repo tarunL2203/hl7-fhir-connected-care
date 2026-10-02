@@ -1,0 +1,895 @@
+{
+  "policy_id": "demo-previsit-v2",
+  "synthetic_data_only": true,
+  "patients": [
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p01",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-001"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person01"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p02",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-002"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person02"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p03",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-003"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person03"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p04",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-004"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person04"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p05",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-005"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person05"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p06",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-006"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person06"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p07",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-007"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person07"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p08",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-008"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person08"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p09",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-009"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person09"
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Patient",
+      "id": "fixture-v2-p10",
+      "identifier": [
+        {
+          "system": "urn:demo:training-hospital:mrn",
+          "value": "V2-010"
+        }
+      ],
+      "name": [
+        {
+          "family": "Training",
+          "given": [
+            "Person10"
+          ]
+        }
+      ]
+    }
+  ],
+  "appointments": [
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a01",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p01"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a02",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p02"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a03",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p03"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a04",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p04"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a05",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p05"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a06",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p06"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a07",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p07"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a08",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p08"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a09",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p09"
+          },
+          "status": "accepted"
+        }
+      ]
+    },
+    {
+      "resourceType": "Appointment",
+      "id": "fixture-v2-a10",
+      "status": "booked",
+      "start": "2026-10-06T12:00:00Z",
+      "end": "2026-10-06T12:30:00Z",
+      "participant": [
+        {
+          "actor": {
+            "reference": "Patient/fixture-v2-p10"
+          },
+          "status": "accepted"
+        }
+      ]
+    }
+  ],
+  "assessment_cases": [
+    {
+      "case_id": "T01",
+      "patient_id": "fixture-v2-p01",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a01",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p01"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t01-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-05T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p01"
+          }
+        }
+      ],
+      "expected_outcome": "information_complete"
+    },
+    {
+      "case_id": "T02",
+      "patient_id": "fixture-v2-p02",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a02",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p02"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [],
+      "expected_outcome": "information_gap"
+    },
+    {
+      "case_id": "T03",
+      "patient_id": "fixture-v2-p03",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a03",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p03"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t03-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-09-28T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p03"
+          }
+        }
+      ],
+      "expected_outcome": "information_gap"
+    },
+    {
+      "case_id": "T04",
+      "patient_id": "fixture-v2-p04",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a04",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p04"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t04-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-09-29T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p04"
+          }
+        }
+      ],
+      "expected_outcome": "information_complete"
+    },
+    {
+      "case_id": "T05",
+      "patient_id": "fixture-v2-p05",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a05",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p05"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t05-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-06T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p05"
+          }
+        }
+      ],
+      "expected_outcome": "information_gap"
+    },
+    {
+      "case_id": "T06",
+      "patient_id": "fixture-v2-p06",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a06",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p06"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "unconfigured-visit",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t06-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-05T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p06"
+          }
+        }
+      ],
+      "expected_outcome": "requirements_not_configured"
+    },
+    {
+      "case_id": "T07",
+      "patient_id": "fixture-v2-p07",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a07",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p07"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "failed",
+      "observations": [],
+      "expected_outcome": "unable_to_assess"
+    },
+    {
+      "case_id": "T08",
+      "patient_id": "fixture-v2-p08",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a08",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p08"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "incomplete",
+      "observations": [],
+      "expected_outcome": "unable_to_assess"
+    },
+    {
+      "case_id": "T10",
+      "patient_id": "fixture-v2-p09",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a09",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p09"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "ambiguous",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t10-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-05T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p09"
+          }
+        }
+      ],
+      "expected_outcome": "unable_to_assess"
+    },
+    {
+      "case_id": "T13",
+      "patient_id": "fixture-v2-p10",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a10",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p10"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t13-result",
+          "status": "cancelled",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-05T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p10"
+          }
+        }
+      ],
+      "expected_outcome": "information_gap"
+    },
+    {
+      "case_id": "T14",
+      "patient_id": "fixture-v2-p01",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a01",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p01"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t14-result",
+          "status": "preliminary",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-05T12:00:00Z",
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p01"
+          }
+        }
+      ],
+      "expected_outcome": "information_gap"
+    },
+    {
+      "case_id": "T15",
+      "patient_id": "fixture-v2-p02",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a02",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p02"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t15-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "valueQuantity": {
+            "value": 95,
+            "unit": "mg/dL",
+            "system": "http://unitsofmeasure.org",
+            "code": "mg/dL"
+          },
+          "subject": {
+            "reference": "Patient/fixture-v2-p02"
+          }
+        }
+      ],
+      "expected_outcome": "unable_to_assess"
+    },
+    {
+      "case_id": "T20",
+      "patient_id": "fixture-v2-p03",
+      "appointment": {
+        "resourceType": "Appointment",
+        "id": "fixture-v2-a03",
+        "status": "booked",
+        "start": "2026-10-06T12:00:00Z",
+        "end": "2026-10-06T12:30:00Z",
+        "participant": [
+          {
+            "actor": {
+              "reference": "Patient/fixture-v2-p03"
+            },
+            "status": "accepted"
+          }
+        ]
+      },
+      "profile_id": "demo-lab-review",
+      "identity_state": "resolved",
+      "retrieval_state": "complete",
+      "observations": [
+        {
+          "resourceType": "Observation",
+          "id": "fixture-t20-result",
+          "status": "final",
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "2345-7",
+                "display": "Glucose"
+              }
+            ]
+          },
+          "effectiveDateTime": "2026-10-05T12:00:00Z",
+          "subject": {
+            "reference": "Patient/fixture-v2-p03"
+          }
+        }
+      ],
+      "expected_outcome": "unable_to_assess"
+    }
+  ]
+}

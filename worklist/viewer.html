@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visit Information Worklist</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f3f6fa;color:#203047;
+font:16px system-ui,-apple-system,sans-serif}
+main{max-width:1050px;margin:auto;padding:32px 20px}
+h1{margin:0 0 8px;font-size:28px}
+h2{font-size:20px;margin-top:0}
+p{line-height:1.5}
+.muted{color:#52647a}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:24px 0}
+select,button{font:inherit;padding:10px 14px;border-radius:8px}
+select{background:white;border:1px solid #b6c3d2}
+button{background:#1858a8;color:white;border:0;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}
+.panel{background:white;border:1px solid #dce4ed;border-radius:12px;
+padding:22px;margin:18px 0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.card{background:#f4f7fb;border-radius:8px;padding:14px}
+.card strong{display:block;margin-top:8px}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:12px 8px;border-bottom:1px solid #e3e9f0}
+th{color:#52647a;font-weight:600}
+.scroll{overflow-x:auto}
+#message{min-height:24px}
+.error{color:#a21d2c}
+details{margin-top:14px}
+li{margin:8px 0}
+.small{font-size:13px}
+</style>
+</head>
+<body>
+<main>
+<h1>Visit Information Worklist</h1>
+<p class="muted">Review expected information and follow up on unresolved gaps.</p>
+<p class="small muted">Synthetic learning demo · Information availability,
+not clinical clearance · Local access without sign-in</p>
+
+<div class="toolbar">
+<label for="patient">Patient</label>
+<select id="patient">
+<option value="demo-patient-002">Ravi — existing demo</option>
+<option value="fixture-v2-p02">Training Person02 — resolved gap demo</option>
+</select>
+<button id="load">Load patient</button>
+</div>
+
+<p id="message" role="status" aria-live="polite"></p>
+<div id="content"></div>
+</main>
+
+<script>
+const patientSelect = document.getElementById("patient");
+const button = document.getElementById("load");
+const message = document.getElementById("message");
+const content = document.getElementById("content");
+
+function element(tag, text, className) {
+  const node = document.createElement(tag);
+  if (text !== undefined) node.textContent = String(text);
+  if (className) node.className = className;
+  return node;
+}
+function section(title) {
+  const node = element("section", undefined, "panel");
+  node.append(element("h2", title));
+  content.append(node);
+  return node;
+}
+function date(value) {
+  if (!value) return "Not recorded";
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
+}
+function readable(value) {
+  const labels = {
+    information_complete: "Configured information complete",
+    information_gap: "Information gap",
+    unable_to_assess: "Unable to assess",
+    requirements_not_configured: "Requirements not configured"
+  };
+  return labels[value] || value;
+}
+function table(section, headings, rows) {
+  const wrap = element("div", undefined, "scroll");
+  const table = element("table");
+  const head = element("thead");
+  const header = element("tr");
+  headings.forEach(text => header.append(element("th", text)));
+  head.append(header);
+  table.append(head);
+  const body = element("tbody");
+  rows.forEach(values => {
+    const row = element("tr");
+    values.forEach(value => row.append(element("td", value)));
+    body.append(row);
+  });
+  table.append(body);
+  wrap.append(table);
+  section.append(wrap);
+}
+async function load() {
+  button.disabled = true;
+  patientSelect.disabled = true;
+  content.replaceChildren();
+  message.className = "muted";
+  message.textContent = "Loading current records…";
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 180000);
+  try {
+    const response = await fetch(
+      "/patients/" + encodeURIComponent(patientSelect.value) + "/summary",
+      {cache:"no-store", signal:controller.signal}
+    );
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Retrieval failed");
+
+    const patient = section("Patient");
+    const name = data.patient.name?.[0];
+    const displayName = [
+      ...(name?.given || []), name?.family || ""
+    ].filter(Boolean).join(" ");
+    patient.append(element("p", displayName || data.patient.id));
+    patient.append(element("p", "Patient ID: " + data.patient.id, "small muted"));
+
+    const overview = section("Information assessment");
+    if (!data.assessments.length) {
+      overview.append(element("p", "No linked appointment to assess."));
+    }
+    data.assessments.forEach(assessment => {
+      const card = element("div", undefined, "card");
+      card.append(element("span", "Appointment: " + assessment.appointment_id));
+      card.append(element("strong", readable(assessment.outcome)));
+      card.append(element("p", assessment.reason, "small"));
+      overview.append(card);
+    });
+
+    const labs = section("Lab results");
+    if (!data.observations.length) {
+      labs.append(element("p", "No observations returned."));
+    } else {
+      table(labs, ["Result", "Value", "Status", "Result date"],
+        data.observations.map(observation => {
+          const coding = observation.code?.coding?.[0];
+          const quantity = observation.valueQuantity;
+          return [
+            observation.code?.text || coding?.display || coding?.code || "Unlabeled",
+            quantity ? String(quantity.value ?? "—") + " " +
+              (quantity.unit || quantity.code || "") : "Not recorded",
+            observation.status || "Not recorded",
+            date(observation.effectiveDateTime)
+          ];
+        })
+      );
+    }
+
+    const visits = section("Appointments");
+    table(visits, ["Appointment ID", "Start", "Status"],
+      data.appointments.map(appointment => [
+        appointment.id, date(appointment.start), appointment.status || "Not recorded"
+      ])
+    );
+
+    const worklist = section("Worklist");
+    if (!data.work_items.length) {
+      worklist.append(element("p", "No saved work items for this patient."));
+    }
+    data.work_items.forEach(item => {
+      const card = element("div", undefined, "card");
+      card.append(element("strong", item.issue_type.replaceAll("_", " ")));
+      card.append(element("p", "Status: " + item.status));
+      card.append(element("p", "Owner: " + item.owner_role.replaceAll("_", " ")));
+      card.append(element("p", "Next action: " + item.permitted_action));
+      card.append(element("p", "Administrative due time: " + date(item.due_at)));
+
+      const details = element("details");
+      details.append(element("summary", "Resolution history and evidence"));
+      const list = element("ol");
+      item.history.forEach(event => list.append(element("li",
+        date(event.at) + " — " + event.action.replaceAll("_", " ") +
+        " — " + event.actor + ": " + event.reason
+      )));
+      details.append(list);
+      details.append(element("pre", JSON.stringify(item.evidence, null, 2), "small"));
+      card.append(details);
+      worklist.append(card);
+    });
+
+    message.textContent = "Retrieved: " + date(data.retrieved_at);
+  } catch (error) {
+    content.replaceChildren();
+    message.className = "error";
+    message.textContent = "Unable to load records. No information-completeness " +
+      "conclusion was made. " +
+      (error.name === "AbortError" ? "Request timed out." : error.message);
+  } finally {
+    clearTimeout(timer);
+    button.disabled = false;
+    patientSelect.disabled = false;
+  }
+}
+button.addEventListener("click", load);
+patientSelect.addEventListener("change", () => {
+  content.replaceChildren();
+  message.textContent = "Select Load patient to retrieve this patient's records.";
+});
+load();
+</script>
+</body>
+</html>

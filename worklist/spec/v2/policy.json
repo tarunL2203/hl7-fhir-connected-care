@@ -1,0 +1,136 @@
+{
+  "policy_id": "demo-previsit-v2",
+  "version": 2,
+  "clinical_validation": "not_validated",
+  "synthetic_data_only": true,
+  "visit_profiles": {
+    "demo-lab-review": {
+      "description": "Synthetic visit requiring one glucose result",
+      "requirements": [
+        {
+          "requirement_id": "glucose-result",
+          "resource_type": "Observation",
+          "code": {
+            "system": "http://loinc.org",
+            "code": "2345-7"
+          },
+          "lookback_days": 7,
+          "start_inclusive": true,
+          "end_inclusive": false,
+          "accepted_statuses": [
+            "final",
+            "amended",
+            "corrected"
+          ],
+          "require_numeric_value": true,
+          "require_unit": true,
+          "date_field": "effectiveDateTime",
+          "missing_or_ambiguous_date": "unable_to_assess"
+        }
+      ]
+    }
+  },
+  "assessment": {
+    "no_matching_visit_profile": "requirements_not_configured",
+    "unresolved_identity": "unable_to_assess",
+    "retrieval_failed_or_incomplete": "unable_to_assess",
+    "invalid_required_data": "unable_to_assess",
+    "successful_search_without_qualifying_record": "information_gap",
+    "all_requirements_satisfied": "information_complete",
+    "label": "Information availability, not clinical clearance"
+  },
+  "identity": {
+    "source_key": [
+      "source_organization",
+      "identifier_system",
+      "identifier_value"
+    ],
+    "name_only_matching": false,
+    "ambiguous_mapping": "manual_review",
+    "unresolved_reference": "quarantine"
+  },
+  "retrieval": {
+    "follow_all_next_pages": true,
+    "partial_results_can_prove_absence": false,
+    "allowed_fhir_bases": [
+      "http://localhost:8081"
+    ],
+    "external_reference": "unresolved_until_verified"
+  },
+  "ingestion": {
+    "replay": "no_extra_resource_or_work_item",
+    "correction": "update_same_source_record_and_preserve_history",
+    "cancellation": "reassess_affected_requirements",
+    "conflicting_or_out_of_order_update": "manual_review"
+  },
+  "work_items": {
+    "deduplication_key": [
+      "appointment_id",
+      "requirement_id",
+      "issue_type"
+    ],
+    "required_fields": [
+      "patient_id",
+      "appointment_id",
+      "requirement_id",
+      "issue_type",
+      "policy_id",
+      "evidence",
+      "owner_role",
+      "permitted_action",
+      "due_at",
+      "status",
+      "created_at",
+      "updated_at",
+      "history"
+    ],
+    "routing": {
+      "missing_expected_record": {
+        "owner": "records_staff",
+        "action": "Investigate availability and request records"
+      },
+      "unavailable_document": {
+        "owner": "records_staff",
+        "action": "Investigate document access or source"
+      },
+      "identity_unresolved": {
+        "owner": "integration_team",
+        "action": "Review identifier mapping; do not merge by name"
+      },
+      "retrieval_failed": {
+        "owner": "integration_team",
+        "action": "Restore retrieval and rerun assessment"
+      },
+      "invalid_required_data": {
+        "owner": "integration_team",
+        "action": "Investigate source data and rerun assessment"
+      }
+    },
+    "due_time": {
+      "demo_hours_before_appointment": 24,
+      "meaning": "Administrative demo target, not medical urgency",
+      "past_due": "flag_for_owner_review"
+    },
+    "statuses": [
+      "open",
+      "in_review",
+      "resolved"
+    ],
+    "resolution_requires": [
+      "authorized_actor",
+      "fresh_successful_reassessment",
+      "resolution_reason",
+      "timestamp"
+    ],
+    "reappearing_issue": "reopen_existing_item_and_append_history",
+    "clinical_actions": "outside_this_worklist"
+  },
+  "documents": {
+    "scope": [
+      "synthetic_pdf",
+      "synthetic_png"
+    ],
+    "presence_of_link_proves_access": false,
+    "access_test": "through_authorized_document_service"
+  }
+}

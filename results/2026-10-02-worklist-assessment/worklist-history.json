@@ -1,0 +1,59 @@
+{
+  "exported_from": "worklist/data/worklist.sqlite (read-only export; database itself is not committed)",
+  "items": [
+    {
+      "id": 1,
+      "appointment_id": "fixture-v2-a02",
+      "requirement_id": "glucose-result",
+      "issue_type": "missing_expected_record",
+      "payload": {
+        "appointment_id": "fixture-v2-a02",
+        "due_at": "2026-10-05T12:00:00+00:00",
+        "evidence": {
+          "matched_record_ids": [],
+          "outcome": "information_gap",
+          "rejected_records": [],
+          "requirement_id": "glucose-result",
+          "uncertain_records": [],
+          "window_end": "2026-10-06T12:00:00+00:00",
+          "window_start": "2026-09-29T12:00:00+00:00"
+        },
+        "issue_type": "missing_expected_record",
+        "owner_role": "records_staff",
+        "patient_id": "fixture-v2-p02",
+        "permitted_action": "Investigate availability and request records",
+        "policy_id": "demo-previsit-v2",
+        "requirement_id": "glucose-result"
+      },
+      "status": "resolved",
+      "created_at": "2026-10-02T17:39:51.655941+00:00",
+      "updated_at": "2026-10-02T17:42:58.503459+00:00"
+    }
+  ],
+  "history": [
+    {
+      "id": 1,
+      "item_id": 1,
+      "action": "created",
+      "actor": "assessment_engine",
+      "reason": "Issue detected",
+      "at": "2026-10-02T17:39:51.657112+00:00"
+    },
+    {
+      "id": 2,
+      "item_id": 1,
+      "action": "in_review",
+      "actor": "demo-records-user",
+      "reason": "Reviewing synthetic missing-result case",
+      "at": "2026-10-02T17:42:17.318114+00:00"
+    },
+    {
+      "id": 3,
+      "item_id": 1,
+      "action": "resolved",
+      "actor": "demo-records-user",
+      "reason": "Synthetic result received and fresh assessment passed",
+      "at": "2026-10-02T17:42:58.503989+00:00"
+    }
+  ]
+}
