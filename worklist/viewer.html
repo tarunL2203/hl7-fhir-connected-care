@@ -167,6 +167,26 @@ async function load() {
       ])
     );
 
+
+    const documents = section("Documents");
+    if (!(data.documents || []).length) {
+      documents.append(element("p", "No linked documents returned."));
+    }
+    (data.documents || []).forEach(document => {
+      const row = element("p");
+      row.append(element("span", document.title + " "));
+      if (document.open_path) {
+        const link = element("a", "Open document");
+        link.href = document.open_path;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        row.append(link);
+      } else {
+        row.append(element("span", "Opening not configured", "muted"));
+      }
+      documents.append(row);
+    });
+
     const worklist = section("Worklist");
     if (!data.work_items.length) {
       worklist.append(element("p", "No saved work items for this patient."));

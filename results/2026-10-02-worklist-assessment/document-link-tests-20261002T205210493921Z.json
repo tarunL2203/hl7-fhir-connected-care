@@ -1,0 +1,30 @@
+{
+  "tested_at": "2026-10-02T20:52:10.493921+00:00",
+  "scope": "Patient-link and document-registry enforcement; no user authentication",
+  "results": [
+    {
+      "check": "Correct patient PDF",
+      "expected_http": 200,
+      "actual_http": 200,
+      "passed": true
+    },
+    {
+      "check": "Correct patient PNG",
+      "expected_http": 200,
+      "actual_http": 200,
+      "passed": true
+    },
+    {
+      "check": "Wrong patient rejected",
+      "expected_http": 403,
+      "actual_http": 403,
+      "passed": true
+    },
+    {
+      "check": "Unregistered document rejected",
+      "expected_http": 403,
+      "actual_http": 403,
+      "passed": true
+    }
+  ]
+}

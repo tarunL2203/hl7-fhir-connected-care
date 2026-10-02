@@ -1,0 +1,24 @@
+{
+  "bucket": "<S3_BUCKET>",
+  "region": "us-east-2",
+  "aws_profile": "firely-learning",
+  "patient_id": "fixture-v2-p02",
+  "documents": [
+    {
+      "filename": "synthetic-visit-document.pdf",
+      "content_type": "application/pdf",
+      "size_bytes": 1900,
+      "sha256": "3a3ae00cea317b1b61bc17736596ba9ed4f046b4d08abd8af641060423c47749",
+      "document_reference_id": "doc-fixture-v2-p02-pdf",
+      "key": "documents/fixture-v2-p02/synthetic-visit-document.pdf"
+    },
+    {
+      "filename": "synthetic-training-image.png",
+      "content_type": "image/png",
+      "size_bytes": 24402,
+      "sha256": "563efb8213e0f3dfec9835f4de74afcceae555d3356b307edda18454858f7629",
+      "document_reference_id": "doc-fixture-v2-p02-png",
+      "key": "documents/fixture-v2-p02/synthetic-training-image.png"
+    }
+  ]
+}
