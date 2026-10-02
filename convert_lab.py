@@ -1,4 +1,5 @@
 import json
+import uuid
 import sys
 import math
 from datetime import datetime
@@ -40,9 +41,34 @@ measured_at = datetime.strptime(
     message.obr.obr_7.to_er7(), "%Y%m%d%H%M%S%z"
 ).isoformat()
 
+
+order_id = message.obr.obr_3.ei_1.to_er7()
+order_authority = message.obr.obr_3.ei_2.to_er7()
+result_number = obx.obx_1.to_er7()
+sender = message.msh.msh_3.to_er7()
+facility = message.msh.msh_4.to_er7()
+
+if not all([order_id, order_authority, result_number, sender, facility]):
+    raise ValueError("Missing source information needed for a stable lab ID")
+
+source_key = [
+    sender, facility, authority, mrn,
+    order_authority, order_id, result_number
+]
+
+if source_key == [
+    "DEMO", "TRAINING", "DEMO", "SYN002",
+    "DEMO", "SYN-ORDER-002", "1"
+]:
+    lab_id = "demo-glucose-002"
+else:
+    lab_id = "lab-" + str(uuid.uuid5(
+        uuid.NAMESPACE_URL, json.dumps(source_key)
+    ))
+
 observation = {
     "resourceType": "Observation",
-    "id": "demo-glucose-002",
+    "id": lab_id,
     "status": "final",
     "category": [{"coding": [{
         "system": "http://terminology.hl7.org/CodeSystem/observation-category",
