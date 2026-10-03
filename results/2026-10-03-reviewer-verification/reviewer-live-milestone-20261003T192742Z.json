@@ -1,0 +1,80 @@
+{
+  "recorded_at_utc": "2026-10-03T19:27:42.815882+00:00",
+  "milestone": "authenticated reviewer demonstration",
+  "status": "core_live_checks_passed; reentry_pending_user_consent",
+  "live": {
+    "reviewer_login": {
+      "user_confirmed": true,
+      "browser_verified_display": "Demo Reviewer"
+    },
+    "ravi": {
+      "patient_id": "demo-patient-002",
+      "appointment_id": "demo-appointment-002",
+      "appointment_status": "booked",
+      "glucose_values_mg_dl": [
+        95,
+        102
+      ],
+      "observation_statuses": [
+        "final",
+        "final"
+      ],
+      "assessment": "Configured information complete",
+      "documents": "No linked documents returned",
+      "worklist": "No saved work items for this patient"
+    },
+    "resolved_gap_fixture": {
+      "patient_id": "fixture-v2-p02",
+      "appointment_id": "fixture-v2-a02",
+      "appointment_status": "booked",
+      "glucose_value_mg_dl": 95,
+      "observation_status": "final",
+      "assessment": "Configured information complete",
+      "work_item_status": "resolved",
+      "history": [
+        "created",
+        "in_review",
+        "resolved"
+      ],
+      "original_evidence_outcome": "information_gap"
+    },
+    "pdf": {
+      "bytes": 1900,
+      "sha256_matches_registry": true,
+      "format_signature_valid": true,
+      "retrieval": "authenticated browser download through viewer"
+    },
+    "png": {
+      "bytes": 24402,
+      "sha256_matches_registry": true,
+      "format_signature_valid": true,
+      "retrieval": "authenticated browser download through viewer"
+    },
+    "logout": {
+      "both_viewer_tabs_cleared": true,
+      "both_tabs_show_sign_in": true,
+      "provider_session_retained": true,
+      "fresh_consent_page_reached": true
+    },
+    "anonymous_http": {
+      "session_authenticated": false,
+      "summary_status": 401,
+      "document_status": 401,
+      "fhir_readiness_status": 200
+    },
+    "worklist_database_sha256_unchanged": true
+  },
+  "simulated": {
+    "authentication_tests_passed": 21,
+    "workflow_tests_passed": 9,
+    "includes_old_cookie_replay_denial": true,
+    "includes_wrong_patient_document_denial": true,
+    "includes_document_integrity_failure": true
+  },
+  "limitations": [
+    "Old session-cookie replay was verified only in simulated tests, not captured/replayed from the live browser.",
+    "Live unregistered-document navigation was blocked by the browser client, so no live authenticated denial status is claimed; no-linked-documents UI behavior was verified on Ravi.",
+    "Original admin access_denied cause is from historical provider logs; fresh successful reviewer flow was verified.",
+    "Consent to restore access after logout was blocked by automatic approval review pending fresh confirmation."
+  ]
+}
