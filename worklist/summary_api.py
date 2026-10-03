@@ -8,7 +8,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import urlencode, urlsplit
 
-from assess_ravi import BASE, get_json, search
+from auth_fhir import BASE, get_json, search
 from evaluator_v2 import evaluate, patient_reference
 
 ROOT = Path.home() / "firely-learning/worklist"

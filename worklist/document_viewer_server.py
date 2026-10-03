@@ -11,7 +11,7 @@ from urllib.parse import urlencode, urlsplit
 
 from viewer_server import ViewerHandler
 from summary_api import ROOT, summary
-from assess_ravi import BASE, get_json, search
+from auth_fhir import BASE, get_json, search
 from evaluator_v2 import patient_reference
 
 def configuration():

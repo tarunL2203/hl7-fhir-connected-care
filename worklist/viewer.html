@@ -39,8 +39,11 @@ li{margin:8px 0}
 <h1>Visit Information Worklist</h1>
 <p class="muted">Review expected information and follow up on unresolved gaps.</p>
 <p class="small muted">Synthetic learning demo · Information availability,
-not clinical clearance · Local access without sign-in</p>
+not clinical clearance · Signed-in reviewer access</p>
 
+<div class="toolbar"><span id="signed-in">Checking session…</span>
+<button id="logout" type="button">Sign out of viewer</button>
+</div>
 <div class="toolbar">
 <label for="patient">Patient</label>
 <select id="patient">
@@ -59,6 +62,67 @@ const patientSelect = document.getElementById("patient");
 const button = document.getElementById("load");
 const message = document.getElementById("message");
 const content = document.getElementById("content");
+const logoutButton = document.getElementById("logout");
+let csrfToken = null;
+let requestGeneration = 0;
+let activeController = null;
+let sessionEnded = false;
+let expiryTimer = null;
+const sessionChannel = new BroadcastChannel("firely-viewer-session");
+sessionChannel.onmessage = event => {
+  if (event.data === "signed_out") {
+    clearPrivateView();
+    location.replace("/");
+  }
+};
+function clearPrivateView() {
+  sessionEnded = true;
+  requestGeneration++;
+  activeController?.abort();
+  content.replaceChildren();
+  button.disabled = true;
+  patientSelect.disabled = true;
+}
+async function checkSession() {
+  const response = await fetch("/auth/session", {cache: "no-store"});
+  const data = await response.json();
+  if (!response.ok || !data.authenticated) {
+    clearPrivateView();
+    location.replace("/");
+    throw new Error("Sign-in required.");
+  }
+  csrfToken = data.csrf;
+  document.getElementById("signed-in").textContent = "Signed in: " + data.name;
+  clearTimeout(expiryTimer);
+  expiryTimer = setTimeout(() => {
+    clearPrivateView();
+    location.replace("/");
+  }, Math.max(0, data.expires_at * 1000 - Date.now()));
+}
+logoutButton.addEventListener("click", async () => {
+  clearPrivateView();
+  logoutButton.disabled = true;
+  message.textContent = "Signing out…";
+  try {
+    const response = await fetch("/auth/logout", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({csrf: csrfToken}), cache: "no-store"
+    });
+    if (!response.ok) throw new Error("Sign-out could not be confirmed. Retry.");
+    sessionChannel.postMessage("signed_out");
+    location.replace("/");
+  } catch (error) {
+    message.textContent = error.message;
+    logoutButton.disabled = false;
+  }
+});
+window.addEventListener("pageshow", () => {
+  content.replaceChildren();
+  checkSession().catch(() => { clearPrivateView(); });
+});
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) checkSession().catch(() => { clearPrivateView(); });
+});
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -105,6 +169,8 @@ function table(section, headings, rows) {
   section.append(wrap);
 }
 async function load() {
+  if (sessionEnded) return;
+  const generation = ++requestGeneration;
   button.disabled = true;
   patientSelect.disabled = true;
   content.replaceChildren();
@@ -112,13 +178,22 @@ async function load() {
   message.textContent = "Loading current records…";
 
   const controller = new AbortController();
+  activeController = controller;
   const timer = setTimeout(() => controller.abort(), 180000);
   try {
+    await checkSession();
+    if (sessionEnded || generation !== requestGeneration) return;
     const response = await fetch(
       "/patients/" + encodeURIComponent(patientSelect.value) + "/summary",
       {cache:"no-store", signal:controller.signal}
     );
     const data = await response.json();
+    if (sessionEnded || generation !== requestGeneration) return;
+    if (response.status === 401) {
+      clearPrivateView();
+      location.replace("/");
+      return;
+    }
     if (!response.ok) throw new Error(data.error || "Retrieval failed");
 
     const patient = section("Patient");
@@ -214,6 +289,7 @@ async function load() {
 
     message.textContent = "Retrieved: " + date(data.retrieved_at);
   } catch (error) {
+    if (sessionEnded || generation !== requestGeneration) return;
     content.replaceChildren();
     message.className = "error";
     message.textContent = "Unable to load records. No information-completeness " +
@@ -221,8 +297,10 @@ async function load() {
       (error.name === "AbortError" ? "Request timed out." : error.message);
   } finally {
     clearTimeout(timer);
-    button.disabled = false;
-    patientSelect.disabled = false;
+    if (!sessionEnded && generation === requestGeneration) {
+      button.disabled = false;
+      patientSelect.disabled = false;
+    }
   }
 }
 button.addEventListener("click", load);
