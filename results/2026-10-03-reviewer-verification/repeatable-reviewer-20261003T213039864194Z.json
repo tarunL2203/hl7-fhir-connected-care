@@ -1,0 +1,134 @@
+{
+  "mode": "reviewer",
+  "live": true,
+  "at": "2026-10-03T21:30:39.864220+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "check": "FHIR readiness",
+      "passed": true,
+      "detail": {
+        "http": 200
+      }
+    },
+    {
+      "check": "FHIR anonymous Patient denial",
+      "passed": true,
+      "detail": {
+        "http": 401
+      }
+    },
+    {
+      "check": "viewer health",
+      "passed": true,
+      "detail": {
+        "http": 200
+      }
+    },
+    {
+      "check": "anonymous summary denial",
+      "passed": true,
+      "detail": {
+        "http": 401
+      }
+    },
+    {
+      "check": "anonymous document denial",
+      "passed": true,
+      "detail": {
+        "http": 401
+      }
+    },
+    {
+      "check": "Auth TLS and discovery issuer",
+      "passed": true,
+      "detail": {
+        "trusted_tls": true,
+        "issuer_matches": true
+      }
+    },
+    {
+      "check": "authenticated summary demo-patient-002",
+      "passed": true,
+      "detail": {
+        "patient_id": "demo-patient-002",
+        "observations": 2,
+        "appointments": 1,
+        "assessments": [
+          "information_complete"
+        ],
+        "worklist_statuses": []
+      }
+    },
+    {
+      "check": "authenticated summary fixture-v2-p02",
+      "passed": true,
+      "detail": {
+        "patient_id": "fixture-v2-p02",
+        "observations": 1,
+        "appointments": 1,
+        "assessments": [
+          "information_complete"
+        ],
+        "worklist_statuses": [
+          "resolved"
+        ]
+      }
+    },
+    {
+      "check": "authenticated document doc-fixture-v2-p02-pdf",
+      "passed": true,
+      "detail": {
+        "bytes": 1900,
+        "sha256_matches": true
+      }
+    },
+    {
+      "check": "authenticated document doc-fixture-v2-p02-png",
+      "passed": true,
+      "detail": {
+        "bytes": 24402,
+        "sha256_matches": true
+      }
+    },
+    {
+      "check": "wrong-patient document denied",
+      "passed": true,
+      "detail": {
+        "http": 403
+      }
+    },
+    {
+      "check": "unregistered document denied",
+      "passed": true,
+      "detail": {
+        "http": 403
+      }
+    },
+    {
+      "check": "logout CSRF enforcement",
+      "passed": true,
+      "detail": {
+        "invalid_csrf_denied": true,
+        "wrong_origin_denied": true,
+        "session_retained": true
+      }
+    },
+    {
+      "check": "real logout and old-session-cookie replay",
+      "passed": true,
+      "detail": {
+        "logout": 200,
+        "old_cookie_summary": 401,
+        "old_cookie_document": 401,
+        "old_cookie_authenticated": false,
+        "logout_replay": 403
+      }
+    },
+    {
+      "check": "worklist preserved",
+      "passed": true,
+      "detail": null
+    }
+  ]
+}

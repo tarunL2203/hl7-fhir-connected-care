@@ -6,6 +6,10 @@ PKCE to the existing synthetic learning viewer. The registered callback is
 
 ## Installation and startup
 
+For this already-installed project, use [repeatable verification and startup](README-verification.md).
+The package installation instructions below are historical; do not rerun the old installer
+over the current milestone.
+
 Extract this package under `~/Downloads/viewer-auth-update/`.
 Stop the old document viewer with Ctrl+C in its terminal. Keep Docker running.
 
@@ -60,9 +64,10 @@ the viewer reads the loopback FHIR service at `http://localhost:8081`.
 
 **Sign out of viewer ends the viewer's session. It does not end Firely Auth's
 separate sign-in session.** A subsequent sign-in can reuse the provider session.
-The Auth dashboard's activation/reset/logout links pointing at
-`http://localhost:3000` remain a separate configuration issue. The viewer's
-own logout does not use those links. No SSO/global-logout completion is claimed.
+The earlier development-mode redirect to `http://localhost:3000` was repaired by
+running the same Auth image in the Production environment with its existing volumes.
+The login UI now uses `https://localhost:5001`. Activation/reset and global provider
+logout have not been included in the reviewer milestone. The viewer's own logout is separate.
 
 The current access model is restricted to the explicit synthetic demo reviewer;
 it is not a general care-team or organization authorization policy. Existing

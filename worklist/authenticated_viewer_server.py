@@ -154,7 +154,8 @@ class AuthenticatedHandler(DocumentHandler):
         except Exception:
             self.send_json(403, {"error": "invalid_logout_request"})
 
-def main():
+def create_server():
+    """Build the same verified HTTPS server for normal use and live verification."""
     certs = Path.home() / "firely-learning/auth/certs"
     try:
         auth = AuthService(Provider(certs / "local-rootCA.crt"))
@@ -166,6 +167,11 @@ def main():
         server.socket = context.wrap_socket(server.socket, server_side=True)
     except AuthError as error:
         raise SystemExit("Viewer startup stopped: " + str(error))
+    return server
+
+def main():
+    server = create_server()
+    auth = server.auth
     print("Authenticated viewer: " + ORIGIN, flush=True)
     print("Keep this terminal open. Ctrl+C stops the viewer.", flush=True)
     try:

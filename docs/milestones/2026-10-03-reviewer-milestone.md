@@ -144,3 +144,7 @@ Visual evidence: worklist/evidence/reviewer-milestone-signed-in.jpg
 Final viewer URL: https://localhost:8082/
 
 This milestone ends here. No additional project phase has been started. Remaining live negative-test gaps (old-cookie replay and authenticated wrong-document status) are explicitly documented above; their passing simulated tests are not relabeled as live tests.
+
+## Subsequent verification milestone
+
+The previously documented live old-cookie replay and authenticated wrong-document rejection gaps were closed on October 3, 2026 by the repeatable real-login runner (15/15 live checks passed). See REPEATABLE-VERIFICATION-MILESTONE-2026-10-03.md and worklist/evidence/repeatable-reviewer-20261003T213039864194Z.json. Earlier descriptions above retain the evidence available at that time.
