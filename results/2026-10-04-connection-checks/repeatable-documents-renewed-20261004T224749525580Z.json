@@ -1,0 +1,22 @@
+{
+  "mode": "documents-renewed",
+  "live": true,
+  "at": "2026-10-04T22:47:49.525694+00:00",
+  "passed": true,
+  "checks": [
+    {
+      "check": "Existing document application/pdf",
+      "passed": true,
+      "detail": {
+        "size_matches": true
+      }
+    },
+    {
+      "check": "Existing document image/png",
+      "passed": true,
+      "detail": {
+        "size_matches": true
+      }
+    }
+  ]
+}

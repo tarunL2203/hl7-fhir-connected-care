@@ -1,0 +1,36 @@
+{
+  "mode": "connection-followup",
+  "live": true,
+  "at": "2026-10-04T22:43:15.746715+00:00",
+  "passed": false,
+  "checks": [
+    {
+      "check": "direct FHIR readiness",
+      "passed": false,
+      "reason": "http_402"
+    },
+    {
+      "check": "direct Auth discovery",
+      "passed": false,
+      "reason": "http_402"
+    },
+    {
+      "check": "Mailpit UI",
+      "passed": true,
+      "detail": {
+        "http": 200,
+        "direct_no_proxy": true
+      }
+    },
+    {
+      "check": "Existing document metadata application/pdf",
+      "passed": false,
+      "reason": "aws_login_required: aws login --profile firely-learning"
+    },
+    {
+      "check": "Existing document metadata image/png",
+      "passed": false,
+      "reason": "aws_login_required: aws login --profile firely-learning"
+    }
+  ]
+}
