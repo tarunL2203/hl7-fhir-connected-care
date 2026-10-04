@@ -1,0 +1,8 @@
+{
+  "role_arn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/firely-snowflake-read-5dd08717",
+  "trust_principal": "arn:aws:iam::<SNOWFLAKE_AWS_ACCOUNT>:user/<snowflake-iam-user>",
+  "external_id_condition_verified": true,
+  "policy_verified": true,
+  "read_only": true,
+  "scope": "analytics-demo/synthetic-20261004T225801Z-5dd08717/"
+}

@@ -1,0 +1,12 @@
+{
+  "live_browser_observed": true,
+  "account": "<SNOWFLAKE_ACCOUNT>",
+  "user": "<SNOWFLAKE_USER>",
+  "original_role": "CHATGPT_ROLE",
+  "available_existing_admin_role": "ACCOUNTADMIN",
+  "warehouse": {"name":"CHATGPT_WH","size":"X-Small","state_at_inventory":"STARTED","auto_suspend_seconds":60,"auto_resume":true},
+  "existing_database":"CHATGPT_LAB",
+  "trial_credit_display":"$395 of $400 left",
+  "trial_days_remaining_display":96,
+  "no_new_warehouse_or_paid_upgrade":true
+}

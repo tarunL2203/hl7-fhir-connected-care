@@ -1,0 +1,47 @@
+{
+  "live": true,
+  "at": "2026-10-04T22:59:49.519494+00:00",
+  "bucket": "<S3_BUCKET>",
+  "prefix": "analytics-demo/synthetic-20261004T225801Z-5dd08717/",
+  "objects": [
+    {
+      "key": "analytics-demo/synthetic-20261004T225801Z-5dd08717/patient.ndjson",
+      "bytes": 586,
+      "sha256": "64c90a58ec8247f6a4cd98046ac3dc2aaea1f552067cddc96771d06210022263",
+      "download_sha256_matches": true,
+      "encryption": "AES256",
+      "already_existed": false
+    },
+    {
+      "key": "analytics-demo/synthetic-20261004T225801Z-5dd08717/observation.ndjson",
+      "bytes": 1743,
+      "sha256": "97b8b6f2924a73a10b74524cdcff08331db1a4816bd19cd4da3639610530164e",
+      "download_sha256_matches": true,
+      "encryption": "AES256",
+      "already_existed": false
+    },
+    {
+      "key": "analytics-demo/synthetic-20261004T225801Z-5dd08717/appointment.ndjson",
+      "bytes": 747,
+      "sha256": "9aa8185ee3d5b4ac3bce204dadbe1f94faa08458db73001d2fa3daf2248d94b0",
+      "download_sha256_matches": true,
+      "encryption": "AES256",
+      "already_existed": false
+    },
+    {
+      "key": "analytics-demo/synthetic-20261004T225801Z-5dd08717/manifest.json",
+      "bytes": 2114,
+      "sha256": "f6f310a45787b9318651d4e8a5d2bc7583d2c9aff72bc7b3eea16033931dfa3a",
+      "download_sha256_matches": true,
+      "encryption": "AES256",
+      "already_existed": false
+    }
+  ],
+  "passed": true,
+  "public_access_block": {
+    "BlockPublicAcls": true,
+    "IgnorePublicAcls": true,
+    "BlockPublicPolicy": true,
+    "RestrictPublicBuckets": true
+  }
+}

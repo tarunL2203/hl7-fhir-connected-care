@@ -1,0 +1,29 @@
+{
+  "simulation": [
+    {
+      "EvalActionName": "s3:GetObject",
+      "EvalResourceName": "arn:aws:s3:::<S3_BUCKET>/analytics-demo/synthetic-20261004T225801Z-5dd08717/patient.ndjson",
+      "EvalDecision": "explicitDeny",
+      "MatchedStatements": [],
+      "MissingContextValues": [],
+      "OrganizationsDecisionDetail": {
+        "AllowedByOrganizations": false
+      },
+      "EvalDecisionDetails": {},
+      "ResourceSpecificResults": [
+        {
+          "EvalResourceName": "arn:aws:s3:::<S3_BUCKET>/analytics-demo/synthetic-20261004T225801Z-5dd08717/patient.ndjson",
+          "EvalResourceDecision": "explicitDeny"
+        }
+      ]
+    }
+  ],
+  "cloudtrail_global": [],
+  "organization": {
+    "id": "<AWS_ORG_ID>",
+    "feature_set": "ALL"
+  },
+  "scp": {
+    "error_code": "AccessDeniedException"
+  }
+}

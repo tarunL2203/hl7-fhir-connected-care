@@ -1,0 +1,21 @@
+{
+  "evidence_type": "AWS policy simulation; not an actual Snowflake object request",
+  "results": [
+    {
+      "check": "batch_read",
+      "decision": "explicitDeny"
+    },
+    {
+      "check": "existing_documents_denied",
+      "decision": "explicitDeny"
+    },
+    {
+      "check": "upload_denied",
+      "decision": "explicitDeny"
+    },
+    {
+      "check": "delete_denied",
+      "decision": "explicitDeny"
+    }
+  ]
+}

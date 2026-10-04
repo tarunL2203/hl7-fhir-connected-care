@@ -1,0 +1,49 @@
+{
+  "live": true,
+  "authorized_normal_reviewer_session": true,
+  "batch_id": "synthetic-20261004T225801Z-5dd08717",
+  "counts": {
+    "Patient": 2,
+    "Observation": 3,
+    "Appointment": 2
+  },
+  "ids": {
+    "Patient": [
+      "demo-patient-002",
+      "fixture-v2-p02"
+    ],
+    "Observation": [
+      "demo-glucose-002",
+      "fixture-v2-p02-glucose-001",
+      "lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4"
+    ],
+    "Appointment": [
+      "demo-appointment-002",
+      "fixture-v2-a02"
+    ]
+  },
+  "source_comparison_passed": true,
+  "pagination": [
+    {
+      "path": "Observation?subject=Patient%2Fdemo-patient-002&_count=1",
+      "pages": 3,
+      "records": 2
+    },
+    {
+      "path": "Appointment?actor=Patient%2Fdemo-patient-002&_count=1",
+      "pages": 2,
+      "records": 1
+    },
+    {
+      "path": "Observation?subject=Patient%2Ffixture-v2-p02&_count=1",
+      "pages": 2,
+      "records": 1
+    },
+    {
+      "path": "Appointment?actor=Patient%2Ffixture-v2-p02&_count=1",
+      "pages": 2,
+      "records": 1
+    }
+  ],
+  "manifest_sha256": "f6f310a45787b9318651d4e8a5d2bc7583d2c9aff72bc7b3eea16033931dfa3a"
+}

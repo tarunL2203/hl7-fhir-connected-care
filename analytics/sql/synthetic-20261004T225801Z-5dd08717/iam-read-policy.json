@@ -1,0 +1,35 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetBucketLocation"
+      ],
+      "Resource": "arn:aws:s3:::<S3_BUCKET>"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:ListBucket"
+      ],
+      "Resource": "arn:aws:s3:::<S3_BUCKET>",
+      "Condition": {
+        "StringLike": {
+          "s3:prefix": [
+            "analytics-demo/synthetic-20261004T225801Z-5dd08717/",
+            "analytics-demo/synthetic-20261004T225801Z-5dd08717/*"
+          ]
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:GetObjectVersion"
+      ],
+      "Resource": "arn:aws:s3:::<S3_BUCKET>/analytics-demo/synthetic-20261004T225801Z-5dd08717/*"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+test_accepts_matching_payload (test_reconcile.ReconciliationTests.test_accepts_matching_payload) ... ok
+test_rejects_altered_payload (test_reconcile.ReconciliationTests.test_rejects_altered_payload) ... ok
+test_rejects_duplicate (test_reconcile.ReconciliationTests.test_rejects_duplicate) ... ok
+test_rejects_missing (test_reconcile.ReconciliationTests.test_rejects_missing) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.004s
+
+OK

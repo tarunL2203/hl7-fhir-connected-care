@@ -1,0 +1,96 @@
+{
+  "identity": {
+    "passed": true,
+    "arn": "arn:aws:sts::<AWS_ACCOUNT_ID>:assumed-role/AccountFullAccessRole/<SESSION>",
+    "account": "<AWS_ACCOUNT_ID>"
+  },
+  "public_access_block": {
+    "passed": true,
+    "configuration": {
+      "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": true,
+        "RestrictPublicBuckets": true
+      }
+    }
+  },
+  "encryption": {
+    "passed": true,
+    "configuration": {
+      "ServerSideEncryptionConfiguration": {
+        "Rules": [
+          {
+            "ApplyServerSideEncryptionByDefault": {
+              "SSEAlgorithm": "AES256"
+            },
+            "BucketKeyEnabled": true,
+            "BlockedEncryptionTypes": {
+              "EncryptionType": [
+                "SSE-C"
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "policy_status": {
+    "passed": false,
+    "error_code": "NoSuchBucketPolicy"
+  },
+  "ownership": {
+    "passed": true,
+    "configuration": {
+      "OwnershipControls": {
+        "Rules": [
+          {
+            "ObjectOwnership": "BucketOwnerEnforced"
+          }
+        ]
+      }
+    }
+  },
+  "acl": {
+    "passed": true,
+    "configuration": [
+      {
+        "Grantee": {
+          "ID": "14ef3cce93bbf186013c97e927ede31f46b39f125eb6555db7b4813eda6e4abe",
+          "Type": "CanonicalUser"
+        },
+        "Permission": "FULL_CONTROL"
+      }
+    ]
+  },
+  "analytics_prefix": {
+    "passed": true,
+    "key_count": 0,
+    "truncated": false
+  },
+  "iam_capability_simulation": {
+    "passed": true,
+    "decisions": [
+      {
+        "action": "iam:CreateRole",
+        "decision": "allowed"
+      },
+      {
+        "action": "iam:PutRolePolicy",
+        "decision": "allowed"
+      },
+      {
+        "action": "iam:UpdateAssumeRolePolicy",
+        "decision": "allowed"
+      },
+      {
+        "action": "iam:GetRole",
+        "decision": "allowed"
+      },
+      {
+        "action": "s3:PutObject",
+        "decision": "explicitDeny"
+      }
+    ]
+  }
+}
