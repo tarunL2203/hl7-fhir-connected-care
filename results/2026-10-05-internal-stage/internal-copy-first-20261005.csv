@@ -1,0 +1,4 @@
+COPY_QUERY_ID,file,status,rows_parsed,rows_loaded,error_limit,errors_seen,first_error,first_error_line,first_error_character,first_error_column_name
+01c784f7-0108-b568-0010-b2a6000b53a2,fhir_internal_stage/observation.ndjson,LOADED,3,3,1,0,,,,
+01c784f7-0108-b568-0010-b2a6000b53a2,fhir_internal_stage/appointment.ndjson,LOADED,2,2,1,0,,,,
+01c784f7-0108-b568-0010-b2a6000b53a2,fhir_internal_stage/patient.ndjson,LOADED,2,2,1,0,,,,

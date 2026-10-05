@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "actual_csvs_identical": true,
+  "valid_patient_links": [
+    {
+      "resource": "demo-appointment-002",
+      "patient": "demo-patient-002"
+    },
+    {
+      "resource": "fixture-v2-a02",
+      "patient": "fixture-v2-p02"
+    },
+    {
+      "resource": "demo-glucose-002",
+      "patient": "demo-patient-002"
+    },
+    {
+      "resource": "fixture-v2-p02-glucose-001",
+      "patient": "fixture-v2-p02"
+    },
+    {
+      "resource": "lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4",
+      "patient": "demo-patient-002"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "mode": "preflight",
+  "live": true,
+  "at": "2026-10-05T04:22:27.856178+00:00",
+  "passed": false,
+  "checks": [
+    {
+      "check": "existing Docker containers",
+      "passed": true,
+      "detail": {
+        "firely-learning-mailpit": "running",
+        "firely-learning-auth": "running",
+        "firely-learning-aws": "running"
+      }
+    },
+    {
+      "check": "AWS login session",
+      "passed": false,
+      "reason": "aws_login_required: aws login --profile firely-learning"
+    },
+    {
+      "check": "stable native IPv4 egress",
+      "passed": true,
+      "detail": "<PUBLIC_IP>/32"
+    },
+    {
+      "check": "RDS availability",
+      "passed": false,
+      "reason": "aws_login_required: aws login --profile firely-learning"
+    },
+    {
+      "check": "current IPv4 security-group access",
+      "passed": false,
+      "reason": "prerequisite_unavailable"
+    },
+    {
+      "check": "configured SQL TLS settings and IPv4 TCP",
+      "passed": false,
+      "reason": "prerequisite_unavailable"
+    }
+  ]
+}

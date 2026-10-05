@@ -1,3 +1,5 @@
+> Current milestone: internal-stage alternative PASSED October 5. See ../SNOWFLAKE-INTERNAL-RAW-MILESTONE-2026-10-05.md. Warehouse FIRELY_DEMO_WH; stage FHIR_INTERNAL_STAGE; table FHIR_RESOURCE_INTERNAL in CHATGPT_LAB.FIRELY_RAW_5DD08717. Original S3 flow below remains blocked.
+
 # Synthetic Firely → private S3 → Snowflake RAW
 
 Only the two synthetic patients established by the reviewer milestone are in scope.

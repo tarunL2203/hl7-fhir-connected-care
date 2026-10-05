@@ -1,3 +1,5 @@
+> UPDATE October 5: User-approved internal-stage alternative PASSED using newly requested FIRELY_DEMO_WH. See SNOWFLAKE-INTERNAL-RAW-MILESTONE-2026-10-05.md before following historical resume steps. Exact 7 records loaded and reconciled; repeat added zero rows. Original AWS S3 integration remains blocked. Do not recreate completed objects.
+
 # AWS S3 to Snowflake RAW ingestion — October 4, 2026
 
 Status: BLOCKED — the reviewer demonstration passed, but the RAW ingestion milestone has not passed. The scoped integration is enabled and RAW objects exist. Live stage LIST failed with Snowflake error 3167: AWS denied sts:AssumeRole. COPY has not been executed.

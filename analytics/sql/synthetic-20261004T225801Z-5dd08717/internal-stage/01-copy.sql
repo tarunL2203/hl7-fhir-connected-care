@@ -1,0 +1,10 @@
+USE WAREHOUSE FIRELY_DEMO_WH;
+ALTER SESSION SET STATEMENT_TIMEOUT_IN_SECONDS=120;
+COPY INTO CHATGPT_LAB.FIRELY_RAW_5DD08717.FHIR_RESOURCE_INTERNAL
+ (payload, resource_type, resource_id, batch_id, source_filename, file_row_number, loaded_at)
+ FROM (SELECT t.$1, t.$1:resourceType::VARCHAR, t.$1:id::VARCHAR,
+              'synthetic-20261004T225801Z-5dd08717', METADATA$FILENAME, METADATA$FILE_ROW_NUMBER,
+              METADATA$START_SCAN_TIME FROM @CHATGPT_LAB.FIRELY_RAW_5DD08717.FHIR_INTERNAL_STAGE t)
+ FILES = ('patient.ndjson', 'observation.ndjson', 'appointment.ndjson')
+ ON_ERROR = ABORT_STATEMENT FORCE = FALSE PURGE = FALSE;
+

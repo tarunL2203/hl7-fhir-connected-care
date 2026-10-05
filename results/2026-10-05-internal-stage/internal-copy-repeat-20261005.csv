@@ -1,0 +1,4 @@
+COPY_QUERY_ID,file,status,rows_parsed,rows_loaded,error_limit,errors_seen,first_error,first_error_line,first_error_character,first_error_column_name
+01c784f8-0108-bfed-0010-b2a6000cf27a,fhir_internal_stage/appointment.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,
+01c784f8-0108-bfed-0010-b2a6000cf27a,fhir_internal_stage/observation.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,
+01c784f8-0108-bfed-0010-b2a6000cf27a,fhir_internal_stage/patient.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,

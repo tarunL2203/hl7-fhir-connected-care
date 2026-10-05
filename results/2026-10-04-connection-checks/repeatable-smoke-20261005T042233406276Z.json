@@ -1,0 +1,45 @@
+{
+  "mode": "smoke",
+  "live": true,
+  "at": "2026-10-05T04:22:33.406379+00:00",
+  "passed": false,
+  "checks": [
+    {
+      "check": "FHIR readiness",
+      "passed": true,
+      "detail": {
+        "http": 200
+      }
+    },
+    {
+      "check": "FHIR anonymous Patient denial",
+      "passed": true,
+      "detail": {
+        "http": 401
+      }
+    },
+    {
+      "check": "viewer health",
+      "passed": false,
+      "reason": "URLError"
+    },
+    {
+      "check": "anonymous summary denial",
+      "passed": false,
+      "reason": "URLError"
+    },
+    {
+      "check": "anonymous document denial",
+      "passed": false,
+      "reason": "URLError"
+    },
+    {
+      "check": "Auth TLS and discovery issuer",
+      "passed": true,
+      "detail": {
+        "trusted_tls": true,
+        "issuer_matches": true
+      }
+    }
+  ]
+}

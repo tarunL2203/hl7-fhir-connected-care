@@ -1,0 +1,38 @@
+{
+  "mode": "preflight",
+  "live": true,
+  "at": "2026-10-05T04:22:14.982032+00:00",
+  "passed": false,
+  "checks": [
+    {
+      "check": "existing Docker containers",
+      "passed": false,
+      "reason": "docker_unavailable_or_permission_denied"
+    },
+    {
+      "check": "AWS login session",
+      "passed": false,
+      "reason": "command_failed"
+    },
+    {
+      "check": "stable native IPv4 egress",
+      "passed": false,
+      "reason": "command_failed"
+    },
+    {
+      "check": "RDS availability",
+      "passed": false,
+      "reason": "command_failed"
+    },
+    {
+      "check": "current IPv4 security-group access",
+      "passed": false,
+      "reason": "prerequisite_unavailable"
+    },
+    {
+      "check": "configured SQL TLS settings and IPv4 TCP",
+      "passed": false,
+      "reason": "prerequisite_unavailable"
+    }
+  ]
+}

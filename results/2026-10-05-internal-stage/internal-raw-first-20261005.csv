@@ -1,0 +1,189 @@
+PAYLOAD,RESOURCE_TYPE,RESOURCE_ID,BATCH_ID,SOURCE_FILENAME,FILE_ROW_NUMBER,LOADED_AT
+"{
+  ""description"": ""Fictional training visit"",
+  ""end"": ""2026-10-06T09:30:00-04:00"",
+  ""id"": ""demo-appointment-002"",
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T13:53:32.869+00:00"",
+    ""versionId"": ""f38ad2a1-6c01-4c83-9201-288e04cc6ec3""
+  },
+  ""participant"": [
+    {
+      ""actor"": {
+        ""reference"": ""http://localhost:8081/Patient/demo-patient-002""
+      },
+      ""status"": ""accepted""
+    }
+  ],
+  ""resourceType"": ""Appointment"",
+  ""start"": ""2026-10-06T09:00:00-04:00"",
+  ""status"": ""booked""
+}",Appointment,demo-appointment-002,synthetic-20261004T225801Z-5dd08717,appointment.ndjson,1,2026-10-04 21:39:27.020 -0700
+"{
+  ""end"": ""2026-10-06T12:30:00Z"",
+  ""id"": ""fixture-v2-a02"",
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T17:39:00.111+00:00"",
+    ""versionId"": ""d2212a0d-8d08-4087-8b24-9608f50812a6""
+  },
+  ""participant"": [
+    {
+      ""actor"": {
+        ""reference"": ""http://localhost:8081/Patient/fixture-v2-p02""
+      },
+      ""status"": ""accepted""
+    }
+  ],
+  ""resourceType"": ""Appointment"",
+  ""start"": ""2026-10-06T12:00:00Z"",
+  ""status"": ""booked""
+}",Appointment,fixture-v2-a02,synthetic-20261004T225801Z-5dd08717,appointment.ndjson,2,2026-10-04 21:39:27.020 -0700
+"{
+  ""category"": [
+    {
+      ""coding"": [
+        {
+          ""code"": ""laboratory"",
+          ""system"": ""http://terminology.hl7.org/CodeSystem/observation-category""
+        }
+      ]
+    }
+  ],
+  ""code"": {
+    ""coding"": [
+      {
+        ""code"": ""2345-7"",
+        ""display"": ""Glucose serum or plasma"",
+        ""system"": ""http://loinc.org""
+      }
+    ]
+  },
+  ""effectiveDateTime"": ""2026-10-01T09:00:00-04:00"",
+  ""id"": ""demo-glucose-002"",
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T13:53:29.736+00:00"",
+    ""versionId"": ""7436df43-0771-4108-b2a2-e7025b010903""
+  },
+  ""resourceType"": ""Observation"",
+  ""status"": ""final"",
+  ""subject"": {
+    ""reference"": ""http://localhost:8081/Patient/demo-patient-002""
+  },
+  ""valueQuantity"": {
+    ""code"": ""mg/dL"",
+    ""system"": ""http://unitsofmeasure.org"",
+    ""unit"": ""mg/dL"",
+    ""value"": 95
+  }
+}",Observation,demo-glucose-002,synthetic-20261004T225801Z-5dd08717,observation.ndjson,1,2026-10-04 21:39:27.014 -0700
+"{
+  ""code"": {
+    ""coding"": [
+      {
+        ""code"": ""2345-7"",
+        ""display"": ""Glucose"",
+        ""system"": ""http://loinc.org""
+      }
+    ]
+  },
+  ""effectiveDateTime"": ""2026-10-05T12:00:00Z"",
+  ""id"": ""fixture-v2-p02-glucose-001"",
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T17:42:37.237+00:00"",
+    ""versionId"": ""b643b54b-3d5e-4ad2-a8b6-987d6d779d23""
+  },
+  ""resourceType"": ""Observation"",
+  ""status"": ""final"",
+  ""subject"": {
+    ""reference"": ""http://localhost:8081/Patient/fixture-v2-p02""
+  },
+  ""valueQuantity"": {
+    ""code"": ""mg/dL"",
+    ""system"": ""http://unitsofmeasure.org"",
+    ""unit"": ""mg/dL"",
+    ""value"": 95
+  }
+}",Observation,fixture-v2-p02-glucose-001,synthetic-20261004T225801Z-5dd08717,observation.ndjson,2,2026-10-04 21:39:27.014 -0700
+"{
+  ""category"": [
+    {
+      ""coding"": [
+        {
+          ""code"": ""laboratory"",
+          ""system"": ""http://terminology.hl7.org/CodeSystem/observation-category""
+        }
+      ]
+    }
+  ],
+  ""code"": {
+    ""coding"": [
+      {
+        ""code"": ""2345-7"",
+        ""display"": ""Glucose serum or plasma"",
+        ""system"": ""http://loinc.org""
+      }
+    ]
+  },
+  ""effectiveDateTime"": ""2026-10-01T10:00:00-04:00"",
+  ""id"": ""lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4"",
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T13:50:16.684+00:00"",
+    ""versionId"": ""20ca7313-687f-43f5-88ed-e12532fe98a1""
+  },
+  ""resourceType"": ""Observation"",
+  ""status"": ""final"",
+  ""subject"": {
+    ""reference"": ""http://localhost:8081/Patient/demo-patient-002""
+  },
+  ""valueQuantity"": {
+    ""code"": ""mg/dL"",
+    ""system"": ""http://unitsofmeasure.org"",
+    ""unit"": ""mg/dL"",
+    ""value"": 102
+  }
+}",Observation,lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4,synthetic-20261004T225801Z-5dd08717,observation.ndjson,3,2026-10-04 21:39:27.014 -0700
+"{
+  ""birthDate"": ""1985-05-12"",
+  ""id"": ""demo-patient-002"",
+  ""identifier"": [
+    {
+      ""system"": ""https://example.org/training/mrn"",
+      ""value"": ""SYN002""
+    }
+  ],
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T13:50:07.64+00:00"",
+    ""versionId"": ""3875250c-c374-4481-9c24-ba832c12e112""
+  },
+  ""name"": [
+    {
+      ""family"": ""Demo"",
+      ""given"": [
+        ""Ravi""
+      ]
+    }
+  ],
+  ""resourceType"": ""Patient""
+}",Patient,demo-patient-002,synthetic-20261004T225801Z-5dd08717,patient.ndjson,1,2026-10-04 21:39:27.015 -0700
+"{
+  ""id"": ""fixture-v2-p02"",
+  ""identifier"": [
+    {
+      ""system"": ""urn:demo:training-hospital:mrn"",
+      ""value"": ""V2-002""
+    }
+  ],
+  ""meta"": {
+    ""lastUpdated"": ""2026-10-02T17:38:58.187+00:00"",
+    ""versionId"": ""26cc1915-91ce-4323-ba9b-4a3766b76f8e""
+  },
+  ""name"": [
+    {
+      ""family"": ""Training"",
+      ""given"": [
+        ""Person02""
+      ]
+    }
+  ],
+  ""resourceType"": ""Patient""
+}",Patient,fixture-v2-p02,synthetic-20261004T225801Z-5dd08717,patient.ndjson,2,2026-10-04 21:39:27.015 -0700

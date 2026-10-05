@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "actual_snowflake_result_csv": "analytics/evidence/internal-raw-repeat-20261005.csv",
+  "batch_id": "synthetic-20261004T225801Z-5dd08717",
+  "rows": 7,
+  "counts": {
+    "Appointment": 2,
+    "Observation": 3,
+    "Patient": 2
+  },
+  "ids_match": true,
+  "complete_payloads_match": true,
+  "file_row_numbers_match": true,
+  "duplicate_count": 0
+}
