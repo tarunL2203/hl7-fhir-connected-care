@@ -1,0 +1,89 @@
+{
+  "batch_id": "synthetic-failure-cases-20261006-v1",
+  "synthetic_only": true,
+  "counts": {
+    "canonical": {
+      "Patient": 30,
+      "Observation": 87,
+      "Appointment": 30,
+      "total": 147
+    },
+    "delivery": {
+      "Patient": 30,
+      "Observation": 91,
+      "Appointment": 30,
+      "total": 151
+    },
+    "distinct_resource_versions": 148,
+    "exact_duplicate_deliveries": 3,
+    "additional_corrected_version": 1
+  },
+  "expected_status_counts": {
+    "information_complete": 11,
+    "information_gap": 13,
+    "not_applicable": 2,
+    "requirements_not_configured": 2,
+    "unable_to_assess": 2
+  },
+  "expected_review_issue_counts": {
+    "invalid_timestamp": 2,
+    "unknown_patient_reference": 4
+  },
+  "version_policy": "Fixture versions are numeric; choose highest version per resource for canonical projection; retain both source versions. Do not generalize numeric version ordering to arbitrary FHIR servers.",
+  "files": [
+    {
+      "path": "appointment-requirements.csv",
+      "sha256": "6b2f773d2532594f290095a34696b01a8175a6e6a2cb0990d13a64e789482031",
+      "bytes": 2349,
+      "data_rows": 28
+    },
+    {
+      "path": "canonical/Appointment.ndjson",
+      "sha256": "00a52a757822d2ed2f2f16949769e1c3c729a90f3d963f602d9757c05ed21bc1",
+      "bytes": 13656,
+      "data_rows": 30
+    },
+    {
+      "path": "canonical/Observation.ndjson",
+      "sha256": "e7f8086d7572782cdedadbc1e7c2fe88961a84cf217f67ef32a513f83134931d",
+      "bytes": 54446,
+      "data_rows": 87
+    },
+    {
+      "path": "canonical/Patient.ndjson",
+      "sha256": "ff773a9c5aa50943caaa3b88b3241f45aca55fc9625e0f346d6741f688d2d858",
+      "bytes": 11835,
+      "data_rows": 30
+    },
+    {
+      "path": "delivery/Appointment.ndjson",
+      "sha256": "00a52a757822d2ed2f2f16949769e1c3c729a90f3d963f602d9757c05ed21bc1",
+      "bytes": 13656,
+      "data_rows": 30
+    },
+    {
+      "path": "delivery/Observation.ndjson",
+      "sha256": "14244b66b8b99bdfb3232c78f1657d5a87942a24194c71b02d897e9e21a8b5e7",
+      "bytes": 56947,
+      "data_rows": 91
+    },
+    {
+      "path": "delivery/Patient.ndjson",
+      "sha256": "ff773a9c5aa50943caaa3b88b3241f45aca55fc9625e0f346d6741f688d2d858",
+      "bytes": 11835,
+      "data_rows": 30
+    },
+    {
+      "path": "expected-outcomes.csv",
+      "sha256": "b4d23b21e2dc389cdf12441cf29418acdd7b6d860dcf695ae06595de3c472ed3",
+      "bytes": 4281,
+      "data_rows": 30
+    },
+    {
+      "path": "expected-review-issues.csv",
+      "sha256": "ee42ac3a905fdcfdfd44dc5848282200143a3b06f3dcc0cfe98b9fdd5a722987",
+      "bytes": 714,
+      "data_rows": 6
+    }
+  ]
+}

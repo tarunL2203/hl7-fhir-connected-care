@@ -1,0 +1,7 @@
+resource_type,resource_id,issue,intended_fixture_patient_id,handling
+Observation,fc30-o027-01,invalid_timestamp,fc30-p027,retain source payload; unable_to_assess
+Observation,fc30-o028-01,invalid_timestamp,fc30-p028,retain source payload; unable_to_assess
+Observation,fc30-o029-01,unknown_patient_reference,fc30-p029,retain unresolved reference; do not silently relink
+Observation,fc30-o029-02,unknown_patient_reference,fc30-p029,retain unresolved reference; do not silently relink
+Observation,fc30-o030-01,unknown_patient_reference,fc30-p030,retain unresolved reference; do not silently relink
+Observation,fc30-o030-02,unknown_patient_reference,fc30-p030,retain unresolved reference; do not silently relink
