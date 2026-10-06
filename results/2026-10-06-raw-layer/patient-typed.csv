@@ -1,0 +1,3 @@
+PATIENT_ID,GIVEN_NAME,FAMILY_NAME,BIRTH_DATE,BIRTH_DATE_STATUS
+demo-patient-002,Ravi,Demo,1985-05-12,valid
+fixture-v2-p02,Person02,Training,,missing

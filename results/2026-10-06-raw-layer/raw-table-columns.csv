@@ -1,0 +1,8 @@
+name,type,kind,null?,default,primary key,unique key,check,expression,comment,policy name,privacy domain,write default
+PAYLOAD,VARIANT,COLUMN,N,,N,N,,,,,,
+RESOURCE_TYPE,VARCHAR(16777216),COLUMN,N,,N,N,,,,,,
+RESOURCE_ID,VARCHAR(16777216),COLUMN,N,,N,N,,,,,,
+BATCH_ID,VARCHAR(16777216),COLUMN,N,,N,N,,,,,,
+SOURCE_FILENAME,VARCHAR(16777216),COLUMN,N,,N,N,,,,,,
+FILE_ROW_NUMBER,"NUMBER(38,0)",COLUMN,N,,N,N,,,,,,
+LOADED_AT,TIMESTAMP_LTZ(9),COLUMN,N,,N,N,,,,,,

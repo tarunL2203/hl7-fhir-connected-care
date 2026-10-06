@@ -1,0 +1,10 @@
+TEST_NAME,EXPECTED_QUALIFIES,ACTUAL_QUALIFIES,TEST_RESULT
+Amended result,TRUE,TRUE,PASS
+Corrected result,TRUE,TRUE,PASS
+Equivalent timezone,TRUE,TRUE,PASS
+Exactly at appointment,FALSE,FALSE,PASS
+Exactly at window start,TRUE,TRUE,PASS
+Missing measurement time,FALSE,FALSE,PASS
+One second before appointment,TRUE,TRUE,PASS
+One second before window,FALSE,FALSE,PASS
+Preliminary result,FALSE,FALSE,PASS

@@ -1,0 +1,3 @@
+created_on,name,database_name,schema_name,kind,comment,cluster_by,rows,bytes,owner,retention_time,automatic_clustering,change_tracking,search_optimization,search_optimization_progress,search_optimization_bytes,is_external,enable_schema_evolution,owner_role_type,is_event,is_hybrid,is_iceberg,is_dynamic,is_immutable,is_interactive,row_timestamp,error_logging
+2026-10-04 16:19:01.495 -0700,FHIR_RESOURCE,CHATGPT_LAB,FIRELY_RAW_5DD08717,TABLE,,,0,0,ACCOUNTADMIN,1,OFF,OFF,OFF,,,N,N,ROLE,N,N,N,N,N,N,OFF,OFF
+2026-10-04 21:37:22.605 -0700,FHIR_RESOURCE_INTERNAL,CHATGPT_LAB,FIRELY_RAW_5DD08717,TABLE,,,7,5632,ACCOUNTADMIN,1,OFF,OFF,OFF,,,N,N,ROLE,N,N,N,N,N,N,OFF,OFF
