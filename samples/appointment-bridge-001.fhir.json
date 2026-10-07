@@ -1,0 +1,42 @@
+{
+  "resourceType": "Appointment",
+  "id": "siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423",
+  "meta": {
+    "tag": [
+      {
+        "system": "https://example.org/fixture-label",
+        "code": "synthetic"
+      }
+    ]
+  },
+  "identifier": [
+    {
+      "system": "https://example.org/training/appointment",
+      "value": "SYN-APPT-BRIDGE-001"
+    }
+  ],
+  "status": "booked",
+  "description": "Synthetic glucose review",
+  "serviceType": [
+    {
+      "coding": [
+        {
+          "system": "https://example.org/synthetic-visit-types",
+          "code": "demo-glucose-review",
+          "display": "Glucose review"
+        }
+      ]
+    }
+  ],
+  "start": "2026-10-06T13:00:00+00:00",
+  "end": "2026-10-06T13:30:00+00:00",
+  "minutesDuration": 30,
+  "participant": [
+    {
+      "actor": {
+        "reference": "Patient/demo-patient-002"
+      },
+      "status": "accepted"
+    }
+  ]
+}

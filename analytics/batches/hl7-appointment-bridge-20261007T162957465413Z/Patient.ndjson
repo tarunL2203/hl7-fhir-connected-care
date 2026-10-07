@@ -1,0 +1,1 @@
+{"birthDate":"1985-05-12","gender":"male","id":"demo-patient-002","identifier":[{"system":"https://example.org/training/mrn","value":"SYN002"}],"meta":{"lastUpdated":"2026-10-07T15:59:47.877+00:00","versionId":"1445f847-bf88-44b5-8b9e-be2db4aa5bee"},"name":[{"family":"Demo","given":["Ravi"]}],"resourceType":"Patient"}

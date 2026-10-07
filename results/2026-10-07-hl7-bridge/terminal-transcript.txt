@@ -1,0 +1,20 @@
+User-reported terminal evidence, October 7, 2026. Copied from this walkthrough. This file is a transcript, not an independently executed log.
+
+Appointment creation/export:
+PASS: offline mapping, stable ID, timestamp and reference checks.
+PASS: patient identity and existing patient/labs verified.
+PASS: SIU^S12 converted to Appointment/siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423
+Appointment created: HTTP 201
+PASS: appointment read-back matches conversion.
+PASS: all four converted resources match Firely and two reads agree.
+Batch ID: hl7-appointment-bridge-20261007T162957465413Z
+Patient.ndjson: 1 row(s)
+Observation.ndjson: 2 row(s)
+Appointment.ndjson: 1 row(s)
+
+Final reconciliation:
+MATCH: Appointment/siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423
+MATCH: Observation/demo-glucose-002
+MATCH: Observation/lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4
+MATCH: Patient/demo-patient-002
+PASS: all 4 Snowflake payloads and source rows match the Firely export.
