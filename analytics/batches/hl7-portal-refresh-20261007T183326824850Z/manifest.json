@@ -1,0 +1,66 @@
+{
+  "batch_id": "hl7-portal-refresh-20261007T183326824850Z",
+  "source": "http://localhost:8081",
+  "authenticated": true,
+  "read_started_at": "2026-10-07T18:33:26.053180+00:00",
+  "read_finished_at": "2026-10-07T18:33:26.636368+00:00",
+  "source_consistency": "two equal authenticated reads; not a transactionally locked snapshot",
+  "files": {
+    "Patient.ndjson": {
+      "rows": 1,
+      "sha256": "d61308b9b4fa090c0a2152f10a59c43dce0c92f02047560d29c63de5a43f4935"
+    },
+    "Observation.ndjson": {
+      "rows": 3,
+      "sha256": "eb2ddea1f6e17968f29424b56ff0c54850a4feb7c57cae590901b60e6a206b2f"
+    },
+    "Appointment.ndjson": {
+      "rows": 1,
+      "sha256": "0bb58f63e00d61e4b8ed1f51367d6c4b39c63f9aeedec5cf1666a8d033ab9e20"
+    }
+  },
+  "lineage": [
+    {
+      "resource": "Patient/demo-patient-002",
+      "hl7_file": "samples/admission-002.hl7",
+      "hl7_sha256": "a464d8fea9c43c205888b9f5caa667a7541f3bfd0a4638fdc683f5a1c30d2e91",
+      "converted_file": "samples/admission-002.fhir.json",
+      "converted_sha256": "3b026a8fc1f87bea2105f9879b8638c5a26f11edf37f0620d3d52b4f7fa9b187",
+      "exported_payload_sha256": "f343b934f5481b2b051bd7bcb8977698255584713d64d5434290edeec1ebb9bd"
+    },
+    {
+      "resource": "Observation/demo-glucose-002",
+      "hl7_file": "samples/lab-002.hl7",
+      "hl7_sha256": "0052b2788e4199575f9f14707fbac68a361227f0999f2856754c331d4c98035c",
+      "converted_file": "samples/lab-002.fhir.json",
+      "converted_sha256": "bbf52c0ecc083fd74e0777463fdb8a0bf694f26a74a5d6baa4a34fe0ebdd416a",
+      "exported_payload_sha256": "4bab9bfe79184045fe380326b76f73bdc842e2d230f5431603ef941266314318"
+    },
+    {
+      "resource": "Observation/lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4",
+      "hl7_file": "samples/lab-003.hl7",
+      "hl7_sha256": "c839d43bcb921a75a9be745677d9806d47b9f9bf1a015cdc56a978cf13d5e4c3",
+      "converted_file": "samples/lab-003.fhir.json",
+      "converted_sha256": "2d23873d21c71d01559f0a5e61d0483c564a0a6b7404279d7ecf7ba1455cb3cf",
+      "exported_payload_sha256": "3b94b5bf1b9465aee17d0d6374b29735dbfef360bdf6e6eabd1f6c2712a46bb6"
+    },
+    {
+      "resource": "Appointment/siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423",
+      "hl7_file": "samples/appointment-bridge-001.hl7",
+      "hl7_sha256": "e9efadb82dbe13995e51ca81774937ffc8b7db88adf76d51b44c07c2ef410be5",
+      "converted_file": "samples/appointment-bridge-001.fhir.json",
+      "converted_sha256": "8d1b7009a4c552ae179b95510530219cd72b89992db0a5623508bc5166265a6a",
+      "exported_payload_sha256": "68ea8bfd79486da4f6ef7f9a93cff8a9c8515a6fc6efc6eb0bc77bf14e767644"
+    },
+    {
+      "resource": "Observation/lab-60c75c14-03f1-5417-858a-ac1f33afdaa4",
+      "hl7_file": "samples/lab-portal-update-004.hl7",
+      "hl7_sha256": "a4705a96fb67deb14741a364df51f5b7bb7479f237d27b82d7976df656e8780e",
+      "converted_file": "samples/lab-portal-update-004.fhir.json",
+      "converted_sha256": "e69422f9b3599a8ad46d35a77ddbae6cc508d9c9148312d909221d06c354995a",
+      "exported_payload_sha256": "a95fae5e432ee03e3db038f990b7c398a3e78e6d3c1c4c045ee669e20db12510"
+    }
+  ],
+  "snowflake_stage": "FHIR_PORTAL_STAGE_20261007T183326824850Z",
+  "snowflake_table": "FHIR_RESOURCE_HL7_PORTAL_REFRESH"
+}

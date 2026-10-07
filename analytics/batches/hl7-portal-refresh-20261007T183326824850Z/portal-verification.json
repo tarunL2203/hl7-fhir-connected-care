@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "authenticated": true,
+  "resource_count": 5,
+  "two_reads_agree": true,
+  "snapshot_matches_after_local_reference_normalization": true,
+  "appointment_id": "siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423",
+  "qualifying_glucose_count": 3,
+  "outcome": "information_complete",
+  "checked_at": "2026-10-07T18:33:26.636368+00:00",
+  "payload_hashes": {
+    "Appointment/siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423": "68ea8bfd79486da4f6ef7f9a93cff8a9c8515a6fc6efc6eb0bc77bf14e767644",
+    "Observation/demo-glucose-002": "4bab9bfe79184045fe380326b76f73bdc842e2d230f5431603ef941266314318",
+    "Observation/lab-60c75c14-03f1-5417-858a-ac1f33afdaa4": "a95fae5e432ee03e3db038f990b7c398a3e78e6d3c1c4c045ee669e20db12510",
+    "Observation/lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4": "3b94b5bf1b9465aee17d0d6374b29735dbfef360bdf6e6eabd1f6c2712a46bb6",
+    "Patient/demo-patient-002": "f343b934f5481b2b051bd7bcb8977698255584713d64d5434290edeec1ebb9bd"
+  }
+}

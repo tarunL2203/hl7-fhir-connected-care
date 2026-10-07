@@ -27,6 +27,32 @@ class DocumentHandler(ViewerHandler):
     def do_GET(self):
         path = urlsplit(self.path).path
 
+        if path == "/local-integration/export" and local_mode():
+            try:
+                from portal_batch_export import build_export
+                filename, data = build_export()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/zip")
+                self.send_header("Content-Disposition", 'attachment; filename="' + filename + '"')
+                self.send_header("Cache-Control", "no-store")
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+            except Exception as error:
+                self.send_json(502, {"error": "authenticated_export_failed", "error_type": type(error).__name__, "diagnostic": getattr(error, "safe_diagnostic", {}),
+"check_message": str(error) if str(error) in (
+    "Authenticated session required",
+    "Unexpected protected FHIR source",
+    "Five-resource refresh not configured",
+    "Snapshot cohort differs",
+    "Authenticated reads or original snapshot differ",
+    "Assessment incomplete",
+    "Qualifying results differ",
+    "Converted source differs from protected resource"
+) else "Unclassified error"
+})
+            return
+
         if path == "/local-integration/verify" and local_mode():
             stage = "load_snapshot"
             diagnostic = {}

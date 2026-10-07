@@ -1,0 +1,4 @@
+file,status,rows_parsed,rows_loaded,error_limit,errors_seen,first_error,first_error_line,first_error_character,first_error_column_name
+fhir_portal_stage_20261007t183326824850z/Observation.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,
+fhir_portal_stage_20261007t183326824850z/Patient.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,
+fhir_portal_stage_20261007t183326824850z/Appointment.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,

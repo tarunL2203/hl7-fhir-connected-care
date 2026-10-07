@@ -1,0 +1,21 @@
+Verified portal export: 1 Patient, 3 Observations, 1 Appointment.
+Batch: hl7-portal-refresh-20261007T183326824850Z
+Stage: FHIR_PORTAL_STAGE_20261007T183326824850Z
+
+1. Unzip this download. Create a new Snowflake SQL worksheet.
+2. Paste/run 01_setup.sql. Expected: stage/table created or already exist.
+3. Upload ONLY Patient.ndjson, Observation.ndjson, Appointment.ndjson to the named stage, at its root.
+   Exclude manifest.json, SQL, Python and evidence files. Expected: 3 staged files.
+4. Paste/run 02_load_and_report.sql. Expected counts 1/3/1, and 3 qualifying results -> information_complete.
+   Download the final report CSV as portal-refresh-report.csv.
+5. Run 03_reconciliation.sql alone. Download CSV as portal-refresh-raw.csv (expected 5 rows).
+6. From your Mac project terminal run:
+   document-tools-venv/bin/python analytics/batches/hl7-portal-refresh-20261007T183326824850Z/reconcile_bridge.py analytics/batches/hl7-portal-refresh-20261007T183326824850Z ~/Downloads/portal-refresh-raw.csv
+   Expected: all 5 full payloads and file row numbers match; source hashes match.
+7. Rerun ONLY the COPY block in 02_load_and_report.sql, preserving FORCE=FALSE.
+   Expected: 0 additional rows and counts remain 1/3/1.
+
+This batch is ready to load; SQL generation does not prove a Snowflake load.
+FHIR resources were read through a verified reviewer session. No tokens/cookies are included.
+The local protected service is a controlled snapshot copy, refreshed by a command.
+The 30-patient failure-case dataset is a separate synthetic analytics dataset.

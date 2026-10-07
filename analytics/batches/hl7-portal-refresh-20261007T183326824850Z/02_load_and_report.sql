@@ -1,0 +1,49 @@
+USE ROLE ACCOUNTADMIN;
+USE WAREHOUSE FIRELY_DEMO_WH;
+USE DATABASE CHATGPT_LAB;
+USE SCHEMA FIRELY_RAW_5DD08717;
+-- Expected first run: 1 Patient + 3 Observations + 1 Appointment loaded.
+-- Rerun this COPY block only: expected 0 additional rows. Keep FORCE=FALSE.
+COPY INTO FHIR_RESOURCE_HL7_PORTAL_REFRESH
+(payload,resource_type,resource_id,batch_id,source_filename,file_row_number,loaded_at)
+FROM (SELECT t.$1,t.$1:resourceType::VARCHAR,t.$1:id::VARCHAR,
+'hl7-portal-refresh-20261007T183326824850Z',METADATA$FILENAME,METADATA$FILE_ROW_NUMBER,METADATA$START_SCAN_TIME
+FROM @FHIR_PORTAL_STAGE_20261007T183326824850Z AS t)
+FILES=('Patient.ndjson','Observation.ndjson','Appointment.ndjson')
+FILE_FORMAT=(TYPE=JSON) ON_ERROR='ABORT_STATEMENT' FORCE=FALSE;
+
+-- Expected: Appointment 1/1, Observation 3/3, Patient 1/1.
+SELECT RESOURCE_TYPE,COUNT(*) AS ROWS_LOADED,COUNT(DISTINCT RESOURCE_ID) AS UNIQUE_IDS
+FROM FHIR_RESOURCE_HL7_PORTAL_REFRESH WHERE BATCH_ID='hl7-portal-refresh-20261007T183326824850Z'
+GROUP BY RESOURCE_TYPE ORDER BY RESOURCE_TYPE;
+
+-- Expected: 1 row, 3 qualifying results, information_complete.
+WITH batch AS (
+ SELECT * FROM FHIR_RESOURCE_HL7_PORTAL_REFRESH WHERE BATCH_ID='hl7-portal-refresh-20261007T183326824850Z'
+), appointments AS (
+ SELECT DISTINCT b.RESOURCE_ID AS APPOINTMENT_ID,b.PAYLOAD:status::VARCHAR AS APPOINTMENT_STATUS,
+ TRY_TO_TIMESTAMP_TZ(b.PAYLOAD:start::VARCHAR) AS START_TIME,
+ REGEXP_REPLACE(p.VALUE:actor:reference::VARCHAR,'^http://localhost:808[01]/','') AS PATIENT_REFERENCE
+ FROM batch b,LATERAL FLATTEN(INPUT=>b.PAYLOAD:participant) p
+ WHERE b.RESOURCE_TYPE='Appointment' AND b.RESOURCE_ID='siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423'
+ AND REGEXP_REPLACE(p.VALUE:actor:reference::VARCHAR,'^http://localhost:808[01]/','')='Patient/demo-patient-002'
+), observations AS (
+ SELECT DISTINCT b.RESOURCE_ID,
+ REGEXP_REPLACE(b.PAYLOAD:subject:reference::VARCHAR,'^http://localhost:808[01]/','') AS PATIENT_REFERENCE,
+ TRY_TO_TIMESTAMP_TZ(b.PAYLOAD:effectiveDateTime::VARCHAR) AS RESULT_TIME
+ FROM batch b,LATERAL FLATTEN(INPUT=>b.PAYLOAD:code:coding) c
+ WHERE b.RESOURCE_TYPE='Observation'
+ AND c.VALUE:system::VARCHAR='http://loinc.org' AND c.VALUE:code::VARCHAR='2345-7'
+ AND b.PAYLOAD:status::VARCHAR IN ('final','amended','corrected')
+ AND b.PAYLOAD:valueQuantity:system::VARCHAR='http://unitsofmeasure.org'
+ AND b.PAYLOAD:valueQuantity:code::VARCHAR='mg/dL'
+ AND TRY_TO_DOUBLE(b.PAYLOAD:valueQuantity:value::VARCHAR) BETWEEN -1e308 AND 1e308
+)
+SELECT 'demo-patient-002' AS PATIENT_ID,a.APPOINTMENT_ID,a.APPOINTMENT_STATUS,a.START_TIME,
+COUNT(DISTINCT o.RESOURCE_ID) AS QUALIFYING_GLUCOSE_COUNT,
+CASE WHEN a.APPOINTMENT_STATUS='cancelled' THEN 'not_applicable'
+WHEN a.START_TIME IS NULL THEN 'unable_to_assess'
+WHEN COUNT(DISTINCT o.RESOURCE_ID)>0 THEN 'information_complete' ELSE 'information_gap' END AS INFORMATION_AVAILABILITY
+FROM appointments a LEFT JOIN observations o ON o.PATIENT_REFERENCE=a.PATIENT_REFERENCE
+AND o.RESULT_TIME>=DATEADD(day,-7,a.START_TIME) AND o.RESULT_TIME<a.START_TIME
+GROUP BY a.APPOINTMENT_ID,a.APPOINTMENT_STATUS,a.START_TIME;
