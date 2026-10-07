@@ -3,5 +3,10 @@
   "documents": "deferred",
   "source": "http://localhost:8080",
   "secured_fhir": "http://localhost:8081",
-  "checkpoint": "~/firely-learning/checkpoints/local-portal-20261007T171227658516Z"
+  "checkpoint": "~/firely-learning/checkpoints/lab-refresh-20261007T180956187836Z",
+  "expected_lab_ids": [
+    "demo-glucose-002",
+    "lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4",
+    "lab-60c75c14-03f1-5417-858a-ac1f33afdaa4"
+  ]
 }

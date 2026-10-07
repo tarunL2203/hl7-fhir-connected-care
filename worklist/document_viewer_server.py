@@ -77,7 +77,7 @@ class DocumentHandler(ViewerHandler):
                 requirements = assessments[0]["requirements"]
                 diagnostic["matched_record_ids"] = [r.get("matched_record_ids", []) for r in requirements]
                 diagnostic["requirement_outcomes"] = [r.get("outcome") for r in requirements]
-                expected_labs = {"demo-glucose-002", "lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4"}
+                expected_labs = set(mode.get("expected_lab_ids", ["demo-glucose-002", "lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4"]))
                 if assessments[0]["outcome"] != "information_complete" or len(requirements) != 1 or set(requirements[0]["matched_record_ids"]) != expected_labs:
                     raise RuntimeError("qualifying_results")
                 stage = "snapshot_comparison"
@@ -117,7 +117,7 @@ class DocumentHandler(ViewerHandler):
                     "snapshot_matches_after_local_reference_normalization": True,
                     "comparison_mode": "all fields match after normalizing exact localhost:8080/8081 patient references",
                     "normalized_reference_fields": diagnostic["snapshot_differences"],
-                    "appointment_id": appointment_id, "qualifying_glucose_count": 2,
+                    "appointment_id": appointment_id, "qualifying_glucose_count": len(expected_labs),
                     "outcome": "information_complete", "documents": "deferred",
                     "checked_at": datetime.now(timezone.utc).isoformat(),
                     "payload_hashes": {key: sha256(json.dumps(value, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
