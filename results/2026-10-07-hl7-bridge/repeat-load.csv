@@ -1,0 +1,3 @@
+file,status,rows_parsed,rows_loaded,error_limit,errors_seen,first_error,first_error_line,first_error_character,first_error_column_name
+fhir_hl7_bridge_stage/Observation.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,
+fhir_hl7_bridge_stage/Patient.ndjson,LOAD_SKIPPED,0,0,,1,File was loaded before.,,,

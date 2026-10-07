@@ -1,0 +1,7 @@
+OBSERVATION_ID,PATIENT_REFERENCE_RAW,EFFECTIVE_TIME_RAW,REVIEW_REASON
+fc30-o027-01,Patient/fc30-p027,2026-13-40T25:61:00Z,invalid_or_missing_timestamp
+fc30-o028-01,Patient/fc30-p028,2026-13-40T25:61:00Z,invalid_or_missing_timestamp
+fc30-o029-01,Patient/fc30-unknown-029,2026-10-20T13:00:00Z,unresolved_patient_reference
+fc30-o029-02,Patient/fc30-unknown-029,2026-10-19T12:00:00Z,unresolved_patient_reference
+fc30-o030-01,Patient/fc30-unknown-030,2026-10-21T13:00:00Z,unresolved_patient_reference
+fc30-o030-02,Patient/fc30-unknown-030,2026-10-20T12:00:00Z,unresolved_patient_reference

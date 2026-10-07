@@ -1,0 +1,49 @@
+{
+  "batch_id": "hl7-bridge-20261007T160123921786Z",
+  "source_base_url": "http://localhost:8080/",
+  "route": "local Firely to Snowflake internal stage",
+  "comparison": "generated fields match; local references normalized",
+  "consistency": "two matching reads; not a locked snapshot",
+  "files": {
+    "Patient.ndjson": {
+      "rows": 1,
+      "sha256": "d3f83861360a37e75d142bf43bd0514b8fc6b804e4054a0fd1e430e716f8d648"
+    },
+    "Observation.ndjson": {
+      "rows": 2,
+      "sha256": "aeba6df2b23c7145dd1beb3ed21cfeb969cbe3438f7a4140140b84c17780d2a3"
+    }
+  },
+  "lineage": [
+    {
+      "hl7_file": "samples/admission-002.hl7",
+      "hl7_sha256": "a464d8fea9c43c205888b9f5caa667a7541f3bfd0a4638fdc683f5a1c30d2e91",
+      "converted_file": "samples/admission-002.fhir.json",
+      "converted_sha256": "3b026a8fc1f87bea2105f9879b8638c5a26f11edf37f0620d3d52b4f7fa9b187",
+      "resource_type": "Patient",
+      "resource_id": "demo-patient-002",
+      "firely_version": "1445f847-bf88-44b5-8b9e-be2db4aa5bee",
+      "exported_payload_sha256": "f343b934f5481b2b051bd7bcb8977698255584713d64d5434290edeec1ebb9bd"
+    },
+    {
+      "hl7_file": "samples/lab-002.hl7",
+      "hl7_sha256": "0052b2788e4199575f9f14707fbac68a361227f0999f2856754c331d4c98035c",
+      "converted_file": "samples/lab-002.fhir.json",
+      "converted_sha256": "bbf52c0ecc083fd74e0777463fdb8a0bf694f26a74a5d6baa4a34fe0ebdd416a",
+      "resource_type": "Observation",
+      "resource_id": "demo-glucose-002",
+      "firely_version": "a2b30a10-632b-4363-b5c8-ec66e96aecee",
+      "exported_payload_sha256": "163dd1986660e6db245b1f35f8f1fc51c3fc249101c5c14666a72550dfb2389f"
+    },
+    {
+      "hl7_file": "samples/lab-003.hl7",
+      "hl7_sha256": "c839d43bcb921a75a9be745677d9806d47b9f9bf1a015cdc56a978cf13d5e4c3",
+      "converted_file": "samples/lab-003.fhir.json",
+      "converted_sha256": "2d23873d21c71d01559f0a5e61d0483c564a0a6b7404279d7ecf7ba1455cb3cf",
+      "resource_type": "Observation",
+      "resource_id": "lab-760b9ffe-19ca-5dbb-b2ef-8bb12d2cf2d4",
+      "firely_version": "bbd90c71-7572-4610-a5a1-a051f0cb069b",
+      "exported_payload_sha256": "4e50259f3b242f897ecf4b5c609b444f1047fc1eebe86466ba65a1f103f80c91"
+    }
+  ]
+}
