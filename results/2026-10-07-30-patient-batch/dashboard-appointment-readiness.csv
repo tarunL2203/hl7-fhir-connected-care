@@ -1,0 +1,31 @@
+Patient,Appointment,Information status,Qualifying glucose results,Appointment start (UTC),Appointment end (UTC),Booking status,Invalid result timestamps
+fc30-p001,fc30-a001,Information ready,4,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p002,fc30-a002,Information ready,4,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p003,fc30-a003,Information ready,4,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p004,fc30-a004,Information ready,3,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p005,fc30-a005,Information ready,3,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p006,fc30-a006,Information ready,4,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p008,fc30-a008,Information ready,4,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p009,fc30-a009,Information ready,4,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p010,fc30-a010,Information ready,4,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p011,fc30-a011,Information ready,4,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p015,fc30-a015,Information missing,0,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p016,fc30-a016,Information missing,0,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p017,fc30-a017,Information missing,0,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p018,fc30-a018,Information missing,0,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p019,fc30-a019,Information missing,0,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p020,fc30-a020,Information missing,0,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p022,fc30-a022,Information missing,0,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p025,fc30-a025,Requirements not configured,0,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p007,fc30-a007,Information ready,4,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p024,fc30-a024,Assessment not applicable,2,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,cancelled,0
+fc30-p027,fc30-a027,Data review required,0,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,1
+fc30-p026,fc30-a026,Requirements not configured,0,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p030,fc30-a030,Information missing,0,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p013,fc30-a013,Information missing,0,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,0
+fc30-p014,fc30-a014,Information missing,0,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p023,fc30-a023,Assessment not applicable,2,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,cancelled,0
+fc30-p028,fc30-a028,Data review required,0,2026-10-20 13:00 UTC,2026-10-20 13:30 UTC,booked,1
+fc30-p021,fc30-a021,Information missing,0,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
+fc30-p029,fc30-a029,Information missing,0,2026-10-21 13:00 UTC,2026-10-21 13:30 UTC,booked,0
+fc30-p012,fc30-a012,Information missing,0,2026-10-22 13:00 UTC,2026-10-22 13:30 UTC,booked,0
