@@ -8,6 +8,10 @@
     "fixture-v2-a02": {
       "patient_id": "fixture-v2-p02",
       "profile_id": "demo-lab-review"
+    },
+    "siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423": {
+      "patient_id": "demo-patient-002",
+      "profile_id": "demo-lab-review"
     }
   }
 }

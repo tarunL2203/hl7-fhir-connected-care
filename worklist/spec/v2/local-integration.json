@@ -1,0 +1,7 @@
+{
+  "mode": "local-secure-copy",
+  "documents": "deferred",
+  "source": "http://localhost:8080",
+  "secured_fhir": "http://localhost:8081",
+  "checkpoint": "~/firely-learning/checkpoints/local-portal-20261007T171227658516Z"
+}

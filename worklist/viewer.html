@@ -212,6 +212,9 @@ async function load() {
       const card = element("div", undefined, "card");
       card.append(element("span", "Appointment: " + assessment.appointment_id));
       card.append(element("strong", readable(assessment.outcome)));
+      assessment.requirements.forEach(requirement => {
+        card.append(element("p", "Qualifying results: " + requirement.matched_record_ids.length, "small"));
+      });
       card.append(element("p", assessment.reason, "small"));
       overview.append(card);
     });
@@ -245,7 +248,7 @@ async function load() {
 
     const documents = section("Documents");
     if (!(data.documents || []).length) {
-      documents.append(element("p", "No linked documents returned."));
+      documents.append(element("p", data.document_status || "No linked documents returned."));
     }
     (data.documents || []).forEach(document => {
       const row = element("p");

@@ -53,7 +53,8 @@
     "follow_all_next_pages": true,
     "partial_results_can_prove_absence": false,
     "allowed_fhir_bases": [
-      "http://localhost:8081"
+      "http://localhost:8081",
+      "http://localhost:8080"
     ],
     "external_reference": "unresolved_until_verified"
   },

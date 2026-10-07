@@ -13,6 +13,25 @@ from evaluator_v2 import evaluate, patient_reference
 
 ROOT = Path.home() / "firely-learning/worklist"
 
+def patient_observations(patient_id, policy):
+    # Search exact references from the original snapshot and the current service.
+    # These are query values; network requests still go only to protected 8081.
+    references = ["Patient/" + patient_id] + [
+        base.rstrip("/") + "/Patient/" + patient_id
+        for base in policy["retrieval"]["allowed_fhir_bases"]
+    ]
+    records = {}
+    for reference in dict.fromkeys(references):
+        query = urlencode({"subject": reference})
+        for observation in search("Observation?" + query, "Observation"):
+            if patient_reference(observation.get("subject", {}).get("reference"), policy) != "Patient/" + patient_id:
+                raise RuntimeError("Observation patient reference mismatch")
+            record_id = observation["id"]
+            if record_id in records and records[record_id] != observation:
+                raise RuntimeError("Observation changed during reference searches")
+            records[record_id] = observation
+    return list(records.values())
+
 def summary(patient_id):
     policy = json.loads((ROOT / "spec/v2/policy.json").read_text())
     assignments = json.loads(
@@ -26,8 +45,7 @@ def summary(patient_id):
     ):
         raise RuntimeError("Patient read-back mismatch")
 
-    query = urlencode({"subject": "Patient/" + patient_id})
-    observations = search("Observation?" + query, "Observation")
+    observations = patient_observations(patient_id, policy)
     appointments = [
         appointment for appointment in search("Appointment", "Appointment")
         if any(
