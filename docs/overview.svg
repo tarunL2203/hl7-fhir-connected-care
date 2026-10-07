@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1830" viewBox="0 0 1600 1830">
+<rect width="1600" height="1830" fill="white"/>
+<style>text{font-family:Arial,sans-serif} .title{font-size:34px;font-weight:700;fill:#153e65} .heading{font-size:22px;font-weight:700;fill:#153e65} .body{font-size:19px;fill:#243b53} .small{font-size:17px;fill:#52677a}</style>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="none" stroke="#6087ac" stroke-width="2"/></marker></defs>
+<text x="55" y="65" class="title">Healthcare Data Integration</text>
+<text x="55" y="108" class="title">&amp; Analytics</text>
+<text x="55" y="167" class="heading">Project delivery overview | 7 October 2026</text>
+<text x="55" y="221" class="body">Completed: authenticated review and verified batch analytics.</text>
+<text x="55" y="250" class="body">Current transfer to Snowflake: manual upload.</text>
+<text x="55" y="279" class="body">Pending: direct AWS linkage and cloud automation.</text>
+<rect x="1100" y="35" width="445" height="445" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="1120" y="69" class="heading">PROJECT BRIEF</text>
+<text x="1120" y="102" class="body">Turn patient, lab and appointment</text>
+<text x="1120" y="129" class="body">messages into connected records.</text>
+<text x="1120" y="156" class="body"></text>
+<text x="1120" y="183" class="body">Let an authorized reviewer see</text>
+<text x="1120" y="210" class="body">whether the expected information</text>
+<text x="1120" y="237" class="body">is available before an appointment.</text>
+<text x="1120" y="264" class="body"></text>
+<text x="1120" y="291" class="body">Export the same records to Snowflake</text>
+<text x="1120" y="318" class="body">to check completeness, view lab</text>
+<text x="1120" y="345" class="body">history and investigate data issues.</text>
+<text x="1120" y="372" class="body"></text>
+<text x="1120" y="399" class="body">Use synthetic data for this demo.</text>
+<rect x="55" y="335" width="1000" height="255" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="75" y="369" class="heading">ANALYTICS COMPLETED</text>
+<text x="75" y="402" class="body">1. Cohort completeness: observation and appointment counts per patient;</text>
+<text x="75" y="429" class="body">   missing birth-date flags.</text>
+<text x="75" y="456" class="body">2. Glucose timeline: measurement values, dates, units and result status.</text>
+<text x="75" y="483" class="body">3. Appointment availability: qualifying glucose counts in a seven-day window;</text>
+<text x="75" y="510" class="body">   configured information complete, information gap or unable to assess.</text>
+<text x="75" y="537" class="body">4. Failure-case summary: complete, gap, cancelled, unconfigured and unassessable.</text>
+<text x="55" y="633" class="small">Blue: completed     Red: pending integration     Grey: next phase</text>
+<text x="55" y="685" class="heading">INTEROPERABILITY &amp; REVIEW</text>
+<rect x="55" y="710" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="75" y="744" class="heading">Requirements and environment</text>
+<text x="75" y="777" class="body">Scope, BRD/FRD and milestones</text>
+<text x="75" y="804" class="body">Python, Docker and FHIR licensing</text>
+<text x="75" y="831" class="body">Persistent storage and checkpoints</text>
+<path d="M290.0 900 L290.0 947" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="55" y="955" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="75" y="989" class="heading">HL7 conversion and integrity</text>
+<text x="75" y="1022" class="body">ADT patients, ORU labs, SIU scheduling</text>
+<text x="75" y="1049" class="body">FHIR R4 mapping and stable identifiers</text>
+<text x="75" y="1076" class="body">References, coding and timestamps</text>
+<path d="M290.0 1145 L290.0 1192" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="55" y="1200" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="75" y="1234" class="heading">FHIR persistence and protection</text>
+<text x="75" y="1267" class="body">Source Firely service on port 8080</text>
+<text x="75" y="1294" class="body">Controlled protected copy on 8081</text>
+<text x="75" y="1321" class="body">Read-back checks; anonymous reads blocked</text>
+<path d="M290.0 1390 L290.0 1437" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="55" y="1445" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="75" y="1479" class="heading">Reviewer portal and worklist</text>
+<text x="75" y="1512" class="body">HTTPS login, reviewer access and logout</text>
+<text x="75" y="1539" class="body">Patient, lab and appointment views</text>
+<text x="75" y="1566" class="body">Assessment, issue routing and history</text>
+<text x="565" y="685" class="heading">EXPORT, ANALYTICS &amp; EVIDENCE</text>
+<rect x="565" y="710" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="585" y="744" class="heading">Authenticated export</text>
+<text x="585" y="777" class="body">Two matching reads; five-resource batch</text>
+<text x="585" y="804" class="body">HL7 lineage, hashes and manifest</text>
+<text x="585" y="831" class="body">Downloadable ZIP excluding credentials</text>
+<path d="M800.0 900 L800.0 947" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="565" y="955" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="585" y="989" class="heading">Snowflake ingestion and model</text>
+<text x="585" y="1022" class="body">Internal stage and explicit-file COPY</text>
+<text x="585" y="1049" class="body">Raw payloads, batch and source-row tracking</text>
+<text x="585" y="1076" class="body">Typed tables; repeat-load protection</text>
+<path d="M800.0 1145 L800.0 1192" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="565" y="1200" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="585" y="1234" class="heading">Reports and deployed dashboard</text>
+<text x="585" y="1267" class="body">Completeness and glucose timeline</text>
+<text x="585" y="1294" class="body">Appointment information availability</text>
+<text x="585" y="1321" class="body">Streamlit displays verified batch</text>
+<path d="M800.0 1390 L800.0 1437" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="565" y="1445" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="585" y="1479" class="heading">Reconciliation and delivery</text>
+<text x="585" y="1512" class="body">Five payloads and source rows matched</text>
+<text x="585" y="1539" class="body">CSV results, SQL and verification evidence</text>
+<text x="585" y="1566" class="body">Runbook, backups and presentation notes</text>
+<text x="1075" y="685" class="heading">CLOUD &amp; EXPANSION</text>
+<rect x="1075" y="710" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="1095" y="744" class="heading">AWS foundation</text>
+<text x="1095" y="777" class="body">RDS SQL Server and FHIR persistence</text>
+<text x="1095" y="804" class="body">Migration/read-back and private S3</text>
+<text x="1095" y="831" class="body">IAM setup, MFA and budget setup</text>
+<path d="M1310.0 900 L1310.0 947" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1075" y="955" width="470" height="190" rx="9" fill="#fff0f0" stroke="#d23b3b" stroke-width="2"/>
+<text x="1095" y="989" class="heading">AWS linkage pending</text>
+<text x="1095" y="1022" class="body">Storage-role assumption remains blocked</text>
+<text x="1095" y="1049" class="body">Direct S3 to Snowflake not verified</text>
+<text x="1095" y="1076" class="body">Cloud automation; local documents deferred</text>
+<rect x="1075" y="1200" width="470" height="190" rx="9" fill="#eaf3fb" stroke="#2878b8" stroke-width="2"/>
+<text x="1095" y="1234" class="heading">Synthetic failure-case analytics</text>
+<text x="1095" y="1267" class="body">30 patients, 87 labs, 30 appointments</text>
+<text x="1095" y="1294" class="body">Missing/invalid data and unknown references</text>
+<text x="1095" y="1321" class="body">Direct FHIR fixtures loaded into Snowflake</text>
+<rect x="1075" y="1445" width="470" height="190" rx="9" fill="#f2f4f6" stroke="#8a98a5" stroke-width="2"/>
+<text x="1095" y="1479" class="heading">Next delivery phase</text>
+<text x="1095" y="1512" class="body">Authenticated gap-to-resolution walkthrough</text>
+<text x="1095" y="1539" class="body">Broader cohort through HL7 and Firely</text>
+<text x="1095" y="1566" class="body">Scheduling, monitoring and security validation</text>
+<path d="M525 1530 L545 1530 L545 805 L557 805" fill="none" stroke="#6087ac" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="55" y="1694" class="heading">Delivery boundaries</text>
+<text x="55" y="1730" class="small">The larger failure cohort bypasses HL7/Firely today. Refreshes and Snowflake uploads are controlled manual steps.</text>
+<text x="55" y="1758" class="small">Assessment describes configured information availability; it is not a diagnosis or clinical clearance.</text>
+<text x="55" y="1786" class="small">Source checks and reconciliation are engineering validation, separate from the four analytics reports.</text>
+</svg>
