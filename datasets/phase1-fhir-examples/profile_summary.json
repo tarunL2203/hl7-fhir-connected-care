@@ -1,0 +1,23 @@
+{
+  "all_records": 14044,
+  "resource_types": 139,
+  "duplicate_type_id_keys": 0,
+  "selected_records": 933,
+  "selected_types": 11,
+  "reference_occurrences": {
+    "resolved_in_archive": 3343,
+    "contained_reference_not_evaluated": 267,
+    "absolute_versioned_or_other_not_evaluated": 66,
+    "unresolved_in_archive": 135
+  },
+  "example_observations": 71,
+  "example_observations_without_effective": 33,
+  "example_observation_years": {
+    "2016": 18,
+    "miss": 33,
+    "2018": 3,
+    "2014": 4,
+    "2012": 3,
+    "1999": 10
+  }
+}

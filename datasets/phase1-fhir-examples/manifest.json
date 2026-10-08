@@ -1,0 +1,63 @@
+{
+  "source_url": "https://hl7.org/fhir/R4/examples-ndjson.zip",
+  "source_sha256": "3a76cb0f45170e6511608cfc89a407b722a2baf5b6432ba5a41d6802aba4a480",
+  "source_dataset": "hl7_r4_official_examples",
+  "batch_id": "hl7-r4-examples-20261008-v1",
+  "files": [
+    {
+      "file": "Patient.ndjson",
+      "records": 265,
+      "sha256": "dae3bac3ee140558179a5367cbef97548052ce234872f639acd996213fd14666"
+    },
+    {
+      "file": "Appointment.ndjson",
+      "records": 3,
+      "sha256": "8cdfd99d8a94b133fd54eb07e1fb6982383ec222cc06ffb4def93d254c698fe9"
+    },
+    {
+      "file": "Observation.ndjson",
+      "records": 531,
+      "sha256": "8b4c9492a9fdd0ccb56489c68a29655784f1b4809c22787a9136e1635d14def6"
+    },
+    {
+      "file": "Condition.ndjson",
+      "records": 12,
+      "sha256": "70ec395fdadfbcd9379bd5cd30dcd7096c0f4c48218e22d18053fb78bce18108"
+    },
+    {
+      "file": "Medication.ndjson",
+      "records": 24,
+      "sha256": "6e74b77a34b7af1b3d7111aba76b1948f8d2651bda7e4732c8548a41bb917187"
+    },
+    {
+      "file": "MedicationRequest.ndjson",
+      "records": 41,
+      "sha256": "eee96fdab83c64b59ec1698933219dd8e74a46578c637076fad313792cc21eb7"
+    },
+    {
+      "file": "MedicationStatement.ndjson",
+      "records": 7,
+      "sha256": "be798f0ca5830f9570019d56ae845b965a4a2e1445b0d18d2eae68a3b3291516"
+    },
+    {
+      "file": "AllergyIntolerance.ndjson",
+      "records": 6,
+      "sha256": "53b8e5d8d51282e8d30ec887f45c37eecac193258809433f1d92cc3ed25a1156"
+    },
+    {
+      "file": "Encounter.ndjson",
+      "records": 11,
+      "sha256": "7e5038b2a280249021a8312d29d45c5088c3e595d930de3a4b99decc7bb483a4"
+    },
+    {
+      "file": "DiagnosticReport.ndjson",
+      "records": 32,
+      "sha256": "d18d13d28e60b4d72ca486e39e5dbf7dcc95e4698a3f5e29d2621aa8e7a43816"
+    },
+    {
+      "file": "DocumentReference.ndjson",
+      "records": 1,
+      "sha256": "1b6bc7947eff3e8b1d0492495fba83d8f428ff1b9e3c45e1bffb0f69fbdebef7"
+    }
+  ]
+}
