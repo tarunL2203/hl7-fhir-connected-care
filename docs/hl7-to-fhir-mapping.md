@@ -4,9 +4,9 @@ The field-level mappings implemented by the three converters, written the way an
 
 | Message | Converter | FHIR resource | Sample input → output |
 |---|---|---|---|
-| ADT^A01 (admit) | [`convert_admission.py`](../convert_admission.py) | Patient | [`admission-002.hl7`](../samples/admission-002.hl7) → [`.fhir.json`](../samples/admission-002.fhir.json) |
-| ORU^R01 (lab result) | [`convert_lab.py`](../convert_lab.py) | Observation | [`lab-002.hl7`](../samples/lab-002.hl7) → [`.fhir.json`](../samples/lab-002.fhir.json) |
-| SIU^S12 (new booking) | [`firely_appointment_bridge.py`](../firely_appointment_bridge.py) | Appointment | [`appointment-bridge-001.hl7`](../samples/appointment-bridge-001.hl7) → [`.fhir.json`](../samples/appointment-bridge-001.fhir.json) |
+| ADT^A01 (admit) | [`convert_admission.py`](../converters/convert_admission.py) | Patient | [`admission-002.hl7`](../samples/admission-002.hl7) → [`.fhir.json`](../samples/admission-002.fhir.json) |
+| ORU^R01 (lab result) | [`convert_lab.py`](../converters/convert_lab.py) | Observation | [`lab-002.hl7`](../samples/lab-002.hl7) → [`.fhir.json`](../samples/lab-002.fhir.json) |
+| SIU^S12 (new booking) | [`appointment_bridge.py`](../converters/appointment_bridge.py) | Appointment | [`appointment-bridge-001.hl7`](../samples/appointment-bridge-001.hl7) → [`.fhir.json`](../samples/appointment-bridge-001.fhir.json) |
 
 ## ADT^A01 → Patient
 
@@ -61,7 +61,7 @@ Names are never used for matching.
 | SCH-2 filler appointment ID (EI) | ID and authority (`DEMO`) both required | `identifier[0]` (system `https://example.org/training/appointment`) |
 | (fixed) | – | `meta.tag` = `synthetic`, `description` = "Synthetic glucose review" |
 
-**Identity.** The ID is `siu-appointment-` + UUID5 over [MSH-3, MSH-4, SCH-2.1, SCH-2.2]. The bridge writes the Appointment to Firely with an idempotent `PUT` on that ID, then reads it back and compares it with the conversion before exporting anything. An offline self-test covers the mapping, stable IDs, timestamps and references: `python firely_appointment_bridge.py --self-test`.
+**Identity.** The ID is `siu-appointment-` + UUID5 over [MSH-3, MSH-4, SCH-2.1, SCH-2.2]. The bridge writes the Appointment to Firely with an idempotent `PUT` on that ID, then reads it back and compares it with the conversion before exporting anything. An offline self-test covers the mapping, stable IDs, timestamps and references: `python converters/appointment_bridge.py --self-test`.
 
 ## Rejections at a glance
 

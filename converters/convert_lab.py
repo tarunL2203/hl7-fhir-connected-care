@@ -6,7 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from hl7apy.parser import parse_message
 
-folder = Path.home() / "firely-learning" / "samples"
+folder = Path(__file__).resolve().parents[1] / "samples"
 source = Path(sys.argv[1]).expanduser() if len(sys.argv) > 1 else folder / "lab-002.hl7"
 message = parse_message(
     source.read_bytes().decode("utf-8"),

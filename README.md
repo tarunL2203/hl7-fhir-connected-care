@@ -38,13 +38,13 @@ flowchart LR
 | A healthcare or business reviewer | [**Business overview**](docs/business-overview.md): the problem, users, rules, tested scenarios and requirement status. Then the [HL7 → FHIR mapping spec](docs/hl7-to-fhir-mapping.md) |
 | A data or Snowflake reviewer | [**Snowflake design**](docs/snowflake-design.md): layers, idempotent loads, validation, semantic model, security and roadmap. Then the [SQL](analytics/snowflake/) |
 | An engineer | [How it works](#how-it-works), [Getting started](#getting-started) and the [project history](docs/project-history.md) |
-| New to healthcare data | [HL7 and FHIR explained](docs/hl7-fhir-explained.md) and the [glossary](#glossary) |
+| New to healthcare data | [HL7 and FHIR explained](archive/hl7-fhir-learning-notes.md) and the [glossary](#glossary) |
 
 ## Results
 
 | What was verified | Result | Evidence |
 |---|---|---|
-| Live reviewer security checks | **15 / 15** passed: 401 for anonymous users, 403 for the wrong patient or a bad CSRF token, replayed session rejected | [reviewer milestone](docs/milestones/2026-10-03-reviewer-milestone.md) |
+| Live reviewer security checks | **15 / 15** passed: 401 for anonymous users, 403 for the wrong patient or a bad CSRF token, replayed session rejected | [reviewer milestone](archive/milestone-reports/2026-10-03-reviewer-milestone.md) |
 | Snowflake loads vs the exported source | **7/7, 3/3, 4/4, 5/5** rows match on ID, full payload, file and row number; **0** duplicates. Reproducible offline | [reproduce](results/README.md#reproduce-the-reconciliation) |
 | Repeat loads of the same files | **0** rows added (`LOAD_SKIPPED`); typed `MERGE` reruns insert **0** | [query history](results/2026-10-06-typed-analytics/05-merge-query-history.csv) |
 | Typed layer vs RAW | **0** review rows, **0** broken patient links, **0** payload mismatches | [validation](results/2026-10-06-typed-analytics/00-typed-validation.csv) |
@@ -67,9 +67,9 @@ flowchart LR
 ![Solution architecture](docs/architecture.png)
 
 1. **HL7 v2 → FHIR.**
-   - [`convert_admission.py`](convert_admission.py) maps ADT^A01 to a **Patient**, matched by identifier system + MRN and never by name.
-   - [`convert_lab.py`](convert_lab.py) maps ORU^R01 to an **Observation** coded LOINC 2345-7 in UCUM units, with an ID derived from the source message so a replay never duplicates.
-   - [`firely_appointment_bridge.py`](firely_appointment_bridge.py) maps SIU^S12 to an **Appointment** and verifies it by reading it back.
+   - [`convert_admission.py`](converters/convert_admission.py) maps ADT^A01 to a **Patient**, matched by identifier system + MRN and never by name.
+   - [`convert_lab.py`](converters/convert_lab.py) maps ORU^R01 to an **Observation** coded LOINC 2345-7 in UCUM units, with an ID derived from the source message so a replay never duplicates.
+   - [`appointment_bridge.py`](converters/appointment_bridge.py) maps SIU^S12 to an **Appointment** and verifies it by reading it back.
    - Field-by-field rules: [mapping spec](docs/hl7-to-fhir-mapping.md).
 2. **Information availability, not clinical clearance.** [`evaluator_v2.py`](worklist/evaluator_v2.py) applies [`policy.json`](worklist/spec/v2/policy.json): a glucose result with units, measured in the 7 days before the visit, with status final, amended or corrected. A gap is reported only after a complete, successful retrieval. Follow-up lives in a [worklist](worklist/worklist_store.py) with owners, due times and resolution history.
 3. **Secured review.** [`viewer_auth.py`](worklist/viewer_auth.py) implements OpenID Connect authorization code + PKCE against Firely Auth:
@@ -88,10 +88,7 @@ flowchart LR
 ## Repository layout
 
 ```
-convert_admission.py          HL7 ADT^A01  → FHIR Patient
-convert_lab.py                HL7 ORU^R01  → FHIR Observation
-firely_appointment_bridge.py  HL7 SIU^S12  → FHIR Appointment (+ read-back check)
-firely_lab_update.py          Synthetic lab load and protected local snapshot refresh
+converters/                   HL7 v2 → FHIR: admissions, lab results, appointments (+ read-back check)
 samples/                      Synthetic HL7 messages and their FHIR output
 worklist/                     Rules engine, worklist, reviewer portal, OIDC/PKCE login, tests
 documents/                    Synthetic PDF/PNG fixture served by the document gate
@@ -101,9 +98,9 @@ analytics/                    Export → S3 / stage → Snowflake pipeline, reco
   dashboard/                  Streamlit-in-Snowflake app
 datasets/                     30-patient failure cases · FHIR R4 examples (Phase 1) · migration snapshot
 results/                      Downloaded query results and verification evidence, by date
-docs/                         Business overview, mapping spec, Snowflake design, history, milestones, decks
+docs/                         Business overview, mapping spec, Snowflake design, project history, decks
 infra/                        Docker trust-store builds · sanitized Firely Auth client configuration
-scripts/patches/              One-time patch scripts from 7 Oct (already applied)
+archive/                      One-time scripts and working records from the build
 ```
 
 ## Getting started
@@ -118,8 +115,8 @@ pip install -r requirements.txt
 **Runs offline, with no servers or cloud accounts:**
 
 ```sh
-python convert_lab.py samples/lab-002.hl7          # HL7 ORU → FHIR Observation JSON
-python firely_appointment_bridge.py --self-test     # SIU^S12 mapping and stable-ID tests
+python converters/convert_lab.py samples/lab-002.hl7       # HL7 ORU → FHIR Observation JSON
+python converters/appointment_bridge.py --self-test      # SIU^S12 mapping and stable-ID tests
 python analytics/compare_fc30_outcomes.py          # 30-patient expected vs actual
 
 (cd analytics && python -B -m unittest test_export test_reconcile)
@@ -129,9 +126,9 @@ python analytics/compare_fc30_outcomes.py          # 30-patient expected vs actu
 
 The Snowflake reconciliations can also be rerun offline: see [Reproduce the reconciliation](results/README.md#reproduce-the-reconciliation).
 
-**With a local Firely Server on port 8080:** `python convert_admission.py samples/admission-002.hl7`
+**With a local Firely Server on port 8080:** `python converters/convert_admission.py samples/admission-002.hl7`
 
-**Full stack** (Firely Server on 8081 with SQL storage, Firely Auth on 5001, reviewer portal on 8082): start from [`.env.example`](.env.example) and the [sanitized Firely Auth configuration](infra/firely-auth/appsettings.instance.example.json). Supply your own licences, TLS certificates (in `auth/certs/`) and signing key. Then follow the [runbook](docs/runbook.md) and [`worklist/README-verification.md`](worklist/README-verification.md). Set `S3_BUCKET` before using [`land_s3.py`](analytics/land_s3.py) or [`prepare_snowflake.py`](analytics/prepare_snowflake.py).
+**Full stack** (Firely Server on 8081 with SQL storage, Firely Auth on 5001, reviewer portal on 8082): start from [`.env.example`](.env.example) and the [sanitized Firely Auth configuration](infra/firely-auth/appsettings.instance.example.json). Supply your own licences, TLS certificates (in `auth/certs/`) and signing key. Then follow the [runbook](archive/runbook.md) and [`worklist/README-verification.md`](worklist/README-verification.md). Set `S3_BUCKET` before using [`land_s3.py`](analytics/land_s3.py) or [`prepare_snowflake.py`](analytics/prepare_snowflake.py).
 
 ## Project timeline
 
@@ -187,8 +184,8 @@ The [project history](docs/project-history.md) tells the full story, with decisi
 | [HL7 → FHIR mapping](docs/hl7-to-fhir-mapping.md) | Field-level interface spec for ADT, ORU and SIU, with validation and identity rules |
 | [Snowflake design](docs/snowflake-design.md) | Objects, RAW and typed layers, idempotency, proofs, security, cost, roadmap |
 | [Project history](docs/project-history.md) | Phase-by-phase build log, decisions and lessons learned |
-| [Milestone reports](docs/milestones/) | Dated working reports with exact checks and query IDs |
-| [Runbook](docs/runbook.md) | Working start-of-day and end-of-day runbook used during the build |
+| [Milestone reports](archive/milestone-reports/) | Dated working reports with exact checks and query IDs |
+| [Runbook](archive/runbook.md) | Working start-of-day and end-of-day runbook used during the build |
 | [HIPAA considerations](docs/hipaa-considerations.md) | Safeguards mapped to the project, and their limits |
 | [Requirements document](docs/BRD-FRD-and-Progress.docx) | Original BRD/FRD and delivery plan, version 3.0 (Word) |
 | [Presentations](docs/presentations/) | Platform deck, consulting edition, analytics demo, beginner guide, LinkedIn carousel (PowerPoint) |

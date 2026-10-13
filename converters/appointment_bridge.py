@@ -292,7 +292,7 @@ def run(root):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--self-test", action="store_true", help="Offline tests; no Firely reads/writes")
-    parser.add_argument("--project-root", type=Path, default=Path.cwd())
+    parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args()
     if args.self_test:
         self_test()

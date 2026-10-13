@@ -77,7 +77,7 @@ The UI label is always **"Information availability, not clinical clearance."**
 
 ## What was tested
 
-**Two demo patients, end to end** (live, 3 October). Ravi was `information_complete`. Person02 Training went from gap to work item to resolved, with the full history kept (created by the assessment engine, then in review and resolved by a records user). The reviewer saw both patients, their results, their appointments and Person02's documents ([reviewer milestone](milestones/2026-10-03-reviewer-milestone.md)).
+**Two demo patients, end to end** (live, 3 October). Ravi was `information_complete`. Person02 Training went from gap to work item to resolved, with the full history kept (created by the assessment engine, then in review and resolved by a records user). The reviewer saw both patients, their results, their appointments and Person02's documents ([reviewer milestone](../archive/milestone-reports/2026-10-03-reviewer-milestone.md)).
 
 **A 30-patient failure-case catalogue** ([dataset](../datasets/fc30-failure-cases/), loaded into Snowflake on 7 October):
 
@@ -106,8 +106,8 @@ Business requirements and the AWS/Snowflake functional requirements from the [re
 |---|---|---|---|
 | BR01 Reliable healthcare record foundation | Firely FHIR server on Amazon RDS for SQL Server with enforced TLS | Done | [project history §2](project-history.md#2-cloud-database-worklist-documents-and-login-2-oct) |
 | BR02 Correct patient and laboratory identity | Identifier-based matching, deterministic resource IDs, unknown-patient rejection | Done | [mapping spec](hl7-to-fhir-mapping.md) |
-| BR03 Useful supported visit information | Patient, lab results, appointments and documents in one reviewer view | Done | [reviewer milestone](milestones/2026-10-03-reviewer-milestone.md) |
-| BR04 Controlled reviewer access | OIDC + PKCE login; 15/15 live security checks | Done | [repeatable verification](milestones/2026-10-03-repeatable-verification.md) |
+| BR03 Useful supported visit information | Patient, lab results, appointments and documents in one reviewer view | Done | [reviewer milestone](../archive/milestone-reports/2026-10-03-reviewer-milestone.md) |
+| BR04 Controlled reviewer access | OIDC + PKCE login; 15/15 live security checks | Done | [repeatable verification](../archive/milestone-reports/2026-10-03-repeatable-verification.md) |
 | BR05 Traceable pre-visit follow-up | Worklist with owners, due times, resolution rules and history | Done | [worklist history](../results/2026-10-02-worklist-assessment/worklist-history.json) |
 | BR06 Protect the demo and retain evidence | Read-only exports, checkpoints, dated evidence for every milestone | Done | [results](../results/) |
 | FR30 Bounded extract with manifest | Two-read authenticated export, SHA-256 manifest | Done | [S3 landing](../results/2026-10-04-s3-landing/) |
