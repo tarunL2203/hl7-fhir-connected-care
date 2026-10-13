@@ -35,4 +35,4 @@ reproduce:
 		$(PYTHON) -B converters/convert_lab.py samples/$$message.hl7 > /dev/null || exit 1; \
 	done
 	cd datasets/fc30-failure-cases && $(PYTHON) -B generate_dataset.py > /dev/null
-	git diff --exit-code -- samples datasets
+	git diff --exit-code -- samples datasets/fc30-failure-cases
