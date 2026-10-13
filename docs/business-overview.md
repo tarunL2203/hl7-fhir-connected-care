@@ -117,7 +117,7 @@ Business requirements and the AWS/Snowflake functional requirements from the [re
 | FR34 Typed tables and visit view | Typed Patient, Observation and Appointment tables; availability computed per appointment in SQL | Done; no separate assessment-snapshot table | [typed SQL](../analytics/snowflake/typed-analytics.sql) |
 | FR35 Three SQL outputs | Visit information availability ✓ · laboratory history (glucose timeline) ✓ · cohort record presence, in place of the planned worklist summary | Partly: worklist summary not built in Snowflake | [reports](../results/2026-10-06-typed-analytics/) |
 | FR36 Counts, IDs, links and duplicate-free replay | Independent reconciliation; repeat loads add 0 rows | Done | [reconciliation](../results/README.md#reproduce-the-reconciliation) |
-| FR37 Evidence, README and walkthrough | This repository, the milestone reports and the demo notes | Done | [README](../README.md) |
+| FR37 Evidence, README and walkthrough | This repository: README, an end-to-end [walkthrough](walkthrough.md), dated milestone reports and evidence re-checked in CI | Done | [README](../README.md) |
 
 Deferred by design in version 3.0: cloud hosting of the application, the 10-patient fixture expansion, broad HL7 support, orchestration and scale testing.
 

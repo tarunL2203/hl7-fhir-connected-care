@@ -101,6 +101,12 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
   - Worklist code now finds its configuration relative to the repository instead of a fixed home-directory path.
   - The document-gate tests, written on 2 October, now run in document mode, with a new test proving that local mode defers downloads. Before this they failed against the 7 October local-mode configuration.
   - Every offline check now passes: 8 analytics tests, 26 authentication, document-gate and startup tests, and 9 workflow tests.
+- **Release v1.0.0 (13 Oct).**
+  - Extracted a shared FHIR client.
+  - Restructured the converters into testable functions with 8 unit tests.
+  - Added CI that runs Black, pyflakes, 51 tests, the load reconciliations and the reproducibility checks on every push.
+  - Wrote the architecture description, decision records and walkthrough.
+  - Moved one-time scripts and working records to `archive/`. See the [changelog](../CHANGELOG.md).
 
 ## Lessons learned
 
