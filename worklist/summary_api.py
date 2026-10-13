@@ -1,3 +1,5 @@
+"""Patient summary: patient, observations, appointments, rule assessments and worklist history for one patient."""
+
 import json
 import re
 import sqlite3

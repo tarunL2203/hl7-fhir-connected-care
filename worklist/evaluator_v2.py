@@ -1,3 +1,5 @@
+"""Pre-visit information-availability rules: evaluate one visit against policy.json and return its outcome."""
+
 import math
 from datetime import datetime, timedelta
 from urllib.parse import urlsplit

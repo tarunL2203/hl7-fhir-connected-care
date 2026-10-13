@@ -1,3 +1,5 @@
+"""Register the synthetic documents in document-storage.json as FHIR DocumentReferences for their patient."""
+
 import json
 from pathlib import Path
 from urllib.error import HTTPError

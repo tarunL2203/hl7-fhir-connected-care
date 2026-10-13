@@ -1,3 +1,5 @@
+"""Turn assessment results into worklist items and keep the worklist in step with fresh assessments."""
+
 from datetime import timedelta
 from evaluator_v2 import timestamp
 

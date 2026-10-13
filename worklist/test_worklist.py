@@ -1,3 +1,5 @@
+"""Offline workflow tests for the worklist: create, deduplicate, transition, resolve and reopen."""
+
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path

@@ -1,3 +1,5 @@
+"""Portal routes for verified document retrieval, local-mode verification and batch export."""
+
 import hashlib
 import json
 import re

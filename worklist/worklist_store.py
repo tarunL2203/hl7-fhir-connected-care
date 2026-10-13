@@ -1,3 +1,5 @@
+"""SQLite worklist: deduplicated work items, guarded state transitions and an append-only history."""
+
 import json
 import sqlite3
 from datetime import datetime, timezone

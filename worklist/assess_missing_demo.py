@@ -1,3 +1,5 @@
+"""Assess the missing-result demo visit (fixture-v2-p02) against the pre-visit policy and save the evidence."""
+
 import json
 from datetime import datetime, timezone
 from pathlib import Path

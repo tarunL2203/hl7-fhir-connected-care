@@ -1,3 +1,5 @@
+"""Run a fresh assessment of the demo patient and reconcile the worklist with its result."""
+
 import json
 import subprocess
 import sys

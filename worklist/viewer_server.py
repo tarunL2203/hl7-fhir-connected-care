@@ -1,3 +1,5 @@
+"""Serve the reviewer page on top of the summary API routes."""
+
 from http.server import ThreadingHTTPServer
 from urllib.parse import urlsplit
 from summary_api import Handler, ROOT
