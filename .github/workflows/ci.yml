@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Lint, tests, reconciliation and reproducibility
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Lint (Black, pyflakes)
+        run: make lint PYTHON=python
+
+      - name: Unit and workflow tests
+        run: make test PYTHON=python
+
+      - name: Reconcile Snowflake loads against the exported batches
+        run: make reconcile PYTHON=python
+
+      - name: Reproduce converter outputs and the 30-patient dataset
+        run: make reproduce PYTHON=python
