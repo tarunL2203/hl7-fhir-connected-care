@@ -214,6 +214,10 @@ class RouteTests(unittest.TestCase):
         self.root_patch = patch.object(document_viewer_server, "ROOT", Path(__file__).parent)
         self.root_patch.start()
         self.addCleanup(self.root_patch.stop)
+        # These tests exercise the document gate; local mode (deferred documents) is tested separately.
+        self.mode_patch = patch.object(document_viewer_server, "local_mode", return_value=False)
+        self.mode_patch.start()
+        self.addCleanup(self.mode_patch.stop)
         self.provider = FakeProvider()
         self.auth = AuthService(self.provider)
         self.server = ThreadingHTTPServer(("127.0.0.1", 0), QuietHandler)
@@ -343,6 +347,15 @@ class RouteTests(unittest.TestCase):
              patch.object(document_viewer_server.subprocess, "run") as s3:
             status, _, _ = self.request("/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie)
             self.assertEqual(status, 502)
+            s3.assert_not_called()
+
+    def test_local_mode_defers_documents(self):
+        _, _, cookie = self.make_session()
+        with patch.object(document_viewer_server, "local_mode", return_value=True), \
+             patch.object(document_viewer_server.subprocess, "run") as s3:
+            status, _, body = self.request("/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie)
+            self.assertEqual(status, 503)
+            self.assertEqual(json.loads(body)["error"], "documents_deferred_to_aws_phase")
             s3.assert_not_called()
 
 if __name__ == "__main__":
