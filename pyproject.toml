@@ -1,0 +1,5 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+# Archived scripts and exported batch artifacts are kept exactly as they were run.
+extend-exclude = "^/(archive|analytics/batches)/"

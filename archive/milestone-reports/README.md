@@ -12,4 +12,4 @@ Contemporaneous working reports, written during the build to record exactly what
 | [2026-10-05 Snowflake internal stage](2026-10-05-snowflake-internal-stage.md) | Internal-stage RAW load, reconciliation and repeat load |
 | [2026-10-06 typed analytics](2026-10-06-typed-analytics.md) | Typed tables, three reports, rule tests and query history |
 
-For the edited, end-to-end account, read [docs/project-history.md](../project-history.md).
+For the edited, end-to-end account, read [docs/project-history.md](../../docs/project-history.md).

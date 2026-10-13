@@ -20,8 +20,22 @@ class CloudError(Exception):
 
 
 def aws(*args):
-    result = subprocess.run(["aws", *args, "--profile", PROFILE, "--region", "us-east-2",
-                             "--output", "json", "--no-cli-pager"], capture_output=True, timeout=60)
+    result = subprocess.run(
+        [
+            "aws",
+            *args,
+            "--profile",
+            PROFILE,
+            "--region",
+            "us-east-2",
+            "--output",
+            "json",
+            "--no-cli-pager",
+        ],
+        capture_output=True,
+        timeout=60,
+        check=False,
+    )
     if result.returncode:
         match = re.search(rb"An error occurred \(([^)]+)\)", result.stderr)
         code = match.group(1).decode() if match else "aws_command_failed"
@@ -40,13 +54,31 @@ def main():
     assert batch == directory.name and re.fullmatch(r"synthetic-[0-9TZ]+-[a-f0-9]{8}", batch)
     assert manifest["synthetic_data_only"] is True
     prefix = "analytics-demo/" + batch + "/"
-    evidence = {"live": True, "at": datetime.now(timezone.utc).isoformat(), "bucket": BUCKET,
-                "prefix": prefix, "objects": [], "passed": False}
+    evidence = {
+        "live": True,
+        "at": datetime.now(timezone.utc).isoformat(),
+        "bucket": BUCKET,
+        "prefix": prefix,
+        "objects": [],
+        "passed": False,
+    }
     try:
-        block = aws("s3api", "get-public-access-block", "--bucket", BUCKET)["PublicAccessBlockConfiguration"]
-        assert all(block.get(k) is True for k in ("BlockPublicAcls", "IgnorePublicAcls", "BlockPublicPolicy", "RestrictPublicBuckets"))
+        block = aws("s3api", "get-public-access-block", "--bucket", BUCKET)[
+            "PublicAccessBlockConfiguration"
+        ]
+        assert all(
+            block.get(k) is True
+            for k in (
+                "BlockPublicAcls",
+                "IgnorePublicAcls",
+                "BlockPublicPolicy",
+                "RestrictPublicBuckets",
+            )
+        )
         ownership = aws("s3api", "get-bucket-ownership-controls", "--bucket", BUCKET)
-        assert ownership["OwnershipControls"]["Rules"][0]["ObjectOwnership"] == "BucketOwnerEnforced"
+        assert (
+            ownership["OwnershipControls"]["Rules"][0]["ObjectOwnership"] == "BucketOwnerEnforced"
+        )
         evidence["public_access_block"] = block
         entries = manifest["files"] + [{"filename": "manifest.json"}]
         for entry in entries:
@@ -56,7 +88,9 @@ def main():
             data = path.read_bytes()
             sha = hashlib.sha256(data).hexdigest()
             if filename != "manifest.json":
-                assert sha == entry["sha256"] and len(data) == entry["bytes"], "local_integrity_mismatch"
+                assert (
+                    sha == entry["sha256"] and len(data) == entry["bytes"]
+                ), "local_integrity_mismatch"
                 rows = [json.loads(line) for line in data.splitlines()]
                 kind = entry["resource_type"]
                 assert len(rows) == manifest["counts"][kind]
@@ -70,19 +104,45 @@ def main():
                 if str(error) not in ("404", "NoSuchKey", "NotFound"):
                     raise
                 existed = False
-                aws("s3api", "put-object", "--bucket", BUCKET, "--key", key,
-                    "--body", str(path), "--if-none-match", "*", "--server-side-encryption", "AES256",
-                    "--checksum-algorithm", "SHA256", "--checksum-sha256", base64.b64encode(hashlib.sha256(data).digest()).decode(),
-                    "--content-type", "application/json" if filename == "manifest.json" else "application/x-ndjson")
+                aws(
+                    "s3api",
+                    "put-object",
+                    "--bucket",
+                    BUCKET,
+                    "--key",
+                    key,
+                    "--body",
+                    str(path),
+                    "--if-none-match",
+                    "*",
+                    "--server-side-encryption",
+                    "AES256",
+                    "--checksum-algorithm",
+                    "SHA256",
+                    "--checksum-sha256",
+                    base64.b64encode(hashlib.sha256(data).digest()).decode(),
+                    "--content-type",
+                    "application/json" if filename == "manifest.json" else "application/x-ndjson",
+                )
                 head = aws("s3api", "head-object", "--bucket", BUCKET, "--key", key)
             assert head["ContentLength"] == len(data)
             assert head.get("ServerSideEncryption") == "AES256"
             with tempfile.TemporaryDirectory() as tmp:
                 downloaded = Path(tmp) / "object"
                 aws("s3api", "get-object", "--bucket", BUCKET, "--key", key, str(downloaded))
-                assert hashlib.sha256(downloaded.read_bytes()).hexdigest() == sha, "download_hash_mismatch"
-            evidence["objects"].append({"key": key, "bytes": len(data), "sha256": sha,
-                "download_sha256_matches": True, "encryption": "AES256", "already_existed": existed})
+                assert (
+                    hashlib.sha256(downloaded.read_bytes()).hexdigest() == sha
+                ), "download_hash_mismatch"
+            evidence["objects"].append(
+                {
+                    "key": key,
+                    "bytes": len(data),
+                    "sha256": sha,
+                    "download_sha256_matches": True,
+                    "encryption": "AES256",
+                    "already_existed": existed,
+                }
+            )
         evidence["passed"] = True
     except Exception as error:
         evidence["failure"] = str(error) if isinstance(error, CloudError) else type(error).__name__

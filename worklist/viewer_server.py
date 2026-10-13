@@ -1,7 +1,9 @@
+"""Serve the reviewer page on top of the summary API routes."""
 
 from http.server import ThreadingHTTPServer
 from urllib.parse import urlsplit
 from summary_api import Handler, ROOT
+
 
 class ViewerHandler(Handler):
     def do_GET(self):
@@ -15,6 +17,7 @@ class ViewerHandler(Handler):
             self.wfile.write(data)
             return
         super().do_GET()
+
 
 if __name__ == "__main__":
     server = ThreadingHTTPServer(("127.0.0.1", 8082), ViewerHandler)

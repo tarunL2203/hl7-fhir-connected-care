@@ -31,15 +31,23 @@ def reconcile(batch, result):
         payload, filename, line_number = expected[key]
         assert json.loads(row["payload"]) == payload, "raw_payload_mismatch"
         assert row["batch_id"] == manifest["batch_id"], "batch_mismatch"
-        assert row["source_filename"].endswith('/' + filename) or row["source_filename"] == filename
+        assert row["source_filename"].endswith("/" + filename) or row["source_filename"] == filename
         assert int(row["file_row_number"]) == line_number, "source_row_mismatch"
         assert row["loaded_at"], "missing_load_timestamp"
         counts[row["resource_type"]] += 1
     assert seen == set(expected), "missing_or_extra_resource"
     assert dict(counts) == manifest["counts"], "count_mismatch"
-    return {"passed": True, "actual_snowflake_result_csv": str(result), "batch_id": manifest["batch_id"],
-            "rows": len(actual), "counts": dict(counts), "ids_match": True, "complete_payloads_match": True,
-            "file_row_numbers_match": True, "duplicate_count": 0}
+    return {
+        "passed": True,
+        "actual_snowflake_result_csv": str(result),
+        "batch_id": manifest["batch_id"],
+        "rows": len(actual),
+        "counts": dict(counts),
+        "ids_match": True,
+        "complete_payloads_match": True,
+        "file_row_numbers_match": True,
+        "duplicate_count": 0,
+    }
 
 
 if __name__ == "__main__":

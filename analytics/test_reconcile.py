@@ -14,11 +14,24 @@ class ReconciliationTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         resource = {"resourceType": "Patient", "id": "synthetic-test"}
         (self.root / "patient.ndjson").write_text(json.dumps(resource) + "\n")
-        (self.root / "manifest.json").write_text(json.dumps({"batch_id": "test", "counts": {"Patient": 1},
-            "files": [{"filename": "patient.ndjson"}]}))
-        self.row = {"PAYLOAD": json.dumps(resource), "RESOURCE_TYPE": "Patient", "RESOURCE_ID": "synthetic-test",
-            "BATCH_ID": "test", "SOURCE_FILENAME": "test/patient.ndjson", "FILE_ROW_NUMBER": "1",
-            "LOADED_AT": "2026-10-04T00:00:00Z"}
+        (self.root / "manifest.json").write_text(
+            json.dumps(
+                {
+                    "batch_id": "test",
+                    "counts": {"Patient": 1},
+                    "files": [{"filename": "patient.ndjson"}],
+                }
+            )
+        )
+        self.row = {
+            "PAYLOAD": json.dumps(resource),
+            "RESOURCE_TYPE": "Patient",
+            "RESOURCE_ID": "synthetic-test",
+            "BATCH_ID": "test",
+            "SOURCE_FILENAME": "test/patient.ndjson",
+            "FILE_ROW_NUMBER": "1",
+            "LOADED_AT": "2026-10-04T00:00:00Z",
+        }
 
     def write(self, rows):
         path = self.root / "simulated-result.csv"
@@ -40,7 +53,9 @@ class ReconciliationTests(unittest.TestCase):
             reconcile(self.root, self.write([]))
 
     def test_rejects_altered_payload(self):
-        row = dict(self.row, PAYLOAD='{"resourceType":"Patient","id":"synthetic-test","active":false}')
+        row = dict(
+            self.row, PAYLOAD='{"resourceType":"Patient","id":"synthetic-test","active":false}'
+        )
         with self.assertRaisesRegex(AssertionError, "payload"):
             reconcile(self.root, self.write([row]))
 

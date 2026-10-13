@@ -77,7 +77,7 @@ The UI label is always **"Information availability, not clinical clearance."**
 
 ## What was tested
 
-**Two demo patients, end to end** (live, 3 October). Ravi was `information_complete`. Person02 Training went from gap to work item to resolved, with the full history kept (created by the assessment engine, then in review and resolved by a records user). The reviewer saw both patients, their results, their appointments and Person02's documents ([reviewer milestone](milestones/2026-10-03-reviewer-milestone.md)).
+**Two demo patients, end to end** (live, 3 October). Ravi was `information_complete`. Person02 Training went from gap to work item to resolved, with the full history kept (created by the assessment engine, then in review and resolved by a records user). The reviewer saw both patients, their results, their appointments and Person02's documents ([reviewer milestone](../archive/milestone-reports/2026-10-03-reviewer-milestone.md)).
 
 **A 30-patient failure-case catalogue** ([dataset](../datasets/fc30-failure-cases/), loaded into Snowflake on 7 October):
 
@@ -106,8 +106,8 @@ Business requirements and the AWS/Snowflake functional requirements from the [re
 |---|---|---|---|
 | BR01 Reliable healthcare record foundation | Firely FHIR server on Amazon RDS for SQL Server with enforced TLS | Done | [project history §2](project-history.md#2-cloud-database-worklist-documents-and-login-2-oct) |
 | BR02 Correct patient and laboratory identity | Identifier-based matching, deterministic resource IDs, unknown-patient rejection | Done | [mapping spec](hl7-to-fhir-mapping.md) |
-| BR03 Useful supported visit information | Patient, lab results, appointments and documents in one reviewer view | Done | [reviewer milestone](milestones/2026-10-03-reviewer-milestone.md) |
-| BR04 Controlled reviewer access | OIDC + PKCE login; 15/15 live security checks | Done | [repeatable verification](milestones/2026-10-03-repeatable-verification.md) |
+| BR03 Useful supported visit information | Patient, lab results, appointments and documents in one reviewer view | Done | [reviewer milestone](../archive/milestone-reports/2026-10-03-reviewer-milestone.md) |
+| BR04 Controlled reviewer access | OIDC + PKCE login; 15/15 live security checks | Done | [repeatable verification](../archive/milestone-reports/2026-10-03-repeatable-verification.md) |
 | BR05 Traceable pre-visit follow-up | Worklist with owners, due times, resolution rules and history | Done | [worklist history](../results/2026-10-02-worklist-assessment/worklist-history.json) |
 | BR06 Protect the demo and retain evidence | Read-only exports, checkpoints, dated evidence for every milestone | Done | [results](../results/) |
 | FR30 Bounded extract with manifest | Two-read authenticated export, SHA-256 manifest | Done | [S3 landing](../results/2026-10-04-s3-landing/) |
@@ -117,7 +117,7 @@ Business requirements and the AWS/Snowflake functional requirements from the [re
 | FR34 Typed tables and visit view | Typed Patient, Observation and Appointment tables; availability computed per appointment in SQL | Done; no separate assessment-snapshot table | [typed SQL](../analytics/snowflake/typed-analytics.sql) |
 | FR35 Three SQL outputs | Visit information availability ✓ · laboratory history (glucose timeline) ✓ · cohort record presence, in place of the planned worklist summary | Partly: worklist summary not built in Snowflake | [reports](../results/2026-10-06-typed-analytics/) |
 | FR36 Counts, IDs, links and duplicate-free replay | Independent reconciliation; repeat loads add 0 rows | Done | [reconciliation](../results/README.md#reproduce-the-reconciliation) |
-| FR37 Evidence, README and walkthrough | This repository, the milestone reports and the demo notes | Done | [README](../README.md) |
+| FR37 Evidence, README and walkthrough | This repository: README, an end-to-end [walkthrough](walkthrough.md), dated milestone reports and evidence re-checked in CI | Done | [README](../README.md) |
 
 Deferred by design in version 3.0: cloud hosting of the application, the 10-patient fixture expansion, broad HL7 support, orchestration and scale testing.
 

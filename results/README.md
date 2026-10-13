@@ -20,7 +20,7 @@ Downloaded Snowflake query results, verification runs and reconciliation inputs,
 
 ## Reproduce the reconciliation
 
-The RAW downloads above can be checked against the exported batches without any cloud account. From the repository root, with `requirements.txt` installed:
+The RAW downloads above can be checked against the exported batches without any cloud account. CI does this on every push. Locally, run `make reconcile`, or the individual commands from the repository root with `requirements.txt` installed:
 
 ```sh
 # 5 Oct internal-stage load: 7 rows

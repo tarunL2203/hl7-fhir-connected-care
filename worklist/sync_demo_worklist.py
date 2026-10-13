@@ -1,3 +1,4 @@
+"""Run a fresh assessment of the demo patient and reconcile the worklist with its result."""
 
 import json
 import subprocess
@@ -8,16 +9,15 @@ from worklist_store import WorklistStore
 
 ROOT = Path(__file__).resolve().parent
 
-def main():
-    before = set((ROOT / "evidence").glob("ravi-assessment-*.json"))
 
-    completed = subprocess.run(
-        [sys.executable, str(ROOT / "assess_ravi.py")]
-    )
+def main():
+    before = set((ROOT / "evidence").glob("demo-patient-assessment-*.json"))
+
+    completed = subprocess.run([sys.executable, str(ROOT / "assess_demo_patient.py")])
     if completed.returncode != 0:
         raise RuntimeError("Live assessment failed; worklist was not updated")
 
-    after = set((ROOT / "evidence").glob("ravi-assessment-*.json"))
+    after = set((ROOT / "evidence").glob("demo-patient-assessment-*.json"))
     new_reports = after - before
     if len(new_reports) != 1:
         raise RuntimeError("Could not identify exactly one fresh assessment")
@@ -28,9 +28,7 @@ def main():
 
     store = WorklistStore(ROOT / "data/worklist.sqlite")
     try:
-        changes = synchronize(
-            store, report["input"], report["result"], policy
-        )
+        changes = synchronize(store, report["input"], report["result"], policy)
         for change in changes:
             print("Work item:", change["item_id"], change["action"])
 
@@ -38,7 +36,7 @@ def main():
         pending = store.db.execute(
             """SELECT COUNT(*) FROM items
                WHERE appointment_id=? AND status!='resolved'""",
-            (report["result"]["appointment_id"],)
+            (report["result"]["appointment_id"],),
         ).fetchone()[0]
         print("Pending items for this appointment:", pending)
 
@@ -48,6 +46,7 @@ def main():
             print("Information now complete; pending items require reviewed resolution")
     finally:
         store.close()
+
 
 if __name__ == "__main__":
     main()

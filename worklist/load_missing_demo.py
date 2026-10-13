@@ -1,3 +1,4 @@
+"""Create the missing-result demo patient and appointment in Firely; never overwrites a differing resource."""
 
 import copy
 import json
@@ -5,9 +6,10 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request
 from pathlib import Path
-from assess_ravi import BASE, get_json, search, opener
+from fhir_client import BASE, get_json, search, opener
 
 ROOT = Path(__file__).resolve().parent
+
 
 def normalize(resource):
     value = copy.deepcopy(resource)
@@ -23,25 +25,21 @@ def normalize(resource):
                 if key == "reference" and isinstance(child, str):
                     prefix = BASE + "/"
                     if child.startswith(prefix):
-                        item[key] = child[len(prefix):]
+                        item[key] = child[len(prefix) :]
                 else:
                     walk(child)
         elif isinstance(item, list):
             for child in item:
                 walk(child)
+
     walk(value)
     return value
 
+
 def main():
-    fixtures = json.loads(
-        (ROOT / "fixtures/v2/assessment-fixtures.json").read_text()
-    )
-    patient = next(
-        p for p in fixtures["patients"] if p["id"] == "fixture-v2-p02"
-    )
-    appointment = next(
-        a for a in fixtures["appointments"] if a["id"] == "fixture-v2-a02"
-    )
+    fixtures = json.loads((ROOT / "fixtures/v2/assessment-fixtures.json").read_text())
+    patient = next(p for p in fixtures["patients"] if p["id"] == "fixture-v2-p02")
+    appointment = next(a for a in fixtures["appointments"] if a["id"] == "fixture-v2-a02")
     resources = [patient, appointment]
     missing = []
 
@@ -71,8 +69,8 @@ def main():
             headers={
                 "Content-Type": "application/fhir+json",
                 "Accept": "application/fhir+json",
-                "If-None-Match": "*"
-            }
+                "If-None-Match": "*",
+            },
         )
         with opener.open(request, timeout=60) as response:
             if response.status not in (200, 201):
@@ -80,15 +78,14 @@ def main():
             response.read()
 
     for resource in resources:
-        saved = get_json(
-            BASE + "/" + resource["resourceType"] + "/" + resource["id"]
-        )
+        saved = get_json(BASE + "/" + resource["resourceType"] + "/" + resource["id"])
         if normalize(saved) != normalize(resource):
             raise RuntimeError("Read-back mismatch: " + resource["id"])
         print("Verified:", resource["resourceType"] + "/" + resource["id"])
 
     print("Resources created this run:", len(missing))
     print("Demo patient observations: 0")
+
 
 if __name__ == "__main__":
     main()

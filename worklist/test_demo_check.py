@@ -9,15 +9,21 @@ class GuardrailTests(unittest.TestCase):
     def test_sql_requires_encryption_and_certificate_validation(self):
         good = "Data Source=example.test,1433;Encrypt=True;Trust Server Certificate=False;Password=not-printed"
         self.assertEqual(sql_settings(good), ("example.test", 1433))
-        for bad in [good.replace("Encrypt=True", "Encrypt=False"),
-                    good.replace("Certificate=False", "Certificate=True")]:
+        for bad in [
+            good.replace("Encrypt=True", "Encrypt=False"),
+            good.replace("Certificate=False", "Certificate=True"),
+        ]:
             with self.assertRaises(CheckError) as error:
                 sql_settings(bad)
             self.assertNotIn("not-printed", str(error.exception))
 
     def test_changed_ip_and_wrong_port_are_denied(self):
-        rule = {"IpProtocol": "tcp", "FromPort": 1433, "ToPort": 1433,
-                "IpRanges": [{"CidrIp": "192.0.2.10/32"}]}
+        rule = {
+            "IpProtocol": "tcp",
+            "FromPort": 1433,
+            "ToPort": 1433,
+            "IpRanges": [{"CidrIp": "192.0.2.10/32"}],
+        }
         self.assertTrue(permits_ipv4(rule, "192.0.2.10", 1433))
         self.assertFalse(permits_ipv4(rule, "192.0.2.11", 1433))
         self.assertFalse(permits_ipv4(rule, "192.0.2.10", 443))
