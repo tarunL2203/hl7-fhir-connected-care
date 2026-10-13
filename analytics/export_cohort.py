@@ -46,7 +46,10 @@ def bounded_search(path, kind, reader=get_json):
         require(url not in seen and len(seen) < 100, "pagination_limit_or_cycle")
         seen.add(url)
         bundle = reader(url)  # Existing reader enforces token and local FHIR origin.
-        require(bundle.get("resourceType") == "Bundle" and bundle.get("type") == "searchset", "invalid_search_bundle")
+        require(
+            bundle.get("resourceType") == "Bundle" and bundle.get("type") == "searchset",
+            "invalid_search_bundle",
+        )
         for entry in bundle.get("entry", []):
             r = entry.get("resource", {})
             require(r.get("resourceType") == kind, "unexpected_search_resource")
@@ -70,7 +73,10 @@ def validate(resources):
         for r in rows:
             require(r.get("resourceType") == kind, "type_mismatch")
             if kind == "Observation":
-                require(patient_reference(r.get("subject", {}).get("reference"), POLICY) in expected, "observation_outside_cohort")
+                require(
+                    patient_reference(r.get("subject", {}).get("reference"), POLICY) in expected,
+                    "observation_outside_cohort",
+                )
             elif kind == "Appointment":
                 refs = [p.get("actor", {}).get("reference") for p in r.get("participant", [])]
                 patients = [patient_reference(ref, POLICY) for ref in refs]
@@ -79,8 +85,13 @@ def validate(resources):
                     if resolved and resolved not in expected:
                         raise ValueError("appointment_contains_other_patient")
                     if not resolved:
-                        exceptions.append({"resource": kind + "/" + r["id"], "reference": ref,
-                                           "reason": "non-cohort-patient actor; not exported or resolved"})
+                        exceptions.append(
+                            {
+                                "resource": kind + "/" + r["id"],
+                                "reference": ref,
+                                "reason": "non-cohort-patient actor; not exported or resolved",
+                            }
+                        )
     return exceptions
 
 
@@ -119,21 +130,44 @@ def save_export():
         (directory / name).write_bytes(data)
         reread = [json.loads(line) for line in data.splitlines()]
         require(reread == rows, "ndjson_roundtrip_failed")
-        files.append({"filename": name, "resource_type": kind, "bytes": len(data), "sha256": digest(data)})
+        files.append(
+            {"filename": name, "resource_type": kind, "bytes": len(data), "sha256": digest(data)}
+        )
         counts[kind] = len(rows)
         ids[kind] = [r["id"] for r in rows]
-    manifest = {"batch_id": batch, "extracted_at_utc": started.isoformat(), "synthetic_data_only": True,
-                "patient_ids": list(PATIENTS), "scope": list(resources), "counts": counts, "ids": ids,
-                "files": files, "searches": searches, "source": BASE,
-                "source_comparison": {"second_authorized_read_identical": True},
-                "reference_exceptions": exceptions,
-                "excluded": ["DocumentReference and PDF/image bodies", "Other patients and unrelated resources"],
-                "snapshot_consistency": "Two matching reads; not a transactionally locked FHIR snapshot"}
+    manifest = {
+        "batch_id": batch,
+        "extracted_at_utc": started.isoformat(),
+        "synthetic_data_only": True,
+        "patient_ids": list(PATIENTS),
+        "scope": list(resources),
+        "counts": counts,
+        "ids": ids,
+        "files": files,
+        "searches": searches,
+        "source": BASE,
+        "source_comparison": {"second_authorized_read_identical": True},
+        "reference_exceptions": exceptions,
+        "excluded": [
+            "DocumentReference and PDF/image bodies",
+            "Other patients and unrelated resources",
+        ],
+        "snapshot_consistency": "Two matching reads; not a transactionally locked FHIR snapshot",
+    }
     (directory / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    evidence = {"live": True, "authorized_normal_reviewer_session": True, "batch_id": batch,
-                "counts": counts, "ids": ids, "source_comparison_passed": True, "pagination": searches,
-                "manifest_sha256": digest((directory / "manifest.json").read_bytes())}
-    (ROOT / "analytics/evidence" / (batch + "-extract.json")).write_text(json.dumps(evidence, indent=2) + "\n")
+    evidence = {
+        "live": True,
+        "authorized_normal_reviewer_session": True,
+        "batch_id": batch,
+        "counts": counts,
+        "ids": ids,
+        "source_comparison_passed": True,
+        "pagination": searches,
+        "manifest_sha256": digest((directory / "manifest.json").read_bytes()),
+    }
+    (ROOT / "analytics/evidence" / (batch + "-extract.json")).write_text(
+        json.dumps(evidence, indent=2) + "\n"
+    )
     print(json.dumps(evidence, indent=2), flush=True)
     print("Export: " + str(directory), flush=True)
 
@@ -165,7 +199,9 @@ def main():
         finally:
             ACCESS_TOKEN.reset(context)
         require(digest(db.read_bytes()) == before, "worklist_changed")
-        print("Read-only export complete; worklist unchanged. Viewer remains available.", flush=True)
+        print(
+            "Read-only export complete; worklist unchanged. Viewer remains available.", flush=True
+        )
         session = None
         while True:
             time.sleep(1)

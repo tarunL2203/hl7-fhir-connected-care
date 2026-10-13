@@ -28,24 +28,43 @@ def main():
             continue
         outcome = want["expected_information_availability"]
         if got["INFORMATION_AVAILABILITY"] != outcome:
-            failures.append(f"{appointment_id}: expected {outcome}, got {got['INFORMATION_AVAILABILITY']}")
+            failures.append(
+                f"{appointment_id}: expected {outcome}, got {got['INFORMATION_AVAILABILITY']}"
+            )
         # Without a configured rule nothing is evaluated, so no results are counted as qualifying.
-        count = want["expected_qualifying_glucose_count"] if outcome != "requirements_not_configured" else "0"
+        count = (
+            want["expected_qualifying_glucose_count"]
+            if outcome != "requirements_not_configured"
+            else "0"
+        )
         if int(got["QUALIFYING_GLUCOSE_COUNT"]) != int(count):
-            failures.append(f"{appointment_id}: expected {count} qualifying results, got {got['QUALIFYING_GLUCOSE_COUNT']}")
+            failures.append(
+                f"{appointment_id}: expected {count} qualifying results, got {got['QUALIFYING_GLUCOSE_COUNT']}"
+            )
     extra = sorted(set(actual) - set(expected))
     failures += [a + ": not in the expected outcomes" for a in extra]
 
-    expected_issues = {r["resource_id"]: r["issue"] for r in rows(DATASET / "expected-review-issues.csv")}
-    flagged = {r["OBSERVATION_ID"]: r["REVIEW_REASON"] for r in rows(RESULTS / "needs-review-observations.csv")}
+    expected_issues = {
+        r["resource_id"]: r["issue"] for r in rows(DATASET / "expected-review-issues.csv")
+    }
+    flagged = {
+        r["OBSERVATION_ID"]: r["REVIEW_REASON"]
+        for r in rows(RESULTS / "needs-review-observations.csv")
+    }
     if set(flagged) != set(expected_issues):
-        failures.append(f"review flags differ: expected {sorted(expected_issues)}, got {sorted(flagged)}")
+        failures.append(
+            f"review flags differ: expected {sorted(expected_issues)}, got {sorted(flagged)}"
+        )
 
     if failures:
         print("\n".join("FAIL: " + f for f in failures))
         sys.exit(1)
-    print(f"PASS: all {len(expected)} appointment outcomes and qualifying counts match the expected outcomes.")
-    print(f"PASS: all {len(expected_issues)} deliberately broken observations were flagged for review.")
+    print(
+        f"PASS: all {len(expected)} appointment outcomes and qualifying counts match the expected outcomes."
+    )
+    print(
+        f"PASS: all {len(expected_issues)} deliberately broken observations were flagged for review."
+    )
 
 
 if __name__ == "__main__":

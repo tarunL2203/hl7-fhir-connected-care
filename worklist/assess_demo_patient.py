@@ -10,28 +10,24 @@ from fhir_client import BASE, get_json, search
 ROOT = Path(__file__).resolve().parent
 PATIENT_ID = "demo-patient-002"
 
+
 def main():
     policy = json.loads((ROOT / "spec/v2/policy.json").read_text())
-    spec = importlib.util.spec_from_file_location(
-        "evaluator_v2", ROOT / "evaluator_v2.py"
-    )
+    spec = importlib.util.spec_from_file_location("evaluator_v2", ROOT / "evaluator_v2.py")
     engine = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(engine)
 
     patient = get_json(BASE + "/Patient/" + PATIENT_ID)
-    if (
-        patient.get("resourceType") != "Patient"
-        or patient.get("id") != PATIENT_ID
-    ):
+    if patient.get("resourceType") != "Patient" or patient.get("id") != PATIENT_ID:
         raise RuntimeError("Patient read-back does not match requested ID")
 
     appointments = search("Appointment", "Appointment")
     linked = [
-        appointment for appointment in appointments
+        appointment
+        for appointment in appointments
         if any(
-            engine.patient_reference(
-                participant.get("actor", {}).get("reference"), policy
-            ) == "Patient/" + PATIENT_ID
+            engine.patient_reference(participant.get("actor", {}).get("reference"), policy)
+            == "Patient/" + PATIENT_ID
             for participant in appointment.get("participant", [])
         )
     ]
@@ -50,7 +46,7 @@ def main():
         "profile_id": "demo-lab-review",
         "identity_state": "resolved",
         "retrieval_state": "complete",
-        "observations": observations
+        "observations": observations,
     }
     result = engine.evaluate(case, policy)
     now = datetime.now(timezone.utc)
@@ -59,10 +55,12 @@ def main():
         "source": BASE,
         "profile_assignment": "Explicit synthetic demo assignment",
         "input": case,
-        "result": result
+        "result": result,
     }
-    output = ROOT / "evidence" / (
-        "demo-patient-assessment-" + now.strftime("%Y%m%dT%H%M%S%fZ") + ".json"
+    output = (
+        ROOT
+        / "evidence"
+        / ("demo-patient-assessment-" + now.strftime("%Y%m%dT%H%M%S%fZ") + ".json")
     )
     output.write_text(json.dumps(evidence, indent=2) + "\n")
 
@@ -75,6 +73,7 @@ def main():
         print("Requirement:", requirement["requirement_id"])
         print("Matching records:", len(requirement["matched_record_ids"]))
     print("Evidence saved:", output.name)
+
 
 if __name__ == "__main__":
     try:

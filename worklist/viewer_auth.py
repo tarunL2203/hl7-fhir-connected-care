@@ -21,19 +21,28 @@ READ_SCOPES = {"user/" + resource + ".rs" for resource in RESOURCE_TYPES}
 SCOPES = " ".join(["openid", "profile", "fhirUser", *sorted(READ_SCOPES)])
 REVIEWER = "Practitioner/demo-reviewer"
 
+
 class AuthError(Exception):
     """Safe error code; never contains a token or provider response."""
+
 
 class NoRedirects(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         raise AuthError("provider_redirect_blocked")
 
+
 def provider_url(url):
     p = urlsplit(url)
-    if (p.scheme != "https" or p.netloc != "localhost:5001"
-            or p.username or p.password or p.fragment):
+    if (
+        p.scheme != "https"
+        or p.netloc != "localhost:5001"
+        or p.username
+        or p.password
+        or p.fragment
+    ):
         raise AuthError("unexpected_provider_endpoint")
     return url
+
 
 class Provider:
     def __init__(self, ca_file):
@@ -62,6 +71,7 @@ class Provider:
             raise
         except Exception:
             raise AuthError("provider_request_failed") from None
+
 
 class AuthService:
     def __init__(self, provider):
@@ -93,24 +103,35 @@ class AuthService:
 
     def begin(self):
         state, browser, nonce, verifier = [secrets.token_urlsafe(32) for _ in range(4)]
-        challenge = base64.urlsafe_b64encode(
-            hashlib.sha256(verifier.encode()).digest()
-        ).rstrip(b"=").decode()
+        challenge = (
+            base64.urlsafe_b64encode(hashlib.sha256(verifier.encode()).digest())
+            .rstrip(b"=")
+            .decode()
+        )
         with self.lock:
             self.prune()
             if len(self.pending) >= 128:
                 raise AuthError("too_many_login_attempts")
             self.pending[state] = {
-                "browser": browser, "nonce": nonce, "verifier": verifier,
-                "expires": time.time() + 300
+                "browser": browser,
+                "nonce": nonce,
+                "verifier": verifier,
+                "expires": time.time() + 300,
             }
-        query = urlencode({
-            "client_id": CLIENT_ID, "redirect_uri": CALLBACK,
-            "response_type": "code", "response_mode": "query",
-            "scope": SCOPES, "aud": AUDIENCE,
-            "state": state, "nonce": nonce,
-            "code_challenge": challenge, "code_challenge_method": "S256"
-        })
+        query = urlencode(
+            {
+                "client_id": CLIENT_ID,
+                "redirect_uri": CALLBACK,
+                "response_type": "code",
+                "response_mode": "query",
+                "scope": SCOPES,
+                "aud": AUDIENCE,
+                "state": state,
+                "nonce": nonce,
+                "code_challenge": challenge,
+                "code_challenge_method": "S256",
+            }
+        )
         return self.discovery["authorization_endpoint"] + "?" + query, browser
 
     def consume(self, state, browser):
@@ -126,13 +147,18 @@ class AuthService:
             header = jwt.get_unverified_header(token)
             if header.get("alg") != "RS256" or not isinstance(header.get("kid"), str):
                 raise AuthError("unsupported_token_signing_algorithm")
+
             def matching_keys():
                 with self.lock:
-                    return [key for key in self.keys
-                            if key.get("kid") == header["kid"]
-                            and key.get("kty") == "RSA"
-                            and key.get("use", "sig") == "sig"
-                            and key.get("alg", "RS256") == "RS256"]
+                    return [
+                        key
+                        for key in self.keys
+                        if key.get("kid") == header["kid"]
+                        and key.get("kty") == "RSA"
+                        and key.get("use", "sig") == "sig"
+                        and key.get("alg", "RS256") == "RS256"
+                    ]
+
             keys = matching_keys()
             if not keys:
                 self.refresh_keys()
@@ -141,9 +167,13 @@ class AuthService:
                 raise AuthError("unknown_token_signing_key")
             key = jwt.PyJWK.from_dict(keys[0]).key
             return jwt.decode(
-                token, key, algorithms=["RS256"], issuer=ISSUER,
-                audience=audience, leeway=0,
-                options={"require": ["iss", "aud", "sub", "exp", "iat"]}
+                token,
+                key,
+                algorithms=["RS256"],
+                issuer=ISSUER,
+                audience=audience,
+                leeway=0,
+                options={"require": ["iss", "aud", "sub", "exp", "iat"]},
             )
         except AuthError:
             raise
@@ -151,11 +181,16 @@ class AuthService:
             raise AuthError("token_validation_failed") from None
 
     def complete(self, pending, code):
-        response = self.provider.fetch(self.discovery["token_endpoint"], form={
-            "grant_type": "authorization_code", "client_id": CLIENT_ID,
-            "redirect_uri": CALLBACK, "code": code,
-            "code_verifier": pending["verifier"]
-        })
+        response = self.provider.fetch(
+            self.discovery["token_endpoint"],
+            form={
+                "grant_type": "authorization_code",
+                "client_id": CLIENT_ID,
+                "redirect_uri": CALLBACK,
+                "code": code,
+                "code_verifier": pending["verifier"],
+            },
+        )
         if str(response.get("token_type", "")).lower() != "bearer":
             raise AuthError("unexpected_token_type")
         access = response.get("access_token")
@@ -166,17 +201,27 @@ class AuthService:
         id_claims = self.decode(identity, CLIENT_ID)
         if id_claims.get("azp", CLIENT_ID) != CLIENT_ID:
             raise AuthError("unexpected_authorized_party")
-        if isinstance(id_claims["aud"], list) and len(id_claims["aud"]) > 1 and "azp" not in id_claims:
+        if (
+            isinstance(id_claims["aud"], list)
+            and len(id_claims["aud"]) > 1
+            and "azp" not in id_claims
+        ):
             raise AuthError("missing_authorized_party")
-        if not isinstance(id_claims.get("nonce"), str) or not hmac.compare_digest(id_claims["nonce"], pending["nonce"]):
+        if not isinstance(id_claims.get("nonce"), str) or not hmac.compare_digest(
+            id_claims["nonce"], pending["nonce"]
+        ):
             raise AuthError("login_nonce_mismatch")
         if claims["sub"] != id_claims["sub"] or claims.get("client_id") != CLIENT_ID:
             raise AuthError("login_subject_or_client_mismatch")
         if "at_hash" in id_claims:
-            expected = base64.urlsafe_b64encode(
-                hashlib.sha256(access.encode()).digest()[:16]
-            ).rstrip(b"=").decode()
-            if not isinstance(id_claims["at_hash"], str) or not hmac.compare_digest(expected, id_claims["at_hash"]):
+            expected = (
+                base64.urlsafe_b64encode(hashlib.sha256(access.encode()).digest()[:16])
+                .rstrip(b"=")
+                .decode()
+            )
+            if not isinstance(id_claims["at_hash"], str) or not hmac.compare_digest(
+                expected, id_claims["at_hash"]
+            ):
                 raise AuthError("access_token_hash_mismatch")
         scope = claims.get("scope", [])
         scope = set(scope.split() if isinstance(scope, str) else scope)
@@ -188,10 +233,7 @@ class AuthService:
             if userinfo.get("sub") != claims["sub"]:
                 raise AuthError("userinfo_subject_mismatch")
             fhir_user = userinfo.get("fhirUser")
-        permitted = {
-            REVIEWER, "http://localhost:8081/" + REVIEWER,
-            AUDIENCE + "/" + REVIEWER
-        }
+        permitted = {REVIEWER, "http://localhost:8081/" + REVIEWER, AUDIENCE + "/" + REVIEWER}
         if not isinstance(fhir_user, str) or fhir_user not in permitted:
             raise AuthError("demo_reviewer_identity_required")
         now = time.time()
@@ -200,9 +242,12 @@ class AuthService:
             raise AuthError("access_token_expired")
         session_id = secrets.token_urlsafe(32)
         session = {
-            "access_token": access, "claims": claims,
-            "expires": expires, "csrf": secrets.token_urlsafe(32),
-            "fhir_user": REVIEWER, "display_name": "Demo Reviewer"
+            "access_token": access,
+            "claims": claims,
+            "expires": expires,
+            "csrf": secrets.token_urlsafe(32),
+            "fhir_user": REVIEWER,
+            "display_name": "Demo Reviewer",
         }
         with self.lock:
             self.prune()
@@ -219,6 +264,10 @@ class AuthService:
     def logout(self, session_id, csrf):
         with self.lock:
             session = self.session(session_id)
-            if not session or not isinstance(csrf, str) or not hmac.compare_digest(session["csrf"], csrf):
+            if (
+                not session
+                or not isinstance(csrf, str)
+                or not hmac.compare_digest(session["csrf"], csrf)
+            ):
                 raise AuthError("invalid_logout_request")
             self.sessions.pop(session_id, None)

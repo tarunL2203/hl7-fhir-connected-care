@@ -39,14 +39,30 @@ def main():
     bucket = os.environ.get("S3_BUCKET", "<S3_BUCKET>")
     output = ROOT / "analytics/sql" / batch
     output.mkdir(parents=True, exist_ok=True)
-    policy = {"Version": "2012-10-17", "Statement": [
-        {"Effect": "Allow", "Action": ["s3:GetBucketLocation"], "Resource": f"arn:aws:s3:::{bucket}"},
-        {"Effect": "Allow", "Action": ["s3:ListBucket"], "Resource": f"arn:aws:s3:::{bucket}",
-         "Condition": {"StringLike": {"s3:prefix": [prefix, prefix + "*"]}}},
-        {"Effect": "Allow", "Action": ["s3:GetObject", "s3:GetObjectVersion"],
-         "Resource": f"arn:aws:s3:::{bucket}/{prefix}*"}]}
+    policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Action": ["s3:GetBucketLocation"],
+                "Resource": f"arn:aws:s3:::{bucket}",
+            },
+            {
+                "Effect": "Allow",
+                "Action": ["s3:ListBucket"],
+                "Resource": f"arn:aws:s3:::{bucket}",
+                "Condition": {"StringLike": {"s3:prefix": [prefix, prefix + "*"]}},
+            },
+            {
+                "Effect": "Allow",
+                "Action": ["s3:GetObject", "s3:GetObjectVersion"],
+                "Resource": f"arn:aws:s3:::{bucket}/{prefix}*",
+            },
+        ],
+    }
     (output / "iam-read-policy.json").write_text(json.dumps(policy, indent=2) + "\n")
-    (output / "01-access.sql").write_text(f"""-- READ-ONLY inventory first. Confirm role privileges, credits and an existing warehouse.
+    (output / "01-access.sql").write_text(
+        f"""-- READ-ONLY inventory first. Confirm role privileges, credits and an existing warehouse.
 SELECT CURRENT_ACCOUNT(), CURRENT_ORGANIZATION_NAME(), CURRENT_USER(), CURRENT_ROLE();
 SHOW WAREHOUSES;
 SHOW DATABASES;
@@ -65,7 +81,8 @@ DESCRIBE INTEGRATION {integration};
 -- and STORAGE_AWS_EXTERNAL_ID, attach iam-read-policy.json, then verify the role.
 -- After required browser confirmation, activate before proceeding to 02-load.sql:
 -- ALTER STORAGE INTEGRATION {integration} SET ENABLED = TRUE;
-""")
+"""
+    )
     copy = f"""COPY INTO {table}
  (payload, resource_type, resource_id, batch_id, source_filename, file_row_number, loaded_at)
  FROM (SELECT t.$1, t.$1:resourceType::VARCHAR, t.$1:id::VARCHAR,
@@ -74,7 +91,8 @@ DESCRIBE INTEGRATION {integration};
  FILES = ('patient.ndjson', 'observation.ndjson', 'appointment.ndjson')
  ON_ERROR = ABORT_STATEMENT FORCE = FALSE PURGE = FALSE;
 """
-    (output / "02-load.sql").write_text(f"""-- Use only the verified existing warehouse; never creates or resizes it.
+    (output / "02-load.sql").write_text(
+        f"""-- Use only the verified existing warehouse; never creates or resizes it.
 USE WAREHOUSE {warehouse};
 ALTER SESSION SET STATEMENT_TIMEOUT_IN_SECONDS = 120;
 ALTER SESSION SET QUERY_TAG = 'firely-synthetic-raw-{suffix}';
@@ -93,7 +111,8 @@ LIST @{stage};
 {copy}
 -- Capture the COPY query ID and result immediately.
 SELECT LAST_QUERY_ID() AS copy_query_id;
-""")
+"""
+    )
     expected = json.dumps(manifest["ids"], separators=(",", ":")).replace("'", "''")
     verification = f"""-- Counts and IDs: save actual results and query IDs.
 SELECT resource_type, COUNT(*) AS resource_count, ARRAY_AGG(resource_id) WITHIN GROUP (ORDER BY resource_id) AS ids
@@ -122,13 +141,33 @@ SELECT resource_id, p.value:actor:reference::VARCHAR AS patient_reference
  WHERE batch_id = '{batch}' AND resource_type = 'Appointment';
 """
     (output / "03-reconcile.sql").write_text(verification)
-    (output / "04-repeat.sql").write_text("-- Repeat identical COPY without FORCE; save result and query ID.\n" + copy +
-        "SELECT LAST_QUERY_ID() AS repeat_copy_query_id;\n" + verification +
-        "-- Suspend only if this session resumed the warehouse and it has no other users/work.\n" +
-        f"-- ALTER WAREHOUSE {warehouse} SUSPEND;\n")
-    (output / "objects.json").write_text(json.dumps({"batch_id": batch, "database": db, "warehouse": warehouse,
-        "schema": schema, "integration": integration, "stage": stage, "table": table,
-        "bucket": bucket, "prefix": prefix, "role_arn": args.role_arn, "executed": False}, indent=2) + "\n")
+    (output / "04-repeat.sql").write_text(
+        "-- Repeat identical COPY without FORCE; save result and query ID.\n"
+        + copy
+        + "SELECT LAST_QUERY_ID() AS repeat_copy_query_id;\n"
+        + verification
+        + "-- Suspend only if this session resumed the warehouse and it has no other users/work.\n"
+        + f"-- ALTER WAREHOUSE {warehouse} SUSPEND;\n"
+    )
+    (output / "objects.json").write_text(
+        json.dumps(
+            {
+                "batch_id": batch,
+                "database": db,
+                "warehouse": warehouse,
+                "schema": schema,
+                "integration": integration,
+                "stage": stage,
+                "table": table,
+                "bucket": bucket,
+                "prefix": prefix,
+                "role_arn": args.role_arn,
+                "executed": False,
+            },
+            indent=2,
+        )
+        + "\n"
+    )
     print(output)
 
 

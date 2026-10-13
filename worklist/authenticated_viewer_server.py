@@ -12,7 +12,7 @@ from viewer_auth import AuthService, Provider, AuthError, ORIGIN
 
 SESSION_COOKIE = "__Host-firely_viewer"
 LOGIN_COOKIE = "__Host-firely_login"
-LOGIN_PAGE = b'''<!doctype html><html><head><meta charset="utf-8">
+LOGIN_PAGE = b"""<!doctype html><html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sign in | Visit Information Worklist</title></head>
 <body style="font:18px system-ui;max-width:650px;margin:80px auto;padding:20px">
@@ -20,14 +20,18 @@ LOGIN_PAGE = b'''<!doctype html><html><head><meta charset="utf-8">
 <p><a href="/auth/login">Sign in with Firely</a></p>
 <p>Use the Demo Reviewer account. Viewer sessions last up to 15 minutes.</p>
 <p>This viewer's sign-out ends its session. Firely may retain its separate sign-in session.</p>
-</body></html>'''
+</body></html>"""
+
 
 class AuthenticatedHandler(DocumentHandler):
     def end_headers(self):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Frame-Options", "DENY")
-        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
+        )
         super().end_headers()
 
     def log_message(self, *args):
@@ -43,7 +47,10 @@ class AuthenticatedHandler(DocumentHandler):
         return {key: value.value for key, value in jar.items()}
 
     def cookie(self, name, value, max_age):
-        self.send_header("Set-Cookie", f"{name}={value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age={max_age}")
+        self.send_header(
+            "Set-Cookie",
+            f"{name}={value}; Path=/; Secure; HttpOnly; SameSite=Lax; Max-Age={max_age}",
+        )
 
     def redirect(self, location, cookie=None):
         self.send_response(303)
@@ -71,11 +78,21 @@ class AuthenticatedHandler(DocumentHandler):
             return
         if path == "/auth/session":
             session = self.current_session()
-            self.send_json(200, {
-                "authenticated": bool(session),
-                **({"name": session["display_name"], "expires_at": session["expires"],
-                    "csrf": session["csrf"]} if session else {})
-            })
+            self.send_json(
+                200,
+                {
+                    "authenticated": bool(session),
+                    **(
+                        {
+                            "name": session["display_name"],
+                            "expires_at": session["expires"],
+                            "csrf": session["csrf"],
+                        }
+                        if session
+                        else {}
+                    ),
+                },
+            )
             return
         if path == "/auth/login":
             try:
@@ -106,7 +123,13 @@ class AuthenticatedHandler(DocumentHandler):
                 self.cookie(LOGIN_COOKIE, "", 0)
                 self.end_headers()
             except AuthError as error:
-                self.send_json(403, {"error": str(error), "message": "Sign in again using the Demo Reviewer account."})
+                self.send_json(
+                    403,
+                    {
+                        "error": str(error),
+                        "message": "Sign in again using the Demo Reviewer account.",
+                    },
+                )
             except Exception:
                 self.send_json(502, {"error": "login_not_completed"})
             return
@@ -153,6 +176,7 @@ class AuthenticatedHandler(DocumentHandler):
         except Exception:
             self.send_json(403, {"error": "invalid_logout_request"})
 
+
 def create_server():
     """Build the same verified HTTPS server for normal use and live verification."""
     certs = Path(__file__).resolve().parent.parent / "auth/certs"
@@ -168,6 +192,7 @@ def create_server():
         raise SystemExit("Viewer startup stopped: " + str(error)) from error
     return server
 
+
 def main():
     server = create_server()
     auth = server.auth
@@ -182,6 +207,7 @@ def main():
         with auth.lock:
             auth.sessions.clear()
             auth.pending.clear()
+
 
 if __name__ == "__main__":
     main()

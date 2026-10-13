@@ -20,6 +20,7 @@ import document_viewer_server
 from authenticated_viewer_server import AuthenticatedHandler, SESSION_COOKIE
 from viewer_auth import AuthService, AuthError, ISSUER, CLIENT_ID, AUDIENCE, READ_SCOPES, REVIEWER
 
+
 class FakeProvider:
     def __init__(self):
         self.key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
@@ -35,25 +36,48 @@ class FakeProvider:
     def fetch(self, url, form=None, token=None):
         self.calls.append((url, form))
         if url.endswith("openid-configuration"):
-            return {"issuer": ISSUER, "authorization_endpoint": ISSUER + "/connect/authorize",
-                    "token_endpoint": ISSUER + "/connect/token", "jwks_uri": ISSUER + "/keys"}
+            return {
+                "issuer": ISSUER,
+                "authorization_endpoint": ISSUER + "/connect/authorize",
+                "token_endpoint": ISSUER + "/connect/token",
+                "jwks_uri": ISSUER + "/keys",
+            }
         if url.endswith("/keys"):
             return {"keys": [self.public]}
         if url.endswith("/connect/token"):
-            if form["code"] != "one-use-test-code" or form["code_verifier"] != self.transaction["verifier"]:
+            if (
+                form["code"] != "one-use-test-code"
+                or form["code_verifier"] != self.transaction["verifier"]
+            ):
                 raise AuthError("invalid_test_code_or_verifier")
             now = int(time.time())
-            access = {"iss": ISSUER, "aud": AUDIENCE, "sub": "reviewer-id",
-                      "iat": now - 1, "exp": now + 900, "client_id": CLIENT_ID,
-                      "scope": sorted(READ_SCOPES)}
-            identity = {"iss": ISSUER, "aud": CLIENT_ID, "sub": "reviewer-id",
-                        "iat": now - 1, "exp": now + 900,
-                        "nonce": self.transaction["nonce"], "fhirUser": REVIEWER}
+            access = {
+                "iss": ISSUER,
+                "aud": AUDIENCE,
+                "sub": "reviewer-id",
+                "iat": now - 1,
+                "exp": now + 900,
+                "client_id": CLIENT_ID,
+                "scope": sorted(READ_SCOPES),
+            }
+            identity = {
+                "iss": ISSUER,
+                "aud": CLIENT_ID,
+                "sub": "reviewer-id",
+                "iat": now - 1,
+                "exp": now + 900,
+                "nonce": self.transaction["nonce"],
+                "fhirUser": REVIEWER,
+            }
             access.update(self.access_changes)
             identity.update(self.id_changes)
-            return {"token_type": "Bearer", "access_token": self.token(access),
-                    "id_token": self.token(identity)}
+            return {
+                "token_type": "Bearer",
+                "access_token": self.token(access),
+                "id_token": self.token(identity),
+            }
         raise AssertionError("Unexpected provider URL")
+
 
 class AuthTests(unittest.TestCase):
     def setUp(self):
@@ -82,7 +106,11 @@ class AuthTests(unittest.TestCase):
         with self.assertRaises(AuthError):
             self.auth.consume(state, "other-browser")
         pending = self.auth.consume(state, browser)
-        challenge = base64.urlsafe_b64encode(hashlib.sha256(pending["verifier"].encode()).digest()).rstrip(b"=").decode()
+        challenge = (
+            base64.urlsafe_b64encode(hashlib.sha256(pending["verifier"].encode()).digest())
+            .rstrip(b"=")
+            .decode()
+        )
         self.assertEqual(query["code_challenge"], [challenge])
         self.assertEqual(query["code_challenge_method"], ["S256"])
         with self.assertRaises(AuthError):
@@ -102,21 +130,32 @@ class AuthTests(unittest.TestCase):
 
     def test_bad_signature(self):
         other = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-        self.provider.token = lambda claims: jwt.encode(claims, other, algorithm="RS256", headers={"kid": "test-key"})
+        self.provider.token = lambda claims: jwt.encode(
+            claims, other, algorithm="RS256", headers={"kid": "test-key"}
+        )
         with self.assertRaises(AuthError):
             self.login()
 
     def test_wrong_issuer_audience_expiry_and_subject(self):
-        for change in ({"iss": "https://attacker.test"}, {"aud": "other-audience"},
-                       {"exp": int(time.time()) - 1}, {"sub": "another-user"},
-                       {"client_id": "another-client"}):
+        for change in (
+            {"iss": "https://attacker.test"},
+            {"aud": "other-audience"},
+            {"exp": int(time.time()) - 1},
+            {"sub": "another-user"},
+            {"client_id": "another-client"},
+        ):
             with self.subTest(change=change):
                 self.provider.access_changes = change
                 with self.assertRaises(AuthError):
                     self.login()
 
     def test_algorithm_confusion_blocked(self):
-        token = jwt.encode({"sub": "x"}, "not-an-rsa-key-but-long-enough-for-hmac", algorithm="HS256", headers={"kid": "test-key"})
+        token = jwt.encode(
+            {"sub": "x"},
+            "not-an-rsa-key-but-long-enough-for-hmac",
+            algorithm="HS256",
+            headers={"kid": "test-key"},
+        )
         with self.assertRaisesRegex(AuthError, "algorithm"):
             self.auth.decode(token, AUDIENCE)
 
@@ -140,13 +179,16 @@ class AuthTests(unittest.TestCase):
         session["expires"] = time.time() - 1
         self.assertIsNone(self.auth.session(sid))
 
+
 class FakeOpener:
     def __init__(self):
         self.headers = []
         self.responses = []
+
     def open(self, request, timeout):
         self.headers.append(request.get_header("Authorization"))
         return io.BytesIO(json.dumps(self.responses.pop(0)).encode())
+
 
 class TransportTests(unittest.TestCase):
     def test_no_token_no_network(self):
@@ -158,9 +200,13 @@ class TransportTests(unittest.TestCase):
     def test_all_pages_forward_token(self):
         opener = FakeOpener()
         opener.responses = [
-            {"resourceType": "Bundle", "type": "searchset", "entry": [],
-             "link": [{"relation": "next", "url": "http://localhost:8081/Patient?page=2"}]},
-            {"resourceType": "Bundle", "type": "searchset", "entry": []}
+            {
+                "resourceType": "Bundle",
+                "type": "searchset",
+                "entry": [],
+                "link": [{"relation": "next", "url": "http://localhost:8081/Patient?page=2"}],
+            },
+            {"resourceType": "Bundle", "type": "searchset", "entry": []},
         ]
         context = auth_fhir.ACCESS_TOKEN.set("test-token")
         try:
@@ -172,8 +218,14 @@ class TransportTests(unittest.TestCase):
 
     def test_external_pagination_blocked(self):
         opener = FakeOpener()
-        opener.responses = [{"resourceType": "Bundle", "type": "searchset", "entry": [],
-                             "link": [{"relation": "next", "url": "https://attacker.test/Patient"}]}]
+        opener.responses = [
+            {
+                "resourceType": "Bundle",
+                "type": "searchset",
+                "entry": [],
+                "link": [{"relation": "next", "url": "https://attacker.test/Patient"}],
+            }
+        ]
         context = auth_fhir.ACCESS_TOKEN.set("test-token")
         try:
             with patch.object(auth_fhir, "opener", opener):
@@ -186,24 +238,31 @@ class TransportTests(unittest.TestCase):
     def test_thread_token_isolation(self):
         results = {}
         barrier = threading.Barrier(2)
+
         def worker(name):
             context = auth_fhir.ACCESS_TOKEN.set(name)
             barrier.wait()
             results[name] = auth_fhir.ACCESS_TOKEN.get()
             auth_fhir.ACCESS_TOKEN.reset(context)
+
         threads = [threading.Thread(target=worker, args=(name,)) for name in ("one", "two")]
-        for thread in threads: thread.start()
-        for thread in threads: thread.join()
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
         self.assertEqual(results, {"one": "one", "two": "two"})
         self.assertIsNone(auth_fhir.ACCESS_TOKEN.get())
+
 
 class QuietHandler(AuthenticatedHandler):
     def log_message(self, *args):
         pass
 
+
 class NoFollow(HTTPRedirectHandler):
     def redirect_request(self, *args, **kwargs):
         return None
+
 
 class RouteTests(unittest.TestCase):
     def setUp(self):
@@ -230,11 +289,15 @@ class RouteTests(unittest.TestCase):
 
     def request(self, path, cookie=None, body=None, origin=None):
         headers = {"Host": "localhost:8082"}
-        if cookie: headers["Cookie"] = cookie
-        if origin: headers["Origin"] = origin
+        if cookie:
+            headers["Cookie"] = cookie
+        if origin:
+            headers["Origin"] = origin
         raw = json.dumps(body).encode() if body is not None else None
         try:
-            response = self.opener.open(Request(self.base + path, data=raw, headers=headers), timeout=3)
+            response = self.opener.open(
+                Request(self.base + path, data=raw, headers=headers), timeout=3
+            )
         except HTTPError as error:
             response = error
         with response:
@@ -248,8 +311,13 @@ class RouteTests(unittest.TestCase):
         return sid, session, SESSION_COOKIE + "=" + sid
 
     def test_anonymous_summary_and_document_never_touch_backend(self):
-        with patch.object(document_viewer_server, "summary") as summary, patch.object(document_viewer_server.subprocess, "run") as s3:
-            for path in ("/patients/demo-patient-002/summary", "/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf"):
+        with patch.object(document_viewer_server, "summary") as summary, patch.object(
+            document_viewer_server.subprocess, "run"
+        ) as s3:
+            for path in (
+                "/patients/demo-patient-002/summary",
+                "/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf",
+            ):
                 self.assertEqual(self.request(path)[0], 401)
             summary.assert_not_called()
             s3.assert_not_called()
@@ -267,7 +335,9 @@ class RouteTests(unittest.TestCase):
         self.assertEqual(status, 303)
         cookies = headers.get_all("Set-Cookie")
         self.assertTrue(any("Secure; HttpOnly; SameSite=Lax" in item for item in cookies))
-        session_cookie = next(item.split(";", 1)[0] for item in cookies if item.startswith(SESSION_COOKIE))
+        session_cookie = next(
+            item.split(";", 1)[0] for item in cookies if item.startswith(SESSION_COOKIE)
+        )
         payload = json.loads(self.request("/auth/session", session_cookie)[2])
         self.assertTrue(payload["authenticated"])
         self.assertNotIn("access_token", payload)
@@ -275,19 +345,39 @@ class RouteTests(unittest.TestCase):
 
     def test_logout_origin_csrf_and_replay(self):
         sid, session, cookie = self.make_session()
-        self.assertEqual(self.request("/auth/logout", cookie, {"csrf": session["csrf"]}, "https://attacker.test")[0], 403)
-        self.assertEqual(self.request("/auth/logout", cookie, {"csrf": "wrong"}, "https://localhost:8082")[0], 403)
+        self.assertEqual(
+            self.request(
+                "/auth/logout", cookie, {"csrf": session["csrf"]}, "https://attacker.test"
+            )[0],
+            403,
+        )
+        self.assertEqual(
+            self.request("/auth/logout", cookie, {"csrf": "wrong"}, "https://localhost:8082")[0],
+            403,
+        )
         self.assertIsNotNone(self.auth.session(sid))
-        self.assertEqual(self.request("/auth/logout", cookie, {"csrf": session["csrf"]}, "https://localhost:8082")[0], 200)
+        self.assertEqual(
+            self.request(
+                "/auth/logout", cookie, {"csrf": session["csrf"]}, "https://localhost:8082"
+            )[0],
+            200,
+        )
         self.assertEqual(self.request("/patients/demo-patient-002/summary", cookie)[0], 401)
 
     def test_authenticated_summary_receives_token(self):
         sid, session, cookie = self.make_session()
         seen = []
+
         def fake_summary(patient):
             seen.append(auth_fhir.ACCESS_TOKEN.get())
-            return {"supported_record_types": ["Patient", "Observation", "Appointment"], "patient": {"id": patient}}
-        with patch.object(document_viewer_server, "summary", fake_summary), patch.object(document_viewer_server, "search", return_value=[]):
+            return {
+                "supported_record_types": ["Patient", "Observation", "Appointment"],
+                "patient": {"id": patient},
+            }
+
+        with patch.object(document_viewer_server, "summary", fake_summary), patch.object(
+            document_viewer_server, "search", return_value=[]
+        ):
             status, _, _ = self.request("/patients/demo-patient-002/summary", cookie)
         self.assertEqual(status, 200)
         self.assertEqual(seen, [session["access_token"]])
@@ -296,12 +386,20 @@ class RouteTests(unittest.TestCase):
     def test_expired_session_blocks_documents(self):
         sid, session, cookie = self.make_session()
         session["expires"] = time.time() - 1
-        self.assertEqual(self.request("/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie)[0], 401)
+        self.assertEqual(
+            self.request("/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie)[0],
+            401,
+        )
 
     def test_wrong_patient_document_blocked(self):
         _, _, cookie = self.make_session()
         with patch.object(document_viewer_server.subprocess, "run") as s3:
-            self.assertEqual(self.request("/patients/demo-patient-002/documents/doc-fixture-v2-p02-pdf", cookie)[0], 403)
+            self.assertEqual(
+                self.request("/patients/demo-patient-002/documents/doc-fixture-v2-p02-pdf", cookie)[
+                    0
+                ],
+                403,
+            )
             s3.assert_not_called()
 
     def test_authorized_documents_and_hash_failure(self):
@@ -312,23 +410,49 @@ class RouteTests(unittest.TestCase):
                 content = b"synthetic-test-document"
                 document["size_bytes"] = len(content)
                 document["sha256"] = hashlib.sha256(content).hexdigest()
-                reference = {"status": "current", "subject": {"reference": "Patient/" + config["patient_id"]},
-                             "content": [{"attachment": {
-                                 "url": "https://" + config["bucket"] + ".s3." + config["region"] + ".amazonaws.com/" + document["key"],
-                                 "contentType": document["content_type"], "size": len(content)
-                             }}]}
+                reference = {
+                    "status": "current",
+                    "subject": {"reference": "Patient/" + config["patient_id"]},
+                    "content": [
+                        {
+                            "attachment": {
+                                "url": "https://"
+                                + config["bucket"]
+                                + ".s3."
+                                + config["region"]
+                                + ".amazonaws.com/"
+                                + document["key"],
+                                "contentType": document["content_type"],
+                                "size": len(content),
+                            }
+                        }
+                    ],
+                }
                 seen = []
+
                 def read_reference(url):
                     seen.append(auth_fhir.ACCESS_TOKEN.get())
                     return reference
+
                 def download(args, **kwargs):
                     Path(args[-1]).write_bytes(content)
                     return type("Completed", (), {"returncode": 0})()
-                path = "/patients/" + config["patient_id"] + "/documents/" + document["document_reference_id"]
-                with patch.object(document_viewer_server, "configuration", return_value=config), \
-                     patch.object(document_viewer_server, "get_json", side_effect=read_reference), \
-                     patch.object(document_viewer_server.shutil, "which", return_value="aws"), \
-                     patch.object(document_viewer_server.subprocess, "run", side_effect=download):
+
+                path = (
+                    "/patients/"
+                    + config["patient_id"]
+                    + "/documents/"
+                    + document["document_reference_id"]
+                )
+                with patch.object(
+                    document_viewer_server, "configuration", return_value=config
+                ), patch.object(
+                    document_viewer_server, "get_json", side_effect=read_reference
+                ), patch.object(
+                    document_viewer_server.shutil, "which", return_value="aws"
+                ), patch.object(
+                    document_viewer_server.subprocess, "run", side_effect=download
+                ):
                     status, headers, body = self.request(path, cookie)
                     self.assertEqual(status, 200)
                     self.assertEqual(body, content)
@@ -339,20 +463,29 @@ class RouteTests(unittest.TestCase):
 
     def test_fhir_denial_prevents_s3_access(self):
         _, _, cookie = self.make_session()
-        with patch.object(document_viewer_server, "get_json", side_effect=HTTPError("local", 403, "Forbidden", {}, None)), \
-             patch.object(document_viewer_server.subprocess, "run") as s3:
-            status, _, _ = self.request("/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie)
+        with patch.object(
+            document_viewer_server,
+            "get_json",
+            side_effect=HTTPError("local", 403, "Forbidden", {}, None),
+        ), patch.object(document_viewer_server.subprocess, "run") as s3:
+            status, _, _ = self.request(
+                "/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie
+            )
             self.assertEqual(status, 502)
             s3.assert_not_called()
 
     def test_local_mode_defers_documents(self):
         _, _, cookie = self.make_session()
-        with patch.object(document_viewer_server, "local_mode", return_value=True), \
-             patch.object(document_viewer_server.subprocess, "run") as s3:
-            status, _, body = self.request("/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie)
+        with patch.object(document_viewer_server, "local_mode", return_value=True), patch.object(
+            document_viewer_server.subprocess, "run"
+        ) as s3:
+            status, _, body = self.request(
+                "/patients/fixture-v2-p02/documents/doc-fixture-v2-p02-pdf", cookie
+            )
             self.assertEqual(status, 503)
             self.assertEqual(json.loads(body)["error"], "documents_deferred_to_aws_phase")
             s3.assert_not_called()
+
 
 if __name__ == "__main__":
     unittest.main()

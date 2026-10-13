@@ -1,16 +1,18 @@
-
 import json
 import sqlite3
 from datetime import datetime, timezone
 
+
 def now():
     return datetime.now(timezone.utc).isoformat()
+
 
 class WorklistStore:
     def __init__(self, path):
         self.db = sqlite3.connect(str(path))
         self.db.row_factory = sqlite3.Row
-        self.db.executescript("""
+        self.db.executescript(
+            """
         CREATE TABLE IF NOT EXISTS items (
             id INTEGER PRIMARY KEY,
             appointment_id TEXT NOT NULL,
@@ -30,18 +32,26 @@ class WorklistStore:
             reason TEXT NOT NULL,
             at TEXT NOT NULL
         );
-        """)
+        """
+        )
 
     def event(self, item_id, action, actor, reason):
         self.db.execute(
             "INSERT INTO history(item_id,action,actor,reason,at) VALUES(?,?,?,?,?)",
-            (item_id, action, actor, reason, now())
+            (item_id, action, actor, reason, now()),
         )
 
     def upsert(self, payload):
         required = (
-            "patient_id", "appointment_id", "requirement_id", "issue_type",
-            "policy_id", "evidence", "owner_role", "permitted_action", "due_at"
+            "patient_id",
+            "appointment_id",
+            "requirement_id",
+            "issue_type",
+            "policy_id",
+            "evidence",
+            "owner_role",
+            "permitted_action",
+            "due_at",
         )
         if any(key not in payload for key in required):
             raise ValueError("Work item is missing required fields")
@@ -50,9 +60,7 @@ class WorklistStore:
         if due.tzinfo is None:
             raise ValueError("Due time requires timezone")
 
-        key = tuple(payload[k] for k in (
-            "appointment_id", "requirement_id", "issue_type"
-        ))
+        key = tuple(payload[k] for k in ("appointment_id", "requirement_id", "issue_type"))
         encoded = json.dumps(payload, sort_keys=True)
 
         with self.db:
@@ -60,7 +68,7 @@ class WorklistStore:
             row = self.db.execute(
                 """SELECT * FROM items
                    WHERE appointment_id=? AND requirement_id=? AND issue_type=?""",
-                key
+                key,
             ).fetchone()
 
             if row is None:
@@ -69,7 +77,7 @@ class WorklistStore:
                     """INSERT INTO items(
                        appointment_id,requirement_id,issue_type,payload,
                        status,created_at,updated_at) VALUES(?,?,?,?,?,?,?)""",
-                    (*key, encoded, "open", stamp, stamp)
+                    (*key, encoded, "open", stamp, stamp),
                 )
                 item_id = cursor.lastrowid
                 self.event(item_id, "created", "assessment_engine", "Issue detected")
@@ -82,23 +90,21 @@ class WorklistStore:
             if row["status"] == "resolved":
                 self.db.execute(
                     "UPDATE items SET payload=?,status='open',updated_at=? WHERE id=?",
-                    (encoded, now(), item_id)
+                    (encoded, now(), item_id),
                 )
                 self.event(item_id, "reopened", "assessment_engine", "Issue detected again")
                 return item_id, "reopened"
 
             if row["payload"] != encoded:
                 self.db.execute(
-                    "UPDATE items SET payload=?,updated_at=? WHERE id=?",
-                    (encoded, now(), item_id)
+                    "UPDATE items SET payload=?,updated_at=? WHERE id=?", (encoded, now(), item_id)
                 )
                 self.event(item_id, "evidence_updated", "assessment_engine", "Evidence changed")
                 return item_id, "updated"
 
             return item_id, "unchanged"
 
-    def transition(self, item_id, target, actor, role, reason,
-                   reassessment=None):
+    def transition(self, item_id, target, actor, role, reason, reassessment=None):
         if target not in ("in_review", "resolved"):
             raise ValueError("Unsupported transition")
         if not actor.strip() or not reason.strip():
@@ -106,9 +112,7 @@ class WorklistStore:
 
         with self.db:
             self.db.execute("BEGIN IMMEDIATE")
-            row = self.db.execute(
-                "SELECT * FROM items WHERE id=?", (item_id,)
-            ).fetchone()
+            row = self.db.execute("SELECT * FROM items WHERE id=?", (item_id,)).fetchone()
             if row is None:
                 raise ValueError("Unknown work item")
 
@@ -140,8 +144,7 @@ class WorklistStore:
                     raise ValueError("Reassessment must be within five minutes")
 
             self.db.execute(
-                "UPDATE items SET status=?,updated_at=? WHERE id=?",
-                (target, now(), item_id)
+                "UPDATE items SET status=?,updated_at=? WHERE id=?", (target, now(), item_id)
             )
             self.event(item_id, target, actor, reason)
 

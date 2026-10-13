@@ -1,4 +1,3 @@
-
 import json
 import subprocess
 import sys
@@ -8,12 +7,11 @@ from worklist_store import WorklistStore
 
 ROOT = Path(__file__).resolve().parent
 
+
 def main():
     before = set((ROOT / "evidence").glob("demo-patient-assessment-*.json"))
 
-    completed = subprocess.run(
-        [sys.executable, str(ROOT / "assess_demo_patient.py")]
-    )
+    completed = subprocess.run([sys.executable, str(ROOT / "assess_demo_patient.py")])
     if completed.returncode != 0:
         raise RuntimeError("Live assessment failed; worklist was not updated")
 
@@ -28,9 +26,7 @@ def main():
 
     store = WorklistStore(ROOT / "data/worklist.sqlite")
     try:
-        changes = synchronize(
-            store, report["input"], report["result"], policy
-        )
+        changes = synchronize(store, report["input"], report["result"], policy)
         for change in changes:
             print("Work item:", change["item_id"], change["action"])
 
@@ -38,7 +34,7 @@ def main():
         pending = store.db.execute(
             """SELECT COUNT(*) FROM items
                WHERE appointment_id=? AND status!='resolved'""",
-            (report["result"]["appointment_id"],)
+            (report["result"]["appointment_id"],),
         ).fetchone()[0]
         print("Pending items for this appointment:", pending)
 
@@ -48,6 +44,7 @@ def main():
             print("Information now complete; pending items require reviewed resolution")
     finally:
         store.close()
+
 
 if __name__ == "__main__":
     main()

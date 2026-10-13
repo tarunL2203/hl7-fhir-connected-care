@@ -1,7 +1,7 @@
-
 import math
 from datetime import datetime, timedelta
 from urllib.parse import urlsplit
+
 
 def timestamp(value):
     if not isinstance(value, str):
@@ -11,6 +11,7 @@ def timestamp(value):
         raise ValueError("Timestamp requires timezone")
     return parsed
 
+
 def patient_reference(reference, policy):
     if not isinstance(reference, str):
         return None
@@ -19,15 +20,17 @@ def patient_reference(reference, policy):
     for base in policy["retrieval"]["allowed_fhir_bases"]:
         prefix = base.rstrip("/") + "/"
         if reference.startswith(prefix):
-            relative = reference[len(prefix):]
+            relative = reference[len(prefix) :]
             parsed = urlsplit(relative)
             if (
-                not parsed.query and not parsed.fragment
+                not parsed.query
+                and not parsed.fragment
                 and relative.startswith("Patient/")
                 and len(relative.split("/")) == 2
             ):
                 return relative
     return None
+
 
 def evaluate(case, policy):
     result = {
@@ -37,7 +40,7 @@ def evaluate(case, policy):
         "outcome": None,
         "reason": None,
         "requirements": [],
-        "interpretation": policy["assessment"]["label"]
+        "interpretation": policy["assessment"]["label"],
     }
 
     def finish(outcome, reason):
@@ -49,26 +52,22 @@ def evaluate(case, policy):
     if not profile:
         return finish(
             policy["assessment"]["no_matching_visit_profile"],
-            "No configured requirements for this visit profile"
+            "No configured requirements for this visit profile",
         )
     if not profile.get("requirements"):
         return finish(
-            policy["assessment"]["no_matching_visit_profile"],
-            "Visit profile has no requirements"
+            policy["assessment"]["no_matching_visit_profile"], "Visit profile has no requirements"
         )
 
     if case.get("identity_state") != "resolved":
         return finish(
-            policy["assessment"]["unresolved_identity"],
-            "Patient identity mapping is unresolved"
+            policy["assessment"]["unresolved_identity"], "Patient identity mapping is unresolved"
         )
 
     expected_ref = "Patient/" + case["patient_id"]
     participants = case["appointment"].get("participant", [])
     linked = any(
-        patient_reference(
-            p.get("actor", {}).get("reference"), policy
-        ) == expected_ref
+        patient_reference(p.get("actor", {}).get("reference"), policy) == expected_ref
         for p in participants
     )
     if not linked:
@@ -77,7 +76,7 @@ def evaluate(case, policy):
     if case.get("retrieval_state") != "complete":
         return finish(
             policy["assessment"]["retrieval_failed_or_incomplete"],
-            "Retrieval failed or not all search pages were retrieved"
+            "Retrieval failed or not all search pages were retrieved",
         )
 
     try:
@@ -109,9 +108,7 @@ def evaluate(case, policy):
             if not matches_code:
                 continue
 
-            reference = patient_reference(
-                observation.get("subject", {}).get("reference"), policy
-            )
+            reference = patient_reference(observation.get("subject", {}).get("reference"), policy)
             if reference is None:
                 uncertain.append({"id": record_id, "reason": "Unresolved patient reference"})
                 continue
@@ -130,11 +127,11 @@ def evaluate(case, policy):
                 continue
 
             after_start = (
-                result_time >= start if requirement["start_inclusive"]
-                else result_time > start
+                result_time >= start if requirement["start_inclusive"] else result_time > start
             )
             before_end = (
-                result_time <= visit_time if requirement["end_inclusive"]
+                result_time <= visit_time
+                if requirement["end_inclusive"]
                 else result_time < visit_time
             )
             if not (after_start and before_end):
@@ -152,9 +149,7 @@ def evaluate(case, policy):
             if requirement["require_numeric_value"] and not numeric:
                 uncertain.append({"id": record_id, "reason": "Missing or invalid numeric value"})
                 continue
-            if requirement["require_unit"] and (
-                not isinstance(unit, str) or not unit.strip()
-            ):
+            if requirement["require_unit"] and (not isinstance(unit, str) or not unit.strip()):
                 uncertain.append({"id": record_id, "reason": "Missing unit"})
                 continue
 
@@ -168,15 +163,17 @@ def evaluate(case, policy):
         else:
             outcome = policy["assessment"]["successful_search_without_qualifying_record"]
 
-        result["requirements"].append({
-            "requirement_id": requirement["requirement_id"],
-            "outcome": outcome,
-            "window_start": start.isoformat(),
-            "window_end": visit_time.isoformat(),
-            "matched_record_ids": matched,
-            "rejected_records": rejected,
-            "uncertain_records": uncertain
-        })
+        result["requirements"].append(
+            {
+                "requirement_id": requirement["requirement_id"],
+                "outcome": outcome,
+                "window_start": start.isoformat(),
+                "window_end": visit_time.isoformat(),
+                "matched_record_ids": matched,
+                "rejected_records": rejected,
+                "uncertain_records": uncertain,
+            }
+        )
 
     outcomes = [r["outcome"] for r in result["requirements"]]
     if "unable_to_assess" in outcomes:

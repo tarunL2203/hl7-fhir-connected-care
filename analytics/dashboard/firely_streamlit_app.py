@@ -120,8 +120,13 @@ def query(sql):
 
 def table_and_download(frame, filename, key):
     st.dataframe(frame, use_container_width=True, hide_index=True)
-    st.download_button("Download this report", frame.to_csv(index=False),
-                       file_name=filename, mime="text/csv", key=key)
+    st.download_button(
+        "Download this report",
+        frame.to_csv(index=False),
+        file_name=filename,
+        mime="text/csv",
+        key=key,
+    )
 
 
 def metrics(counts):
@@ -133,7 +138,9 @@ def metrics(counts):
 def main():
     st.set_page_config(page_title="Firely information availability", layout="wide")
     st.title("Healthcare information availability")
-    st.caption("Synthetic training data. Results describe information availability for a configured demo rule.")
+    st.caption(
+        "Synthetic training data. Results describe information availability for a configured demo rule."
+    )
     source = st.sidebar.radio("Dataset", ["Verified HL7 sample", "30-patient failure cases"])
     if st.sidebar.button("Refresh reports"):
         query.clear()
@@ -145,22 +152,30 @@ def main():
             failure_cases()
     except Exception as error:
         st.error("The dashboard could not read an existing Snowflake object.")
-        st.write("Check that the app's owner role can read the listed schema and that the selected warehouse is available.")
+        st.write(
+            "Check that the app's owner role can read the listed schema and that the selected warehouse is available."
+        )
         st.code(str(error))
 
 
 def bridge():
     st.subheader("HL7 patient, labs and appointment")
-    st.write("This sample passed conversion-to-Firely comparison and full-payload reconciliation after an internal-stage load.")
+    st.write(
+        "This sample passed conversion-to-Firely comparison and full-payload reconciliation after an internal-stage load."
+    )
     st.caption("Batch: " + BRIDGE_BATCH)
     resources = query(BRIDGE_RESOURCES_SQL)
     counts = resources.groupby("RESOURCE_TYPE", as_index=False).agg(RECORDS=("RESOURCE_ID", "size"))
     metrics(counts)
-    appointment_tab, lab_tab, evidence_tab = st.tabs(["Appointment report", "Glucose timeline", "Resource evidence"])
+    appointment_tab, lab_tab, evidence_tab = st.tabs(
+        ["Appointment report", "Glucose timeline", "Resource evidence"]
+    )
     with appointment_tab:
         report = query(BRIDGE_REPORT_SQL)
         table_and_download(report, "hl7-appointment-report.csv", "bridge-report")
-        st.caption("Rule: numeric LOINC 2345-7, UCUM mg/dL, final/amended/corrected, from seven days before the appointment up to but excluding its start.")
+        st.caption(
+            "Rule: numeric LOINC 2345-7, UCUM mg/dL, final/amended/corrected, from seven days before the appointment up to but excluding its start."
+        )
         with st.expander("View the report SQL"):
             st.code(BRIDGE_REPORT_SQL, language="sql")
     with lab_tab:
@@ -180,28 +195,40 @@ def bridge():
         if not timeline.empty:
             st.line_chart(timeline.set_index("MEASURED_AT")[["GLUCOSE_MG_DL"]])
     with evidence_tab:
-        st.dataframe(resources.drop(columns=["PAYLOAD_JSON"]), use_container_width=True, hide_index=True)
+        st.dataframe(
+            resources.drop(columns=["PAYLOAD_JSON"]), use_container_width=True, hide_index=True
+        )
         options = (resources["RESOURCE_TYPE"] + "/" + resources["RESOURCE_ID"]).tolist()
         if options:
             selected = st.selectbox("Inspect a loaded resource", options)
             index = options.index(selected)
             st.json(json.loads(resources.iloc[index]["PAYLOAD_JSON"]))
-        st.caption("The source manifest and HL7 files remain in the local export package. This dashboard reads the loaded batch; it does not rerun ingestion or the local comparison.")
+        st.caption(
+            "The source manifest and HL7 files remain in the local export package. This dashboard reads the loaded batch; it does not rerun ingestion or the local comparison."
+        )
 
 
 def failure_cases():
     st.subheader("Synthetic failure-case analytics")
-    st.write("This separate dataset starts as FHIR JSON. It has not passed through the HL7 converters or Firely.")
+    st.write(
+        "This separate dataset starts as FHIR JSON. It has not passed through the HL7 converters or Firely."
+    )
     st.caption("Batch: " + FC30_BATCH)
     counts = query(FC30_COUNTS_SQL)
     metrics(counts)
     report = query(FC30_REPORT_SQL)
     review = query(FC30_REVIEW_SQL)
     if not review.empty:
-        st.warning("This batch has records requiring review. Appointment results remain an analytics preview while patient references are unresolved.")
-    summary_tab, patient_tab, quality_tab = st.tabs(["Appointment summary", "Patient details", "Data-quality review"])
+        st.warning(
+            "This batch has records requiring review. Appointment results remain an analytics preview while patient references are unresolved."
+        )
+    summary_tab, patient_tab, quality_tab = st.tabs(
+        ["Appointment summary", "Patient details", "Data-quality review"]
+    )
     with summary_tab:
-        summary = report.groupby("INFORMATION_AVAILABILITY").size().rename("APPOINTMENTS").to_frame()
+        summary = (
+            report.groupby("INFORMATION_AVAILABILITY").size().rename("APPOINTMENTS").to_frame()
+        )
         st.bar_chart(summary)
         st.dataframe(summary.reset_index(), use_container_width=True, hide_index=True)
         table_and_download(report, "failure-case-appointment-report.csv", "fc30-full")
@@ -220,7 +247,9 @@ def failure_cases():
         missing = birth[birth["BIRTH_DATE_STATUS"] == "missing"]
         st.metric("Patients with missing birth dates", len(missing))
         st.dataframe(missing, use_container_width=True, hide_index=True)
-        st.caption("Unresolved observations retain their original references. The dashboard does not assign them to an assumed patient or change records.")
+        st.caption(
+            "Unresolved observations retain their original references. The dashboard does not assign them to an assumed patient or change records."
+        )
 
 
 if __name__ == "__main__":

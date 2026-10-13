@@ -37,80 +37,139 @@ def segment(name, count, fields):
 
 def fixture():
     # SCH-11 is TQ: component 4=start, component 5=end.
-    return ("\r".join([
-        "MSH|^~\\&|DEMO|TRAINING|FIRELY|LOCAL|20261007160000+0000||SIU^S12^SIU_S12|SYN-SIU-BRIDGE-001|T|2.5.1",
-        segment("SCH", 25, {
-            1: "SYN-PLACER-BRIDGE-001^DEMO",
-            2: "SYN-APPT-BRIDGE-001^DEMO",
-            6: "demo-glucose-review^Glucose review^L",
-            7: "demo-glucose-review^Glucose review^L",
-            9: "30", 10: "min^minutes^UCUM",
-            11: "^^30^20261006130000+0000^20261006133000+0000",
-            25: "Booked^Booked^HL70278",
-        }),
-        segment("PID", 8, {
-            1: "1", 3: "SYN002^^^DEMO^MR", 5: "Demo^Ravi",
-            7: "19850512", 8: "M",
-        }),
-        "RGS|1",
-        segment("AIS", 8, {
-            1: "1", 3: "demo-glucose-review^Glucose review^L",
-            4: "20261006130000+0000", 7: "30",
-            8: "min^minutes^UCUM",
-        }),
-    ]) + "\r").encode("utf-8")
+    return (
+        "\r".join(
+            [
+                "MSH|^~\\&|DEMO|TRAINING|FIRELY|LOCAL|20261007160000+0000||SIU^S12^SIU_S12|SYN-SIU-BRIDGE-001|T|2.5.1",
+                segment(
+                    "SCH",
+                    25,
+                    {
+                        1: "SYN-PLACER-BRIDGE-001^DEMO",
+                        2: "SYN-APPT-BRIDGE-001^DEMO",
+                        6: "demo-glucose-review^Glucose review^L",
+                        7: "demo-glucose-review^Glucose review^L",
+                        9: "30",
+                        10: "min^minutes^UCUM",
+                        11: "^^30^20261006130000+0000^20261006133000+0000",
+                        25: "Booked^Booked^HL70278",
+                    },
+                ),
+                segment(
+                    "PID",
+                    8,
+                    {
+                        1: "1",
+                        3: "SYN002^^^DEMO^MR",
+                        5: "Demo^Ravi",
+                        7: "19850512",
+                        8: "M",
+                    },
+                ),
+                "RGS|1",
+                segment(
+                    "AIS",
+                    8,
+                    {
+                        1: "1",
+                        3: "demo-glucose-review^Glucose review^L",
+                        4: "20261006130000+0000",
+                        7: "30",
+                        8: "min^minutes^UCUM",
+                    },
+                ),
+            ]
+        )
+        + "\r"
+    ).encode("utf-8")
 
 
 def timestamp(value):
-    require(bool(re.fullmatch(r"[0-9]{14}[+-][0-9]{4}", value)),
-            "Appointment timestamps must include seconds and an explicit offset.")
+    require(
+        bool(re.fullmatch(r"[0-9]{14}[+-][0-9]{4}", value)),
+        "Appointment timestamps must include seconds and an explicit offset.",
+    )
     return datetime.strptime(value, "%Y%m%d%H%M%S%z")
 
 
 def convert(raw, patient_id):
     text = raw.decode("utf-8").replace("\r\n", "\r").replace("\n", "\r")
     rows = [line.split("|") for line in text.split("\r") if line]
-    require([row[0] for row in rows] == ["MSH", "SCH", "PID", "RGS", "AIS"],
-            "Only the fixture's single SCH/PID/RGS/AIS structure is supported.")
+    require(
+        [row[0] for row in rows] == ["MSH", "SCH", "PID", "RGS", "AIS"],
+        "Only the fixture's single SCH/PID/RGS/AIS structure is supported.",
+    )
     msh, sch, pid, _rgs, ais = rows
     require(len(msh) >= 12 and msh[1] == "^~\\&", "Unsupported encoding delimiters.")
-    require(msh[8] == "SIU^S12^SIU_S12" and msh[11] == "2.5.1",
-            "Only SIU^S12 version 2.5.1 new-booking messages are supported.")
-    require(msh[10] == "T" and msh[2:4] == ["DEMO", "TRAINING"],
-            "Only the synthetic training sender is supported.")
-    require(len(sch) >= 26 and len(pid) >= 9 and len(ais) >= 9,
-            "Required fixture fields are missing.")
-    require(not any("~" in field or "\\" in field for row in rows[1:] for field in row[1:]),
-            "Repeating fields and escaped content are outside this fixture converter.")
+    require(
+        msh[8] == "SIU^S12^SIU_S12" and msh[11] == "2.5.1",
+        "Only SIU^S12 version 2.5.1 new-booking messages are supported.",
+    )
+    require(
+        msh[10] == "T" and msh[2:4] == ["DEMO", "TRAINING"],
+        "Only the synthetic training sender is supported.",
+    )
+    require(
+        len(sch) >= 26 and len(pid) >= 9 and len(ais) >= 9, "Required fixture fields are missing."
+    )
+    require(
+        not any("~" in field or "\\" in field for row in rows[1:] for field in row[1:]),
+        "Repeating fields and escaped content are outside this fixture converter.",
+    )
     mrn = pid[3].split("^")
-    require(len(mrn) == 5 and mrn == ["SYN002", "", "", "DEMO", "MR"],
-            "Patient identifier is outside the SYN002/DEMO fixture.")
+    require(
+        len(mrn) == 5 and mrn == ["SYN002", "", "", "DEMO", "MR"],
+        "Patient identifier is outside the SYN002/DEMO fixture.",
+    )
     require(bool(re.fullmatch(r"[A-Za-z0-9.-]{1,64}", patient_id)), "Invalid patient ID.")
     require(sch[25].split("^")[0] == "Booked", "Only booked appointments are supported.")
     timing = sch[11].split("^")
-    require(len(timing) == 5 and timing[:3] == ["", "", "30"],
-            "Expected one 30-minute timing interval in SCH-11.")
+    require(
+        len(timing) == 5 and timing[:3] == ["", "", "30"],
+        "Expected one 30-minute timing interval in SCH-11.",
+    )
     start, end = timestamp(timing[3]), timestamp(timing[4])
     require(end > start, "Appointment end must be after start.")
-    require((end - start).total_seconds() == 1800 and sch[9] == "30"
-            and sch[10] == "min^minutes^UCUM", "Duration fields disagree.")
-    require(timestamp(ais[4]) == start and ais[7:9] == ["30", "min^minutes^UCUM"],
-            "AIS service timing disagrees with SCH.")
-    require(sch[7] == ais[3] == "demo-glucose-review^Glucose review^L",
-            "Unsupported or inconsistent appointment service.")
+    require(
+        (end - start).total_seconds() == 1800 and sch[9] == "30" and sch[10] == "min^minutes^UCUM",
+        "Duration fields disagree.",
+    )
+    require(
+        timestamp(ais[4]) == start and ais[7:9] == ["30", "min^minutes^UCUM"],
+        "AIS service timing disagrees with SCH.",
+    )
+    require(
+        sch[7] == ais[3] == "demo-glucose-review^Glucose review^L",
+        "Unsupported or inconsistent appointment service.",
+    )
     filler = sch[2].split("^")
-    require(len(filler) == 2 and all(filler) and filler[1] == "DEMO",
-            "A DEMO filler appointment identifier is required.")
+    require(
+        len(filler) == 2 and all(filler) and filler[1] == "DEMO",
+        "A DEMO filler appointment identifier is required.",
+    )
     source_key = json.dumps([msh[2], msh[3], *filler], separators=(",", ":"))
     appointment_id = "siu-appointment-" + str(uuid5(NAMESPACE_URL, source_key))
     return {
-        "resourceType": "Appointment", "id": appointment_id,
+        "resourceType": "Appointment",
+        "id": appointment_id,
         "meta": {"tag": [{"system": "https://example.org/fixture-label", "code": "synthetic"}]},
         "identifier": [{"system": APPT_SYSTEM, "value": filler[0]}],
-        "status": "booked", "description": "Synthetic glucose review",
-        "serviceType": [{"coding": [{"system": "https://example.org/synthetic-visit-types",
-                                      "code": "demo-glucose-review", "display": "Glucose review"}]}],
-        "start": start.isoformat(), "end": end.isoformat(), "minutesDuration": 30,
+        "status": "booked",
+        "description": "Synthetic glucose review",
+        "serviceType": [
+            {
+                "coding": [
+                    {
+                        "system": "https://example.org/synthetic-visit-types",
+                        "code": "demo-glucose-review",
+                        "display": "Glucose review",
+                    }
+                ]
+            }
+        ],
+        "start": start.isoformat(),
+        "end": end.isoformat(),
+        "minutesDuration": 30,
         "participant": [{"actor": {"reference": "Patient/" + patient_id}, "status": "accepted"}],
     }
 
@@ -127,16 +186,20 @@ def request_json(path, data=None, method="GET"):
     headers = dict(ACCEPT)
     if data is not None:
         headers["Content-Type"] = "application/fhir+json; fhirVersion=4.0"
-    request = Request(BASE + path, data=None if data is None else encode(data),
-                      method=method, headers=headers)
+    request = Request(
+        BASE + path, data=None if data is None else encode(data), method=method, headers=headers
+    )
     with urlopen(request, timeout=30) as response:
         body = response.read()
         return (json.loads(body) if body else None), response.status
 
 
 def compare(expected, actual):
-    require(actual.get("resourceType") == expected["resourceType"]
-            and actual.get("id") == expected["id"], "Resource identity differs.")
+    require(
+        actual.get("resourceType") == expected["resourceType"]
+        and actual.get("id") == expected["id"],
+        "Resource identity differs.",
+    )
     normalized = copy.deepcopy(actual)
     references = []
     if "subject" in normalized:
@@ -145,7 +208,7 @@ def compare(expected, actual):
     for reference in references:
         value = reference.get("reference", "")
         if value.startswith(BASE):
-            reference["reference"] = value[len(BASE):]
+            reference["reference"] = value[len(BASE) :]
     for key, value in expected.items():
         if key == "meta":
             # Firely adds its version and update time; retain and compare our tags.
@@ -160,14 +223,19 @@ def self_test():
     result = convert(raw, "demo-patient-002")
     require(result["start"] == "2026-10-06T13:00:00+00:00", "Start mapping failed.")
     require(result["end"] == "2026-10-06T13:30:00+00:00", "End mapping failed.")
-    require(result["participant"][0]["actor"]["reference"] == "Patient/demo-patient-002",
-            "Patient mapping failed.")
+    require(
+        result["participant"][0]["actor"]["reference"] == "Patient/demo-patient-002",
+        "Patient mapping failed.",
+    )
     # A retransmission gets the same ID, even if its message control ID changes.
     repeat = raw.replace(b"SYN-SIU-BRIDGE-001", b"SYN-SIU-BRIDGE-REPEAT")
     require(convert(repeat, "demo-patient-002")["id"] == result["id"], "Stable identity failed.")
-    for bad in [raw.replace(b"SYN002", b"SYN999"), raw.replace(b"SIU^S12", b"SIU^S15"),
-                raw.replace(b"20261006133000+0000", b"20261006123000+0000"),
-                raw.replace(b"20261006130000+0000", b"20261006130000")]:
+    for bad in [
+        raw.replace(b"SYN002", b"SYN999"),
+        raw.replace(b"SIU^S12", b"SIU^S15"),
+        raw.replace(b"20261006133000+0000", b"20261006123000+0000"),
+        raw.replace(b"20261006130000+0000", b"20261006130000"),
+    ]:
         try:
             convert(bad, "demo-patient-002")
         except ValueError:
@@ -197,14 +265,27 @@ def run(root):
     query = urlencode({"identifier": MRN_SYSTEM + "|SYN002", "_count": "2"})
     bundle, _ = request_json("Patient?" + query)
     require(bundle.get("resourceType") == "Bundle", "Patient search did not return a Bundle.")
-    matches = [entry["resource"] for entry in bundle.get("entry", [])
-               if entry.get("resource", {}).get("resourceType") == "Patient"]
-    require(len(matches) == 1 and bundle.get("total", 1) == 1
-            and not any(link.get("relation") == "next" for link in bundle.get("link", [])),
-            "Patient identifier must resolve to exactly one patient.")
-    require(matches[0]["id"] == patient_id, "Patient search disagrees with the admission conversion.")
-    require(any(i.get("system") == MRN_SYSTEM and i.get("value") == "SYN002"
-                for i in matches[0].get("identifier", [])), "Patient identifier mismatch.")
+    matches = [
+        entry["resource"]
+        for entry in bundle.get("entry", [])
+        if entry.get("resource", {}).get("resourceType") == "Patient"
+    ]
+    require(
+        len(matches) == 1
+        and bundle.get("total", 1) == 1
+        and not any(link.get("relation") == "next" for link in bundle.get("link", [])),
+        "Patient identifier must resolve to exactly one patient.",
+    )
+    require(
+        matches[0]["id"] == patient_id, "Patient search disagrees with the admission conversion."
+    )
+    require(
+        any(
+            i.get("system") == MRN_SYSTEM and i.get("value") == "SYN002"
+            for i in matches[0].get("identifier", [])
+        ),
+        "Patient identifier mismatch.",
+    )
     # Check existing converted resources before creating a new appointment.
     for converted in expected:
         stored, _ = request_json(converted["resourceType"] + "/" + converted["id"])
@@ -220,8 +301,10 @@ def run(root):
     appointment = convert(source.read_bytes(), patient_id)
     converted_path = source.with_suffix(".fhir.json")
     if converted_path.exists():
-        require(json.loads(converted_path.read_text()) == appointment,
-                "Existing converted appointment differs; review it first.")
+        require(
+            json.loads(converted_path.read_text()) == appointment,
+            "Existing converted appointment differs; review it first.",
+        )
     else:
         converted_path.write_text(json.dumps(appointment, indent=2) + "\n")
     print("PASS: SIU^S12 converted to Appointment/" + appointment["id"])
@@ -266,20 +349,29 @@ def run(root):
         files[filename] = {"rows": len(rows), "sha256": sha(data)}
     lineage = []
     for source_path, converted_path, resource in zip(source_paths, sample_paths, exported):
-        lineage.append({"hl7_file": str(source_path.relative_to(root)),
-                        "hl7_sha256": sha(source_path.read_bytes()),
-                        "converted_file": str(converted_path.relative_to(root)),
-                        "converted_sha256": sha(converted_path.read_bytes()),
-                        "resource_type": resource["resourceType"], "resource_id": resource["id"],
-                        "firely_version": resource.get("meta", {}).get("versionId"),
-                        "exported_payload_sha256": sha(encode(resource))})
-    manifest = {"batch_id": batch_id, "source_base_url": BASE,
-                "route": "HL7-derived local Firely resources to Snowflake internal stage",
-                "consistency": "two matching reads; not a locked snapshot",
-                "comparison": "converted fields match; exact local reference base normalized",
-                "scope": "synthetic single-patient SIU S12 booking fixture; not full profile validation",
-                "converter_sha256": sha(Path(__file__).read_bytes()),
-                "files": files, "lineage": lineage}
+        lineage.append(
+            {
+                "hl7_file": str(source_path.relative_to(root)),
+                "hl7_sha256": sha(source_path.read_bytes()),
+                "converted_file": str(converted_path.relative_to(root)),
+                "converted_sha256": sha(converted_path.read_bytes()),
+                "resource_type": resource["resourceType"],
+                "resource_id": resource["id"],
+                "firely_version": resource.get("meta", {}).get("versionId"),
+                "exported_payload_sha256": sha(encode(resource)),
+            }
+        )
+    manifest = {
+        "batch_id": batch_id,
+        "source_base_url": BASE,
+        "route": "HL7-derived local Firely resources to Snowflake internal stage",
+        "consistency": "two matching reads; not a locked snapshot",
+        "comparison": "converted fields match; exact local reference base normalized",
+        "scope": "synthetic single-patient SIU S12 booking fixture; not full profile validation",
+        "converter_sha256": sha(Path(__file__).read_bytes()),
+        "files": files,
+        "lineage": lineage,
+    }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     print("PASS: all four converted resources match Firely and two reads agree.")
     print("Batch ID:", batch_id)
@@ -291,15 +383,19 @@ def run(root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--self-test", action="store_true", help="Offline tests; no Firely reads/writes")
+    parser.add_argument(
+        "--self-test", action="store_true", help="Offline tests; no Firely reads/writes"
+    )
     parser.add_argument("--project-root", type=Path, default=Path(__file__).resolve().parents[1])
     args = parser.parse_args()
     if args.self_test:
         self_test()
         return
     root = args.project_root.resolve()
-    require((root / "samples" / "admission-002.fhir.json").is_file(),
-            "Run from your existing firely-learning folder.")
+    require(
+        (root / "samples" / "admission-002.fhir.json").is_file(),
+        "Run from your existing firely-learning folder.",
+    )
     self_test()
     run(root)
 

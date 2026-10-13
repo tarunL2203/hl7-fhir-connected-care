@@ -9,18 +9,19 @@ __all__ = ["ACCESS_TOKEN", "BASE", "get_json", "search"]
 ACCESS_TOKEN = ContextVar("viewer_access_token", default=None)
 opener = build_opener(LocalRedirects())
 
+
 def get_json(url):
     token = ACCESS_TOKEN.get()
     if not token:
         raise RuntimeError("Authenticated FHIR context required")
     if not allowed(url):
         raise RuntimeError("Request outside local Firely blocked")
-    request = Request(url, headers={
-        "Accept": "application/fhir+json",
-        "Authorization": "Bearer " + token
-    })
+    request = Request(
+        url, headers={"Accept": "application/fhir+json", "Authorization": "Bearer " + token}
+    )
     with opener.open(request, timeout=60) as response:
         return json.load(response)
+
 
 def search(path, resource_type):
     return paginate(path, resource_type, get_json)

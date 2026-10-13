@@ -26,19 +26,21 @@ if not all([identifier, family, given]):
 query = urlencode({"identifier": system + "|" + identifier, "_count": "2"})
 request = Request(
     "http://localhost:8080/Patient?" + query,
-    headers={"Accept": "application/fhir+json; fhirVersion=4.0"}
+    headers={"Accept": "application/fhir+json; fhirVersion=4.0"},
 )
 with urlopen(request, timeout=10) as response:
     bundle = json.load(response)
 matches = [
-    entry["resource"] for entry in bundle.get("entry", [])
+    entry["resource"]
+    for entry in bundle.get("entry", [])
     if entry.get("resource", {}).get("resourceType") == "Patient"
 ]
 if len(matches) > 1 or bundle.get("total", 0) > 1:
     raise ValueError("Duplicate identifier: review before continuing.")
 
 patient_id = (
-    matches[0]["id"] if matches
+    matches[0]["id"]
+    if matches
     else "patient-" + str(uuid5(NAMESPACE_URL, system + "|" + identifier))
 )
 gender_codes = {"M": "male", "F": "female", "O": "other", "U": "unknown"}
@@ -48,7 +50,7 @@ patient = {
     "identifier": [{"system": system, "value": identifier}],
     "name": [{"family": family, "given": [given]}],
     "birthDate": datetime.strptime(pid.pid_7.to_er7(), "%Y%m%d").date().isoformat(),
-    "gender": gender_codes[pid.pid_8.to_er7()]
+    "gender": gender_codes[pid.pid_8.to_er7()],
 }
 output = source.with_suffix(".fhir.json")
 output.write_text(json.dumps(patient, indent=2) + "\n", encoding="utf-8")
