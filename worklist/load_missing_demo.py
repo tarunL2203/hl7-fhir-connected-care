@@ -5,7 +5,7 @@ from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request
 from pathlib import Path
-from assess_ravi import BASE, get_json, search, opener
+from fhir_client import BASE, get_json, search, opener
 
 ROOT = Path(__file__).resolve().parent
 

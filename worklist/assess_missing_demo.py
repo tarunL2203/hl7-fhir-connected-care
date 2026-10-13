@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
-from assess_ravi import BASE, get_json, search
+from fhir_client import BASE, get_json, search
 from evaluator_v2 import evaluate, patient_reference
 from worklist_bridge import synchronize
 from worklist_store import WorklistStore

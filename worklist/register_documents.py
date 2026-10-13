@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request
-from assess_ravi import BASE, get_json, opener
+from fhir_client import BASE, get_json, opener
 from load_missing_demo import normalize
 
 ROOT = Path(__file__).resolve().parent

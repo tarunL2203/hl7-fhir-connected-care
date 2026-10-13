@@ -1,76 +1,14 @@
-
+"""Assess the demo patient's booked visit against the pre-visit policy and save the evidence."""
 import importlib.util
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import urlencode, urljoin, urlsplit
-from urllib.request import (
-    Request, HTTPRedirectHandler, build_opener
-)
+from urllib.parse import urlencode
+
+from fhir_client import BASE, get_json, search
 
 ROOT = Path(__file__).resolve().parent
-BASE = "http://localhost:8081"
 PATIENT_ID = "demo-patient-002"
-
-def allowed(url):
-    parsed = urlsplit(url)
-    return (
-        parsed.scheme == "http"
-        and parsed.netloc == "localhost:8081"
-        and not parsed.username
-        and not parsed.password
-    )
-
-class LocalRedirects(HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        if not allowed(newurl):
-            raise RuntimeError("Redirect outside local Firely blocked")
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
-
-opener = build_opener(LocalRedirects())
-
-def get_json(url):
-    if not allowed(url):
-        raise RuntimeError("Request outside local Firely blocked")
-    request = Request(
-        url, headers={"Accept": "application/fhir+json"}
-    )
-    with opener.open(request, timeout=60) as response:
-        return json.load(response)
-
-def search(path, resource_type):
-    url = BASE + "/" + path
-    visited = set()
-    records = {}
-
-    while url:
-        if url in visited:
-            raise RuntimeError("Repeated pagination link")
-        visited.add(url)
-        bundle = get_json(url)
-
-        if (
-            bundle.get("resourceType") != "Bundle"
-            or bundle.get("type") != "searchset"
-        ):
-            raise RuntimeError("Invalid search response")
-
-        for entry in bundle.get("entry", []):
-            resource = entry.get("resource", {})
-            if resource.get("resourceType") == "OperationOutcome":
-                raise RuntimeError("Search returned an OperationOutcome; inspect before assessing")
-            if resource.get("resourceType") == resource_type:
-                records[resource["id"]] = resource
-
-        next_links = [
-            link["url"] for link in bundle.get("link", [])
-            if link.get("relation") == "next"
-        ]
-        if len(next_links) > 1:
-            raise RuntimeError("Ambiguous pagination links")
-        url = urljoin(url, next_links[0]) if next_links else None
-
-    return list(records.values())
 
 def main():
     policy = json.loads((ROOT / "spec/v2/policy.json").read_text())
@@ -144,4 +82,4 @@ if __name__ == "__main__":
     except Exception as error:
         print("Assessment not completed:", error)
         print("No missing-record conclusion was made.")
-        raise SystemExit(1)
+        raise SystemExit(1) from error
