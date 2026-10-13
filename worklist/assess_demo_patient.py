@@ -62,7 +62,7 @@ def main():
         "result": result
     }
     output = ROOT / "evidence" / (
-        "ravi-assessment-" + now.strftime("%Y%m%dT%H%M%S%fZ") + ".json"
+        "demo-patient-assessment-" + now.strftime("%Y%m%dT%H%M%S%fZ") + ".json"
     )
     output.write_text(json.dumps(evidence, indent=2) + "\n")
 

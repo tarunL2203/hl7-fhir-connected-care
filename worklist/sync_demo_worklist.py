@@ -9,15 +9,15 @@ from worklist_store import WorklistStore
 ROOT = Path(__file__).resolve().parent
 
 def main():
-    before = set((ROOT / "evidence").glob("ravi-assessment-*.json"))
+    before = set((ROOT / "evidence").glob("demo-patient-assessment-*.json"))
 
     completed = subprocess.run(
-        [sys.executable, str(ROOT / "assess_ravi.py")]
+        [sys.executable, str(ROOT / "assess_demo_patient.py")]
     )
     if completed.returncode != 0:
         raise RuntimeError("Live assessment failed; worklist was not updated")
 
-    after = set((ROOT / "evidence").glob("ravi-assessment-*.json"))
+    after = set((ROOT / "evidence").glob("demo-patient-assessment-*.json"))
     new_reports = after - before
     if len(new_reports) != 1:
         raise RuntimeError("Could not identify exactly one fresh assessment")
