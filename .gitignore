@@ -1,0 +1,34 @@
+# Secrets and credentials
+*.env
+!.env.example
+*.pem
+*.key
+*.crt
+*.jwk.json
+appsettings.instance.json
+firelyserver-license.json
+
+# Databases and runtime data
+*.db
+*.sqlite
+data/
+local-secure-data*/
+checkpoints/
+worklist/evidence/
+analytics/evidence/
+
+# Python / editors / OS
+__pycache__/
+*.pyc
+.venv/
+venv/
+document-tools-venv/
+.DS_Store
+.idea/
+.vscode/
+
+# Archives and leftovers
+*.zip
+*.backup-*
+*.before*
+*.openai-download-*
