@@ -7,7 +7,7 @@ from urllib.request import Request
 from pathlib import Path
 from assess_ravi import BASE, get_json, search, opener
 
-ROOT = Path.home() / "firely-learning/worklist"
+ROOT = Path(__file__).resolve().parent
 
 def normalize(resource):
     value = copy.deepcopy(resource)

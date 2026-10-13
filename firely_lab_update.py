@@ -15,7 +15,7 @@ from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
-ROOT=Path.home()/'firely-learning'
+ROOT=Path(__file__).resolve().parent
 BASE='http://localhost:8080'
 SECURE='firely-learning-local-secure'
 APPOINTMENT='siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423'

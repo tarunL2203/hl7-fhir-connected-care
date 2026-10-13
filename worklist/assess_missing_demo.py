@@ -8,7 +8,7 @@ from evaluator_v2 import evaluate, patient_reference
 from worklist_bridge import synchronize
 from worklist_store import WorklistStore
 
-ROOT = Path.home() / "firely-learning/worklist"
+ROOT = Path(__file__).resolve().parent
 PATIENT_ID = "fixture-v2-p02"
 APPOINTMENT_ID = "fixture-v2-a02"
 

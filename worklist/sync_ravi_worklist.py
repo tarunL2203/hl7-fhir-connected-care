@@ -6,7 +6,7 @@ from pathlib import Path
 from worklist_bridge import synchronize
 from worklist_store import WorklistStore
 
-ROOT = Path.home() / "firely-learning/worklist"
+ROOT = Path(__file__).resolve().parent
 
 def main():
     before = set((ROOT / "evidence").glob("ravi-assessment-*.json"))

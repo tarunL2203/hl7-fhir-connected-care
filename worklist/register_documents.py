@@ -6,7 +6,7 @@ from urllib.request import Request
 from assess_ravi import BASE, get_json, opener
 from load_missing_demo import normalize
 
-ROOT = Path.home() / "firely-learning/worklist"
+ROOT = Path(__file__).resolve().parent
 
 def main():
     config = json.loads(

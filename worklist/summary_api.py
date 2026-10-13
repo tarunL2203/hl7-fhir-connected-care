@@ -11,7 +11,7 @@ from urllib.parse import urlencode, urlsplit
 from auth_fhir import BASE, get_json, search
 from evaluator_v2 import evaluate, patient_reference
 
-ROOT = Path.home() / "firely-learning/worklist"
+ROOT = Path(__file__).resolve().parent
 
 def patient_observations(patient_id, policy):
     # Search exact references from the original snapshot and the current service.

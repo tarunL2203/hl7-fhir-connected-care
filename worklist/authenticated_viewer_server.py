@@ -156,7 +156,7 @@ class AuthenticatedHandler(DocumentHandler):
 
 def create_server():
     """Build the same verified HTTPS server for normal use and live verification."""
-    certs = Path.home() / "firely-learning/auth/certs"
+    certs = Path(__file__).resolve().parent.parent / "auth/certs"
     try:
         auth = AuthService(Provider(certs / "local-rootCA.crt"))
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)

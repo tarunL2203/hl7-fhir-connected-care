@@ -8,7 +8,7 @@ from urllib.request import (
     Request, HTTPRedirectHandler, build_opener
 )
 
-ROOT = Path.home() / "firely-learning/worklist"
+ROOT = Path(__file__).resolve().parent
 BASE = "http://localhost:8081"
 PATIENT_ID = "demo-patient-002"
 
