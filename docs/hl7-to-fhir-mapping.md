@@ -34,7 +34,7 @@ Names are never used for matching.
 |---|---|---|
 | MSH-9 | Must be `ORU^R01^ORU_R01` | (gate) |
 | OBX segments | Exactly one | (gate) |
-| PID-3.1 / PID-3.4 | Must map to the configured training patient (`SYN002` / `DEMO`) | `subject.reference` = `Patient/demo-patient-002` |
+| PID-3.4 / PID-3.1 | Looked up in the converter's `PATIENT_INDEX`, (`DEMO`, `SYN002`) → `demo-patient-002`; unknown patients are rejected | `subject.reference` = `Patient/<id>` |
 | OBX-2 value type | Must be `NM` (numeric) | (gate) |
 | OBX-11 result status | Must be `F` (final) | `status` = `final` |
 | OBX-3 observation identifier | Coding system (component 3) must be `LN` | `code.coding[0]`: `system` = `http://loinc.org`, `code` = OBX-3.1, `display` = OBX-3.2 |
@@ -43,7 +43,7 @@ Names are never used for matching.
 | OBR-7 observation date/time | Must include seconds and a UTC offset | `effectiveDateTime` (ISO 8601 with offset) |
 | (fixed) | – | `category` = `laboratory` (observation-category code system) |
 
-**Identity.** The ID is `lab-` + UUID5 over the source key [MSH-3 sender, MSH-4 facility, PID-3.4 authority, PID-3.1 MRN, OBR-3.2 order authority, OBR-3.1 order ID, OBX-1 set ID]. All seven parts are required. Replaying the same result therefore always produces the same resource, while a different order or result number produces a new one. The original demo result keeps its earlier ID, `demo-glucose-002`.
+**Identity.** The ID is `lab-` + UUID5 over the source key [MSH-3 sender, MSH-4 facility, PID-3.4 authority, PID-3.1 MRN, OBR-3.2 order authority, OBR-3.1 order ID, OBX-1 set ID]. All seven parts are required. Replaying the same result therefore always produces the same resource, while a different order or result number produces a new one. The original demo result keeps its earlier ID, `demo-glucose-002`, through the `LEGACY_RESULT_IDS` table.
 
 ## SIU^S12 → Appointment
 
@@ -65,7 +65,7 @@ Names are never used for matching.
 
 ## Rejections at a glance
 
-Every converter fails closed, raising an error that names the problem rather than producing a partial resource:
+Every converter fails closed, raising an error that names the problem rather than producing a partial resource. [`converters/test_converters.py`](../converters/test_converters.py) runs these cases in CI:
 
 - Unsupported message type, version, sender or segment structure.
 - An identifier authority or patient outside the configured mapping, or a duplicate identifier match.
