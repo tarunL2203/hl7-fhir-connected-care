@@ -4,6 +4,7 @@ This generates files only. Executed SQL results are required for milestone succe
 """
 import argparse
 import json
+import os
 from pathlib import Path
 import re
 
@@ -35,7 +36,7 @@ def main():
     schema, integration = "FIRELY_RAW_" + suffix, "FIRELY_S3_READ_" + suffix
     stage, table = f"{db}.{schema}.FHIR_STAGE", f"{db}.{schema}.FHIR_RESOURCE"
     prefix = "analytics-demo/" + batch + "/"
-    bucket = "<S3_BUCKET>"
+    bucket = os.environ.get("S3_BUCKET", "<S3_BUCKET>")
     output = ROOT / "analytics/sql" / batch
     output.mkdir(parents=True, exist_ok=True)
     policy = {"Version": "2012-10-17", "Statement": [

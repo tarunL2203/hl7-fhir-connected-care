@@ -3,6 +3,7 @@ import argparse
 import base64
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -10,7 +11,7 @@ import tempfile
 from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
-BUCKET = "<S3_BUCKET>"
+BUCKET = os.environ.get("S3_BUCKET", "<S3_BUCKET>")
 PROFILE = "firely-learning"
 
 
