@@ -8,7 +8,6 @@ from urllib.parse import parse_qs, urlsplit
 
 from auth_fhir import ACCESS_TOKEN
 from document_viewer_server import DocumentHandler
-from summary_api import ROOT
 from viewer_auth import AuthService, Provider, AuthError, ORIGIN
 
 SESSION_COOKIE = "__Host-firely_viewer"
@@ -166,7 +165,7 @@ def create_server():
         server.auth = auth
         server.socket = context.wrap_socket(server.socket, server_side=True)
     except AuthError as error:
-        raise SystemExit("Viewer startup stopped: " + str(error))
+        raise SystemExit("Viewer startup stopped: " + str(error)) from error
     return server
 
 def main():

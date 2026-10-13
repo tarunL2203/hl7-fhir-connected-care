@@ -21,7 +21,7 @@ class CloudError(Exception):
 
 def aws(*args):
     result = subprocess.run(["aws", *args, "--profile", PROFILE, "--region", "us-east-2",
-                             "--output", "json", "--no-cli-pager"], capture_output=True, timeout=60)
+                             "--output", "json", "--no-cli-pager"], capture_output=True, timeout=60, check=False)
     if result.returncode:
         match = re.search(rb"An error occurred \(([^)]+)\)", result.stderr)
         code = match.group(1).decode() if match else "aws_command_failed"

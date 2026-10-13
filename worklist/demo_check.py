@@ -33,7 +33,7 @@ class CheckError(Exception):
 
 def command(args):
     try:
-        result = subprocess.run(args, capture_output=True, timeout=30)
+        result = subprocess.run(args, capture_output=True, timeout=30, check=False)
     except (OSError, subprocess.TimeoutExpired):
         raise CheckError("command_unavailable_or_timed_out") from None
     if result.returncode:
@@ -330,7 +330,13 @@ def main():
     except KeyboardInterrupt:
         return 130
     except Exception as error:
-        checks.run("runner completion", lambda: (_ for _ in ()).throw(error))
+        # Route the failure through Checks.run so only its sanitized reason is printed.
+        failure = error
+
+        def report_failure():
+            raise failure
+
+        checks.run("runner completion", report_failure)
         checks.save()
         return 1
 

@@ -3,8 +3,6 @@ import base64
 import hashlib
 import io
 import json
-import ssl
-import tempfile
 import threading
 import time
 import unittest
@@ -19,10 +17,8 @@ import jwt
 
 import auth_fhir
 import document_viewer_server
-import summary_api
-from authenticated_viewer_server import AuthenticatedHandler, SESSION_COOKIE, LOGIN_COOKIE
+from authenticated_viewer_server import AuthenticatedHandler, SESSION_COOKIE
 from viewer_auth import AuthService, AuthError, ISSUER, CLIENT_ID, AUDIENCE, READ_SCOPES, REVIEWER
-from worklist_store import WorklistStore
 
 class FakeProvider:
     def __init__(self):

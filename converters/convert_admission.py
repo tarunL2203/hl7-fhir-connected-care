@@ -51,6 +51,6 @@ patient = {
     "gender": gender_codes[pid.pid_8.to_er7()]
 }
 output = source.with_suffix(".fhir.json")
-output.write_text(json.dumps(patient, indent=2) + "\n")
+output.write_text(json.dumps(patient, indent=2) + "\n", encoding="utf-8")
 print("Saved:", output)
 print(json.dumps(patient, indent=2))

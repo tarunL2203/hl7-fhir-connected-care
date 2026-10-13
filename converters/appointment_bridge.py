@@ -72,7 +72,7 @@ def convert(raw, patient_id):
     rows = [line.split("|") for line in text.split("\r") if line]
     require([row[0] for row in rows] == ["MSH", "SCH", "PID", "RGS", "AIS"],
             "Only the fixture's single SCH/PID/RGS/AIS structure is supported.")
-    msh, sch, pid, rgs, ais = rows
+    msh, sch, pid, _rgs, ais = rows
     require(len(msh) >= 12 and msh[1] == "^~\\&", "Unsupported encoding delimiters.")
     require(msh[8] == "SIU^S12^SIU_S12" and msh[11] == "2.5.1",
             "Only SIU^S12 version 2.5.1 new-booking messages are supported.")
@@ -309,7 +309,7 @@ if __name__ == "__main__":
         main()
     except HTTPError as error:
         print("STOP: HTTP", error.code, error.read().decode("utf-8", errors="replace"))
-        raise SystemExit(1)
+        raise SystemExit(1) from error
     except (ValueError, OSError, KeyError, TypeError) as error:
         print("STOP:", error)
-        raise SystemExit(1)
+        raise SystemExit(1) from error

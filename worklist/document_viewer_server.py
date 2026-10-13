@@ -268,7 +268,7 @@ class DocumentHandler(ViewerHandler):
                     "--bucket", config["bucket"],
                     "--key", document["key"],
                     "--no-cli-pager", str(output)
-                ], capture_output=True, timeout=60)
+                ], capture_output=True, timeout=60, check=False)
                 if completed.returncode != 0:
                     raise RuntimeError("Private S3 retrieval failed")
                 content = output.read_bytes()
