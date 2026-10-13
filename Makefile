@@ -11,6 +11,7 @@ lint:
 	$(PYTHON) -m pyflakes $$(git ls-files '*.py' | grep -v '^archive/')
 
 test:
+	cd converters && $(PYTHON) -B -m unittest test_converters
 	cd analytics && $(PYTHON) -B -m unittest test_export test_reconcile
 	cd worklist && $(PYTHON) -B -m unittest test_demo_check test_viewer_auth
 	cd worklist && $(PYTHON) -B test_worklist.py

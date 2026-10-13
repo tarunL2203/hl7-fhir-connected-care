@@ -1,13 +1,16 @@
-"""Focused synthetic SIU^S12 -> FHIR appointment demonstration.
+"""Convert a synthetic SIU^S12 booking into a FHIR R4 Appointment, verify it and export a batch.
 
-Run from the existing firely-learning project folder with its Python interpreter.
-Uses the standard library only. This intentionally supports the fixture below,
-not a general HL7 feed or complete HL7/FHIR profile validation.
+Writes the Appointment to the source FHIR server (FHIR_SOURCE_URL, default
+http://localhost:8080), reads it back, and exports the patient's resources as an
+NDJSON batch with a SHA-256 manifest. It intentionally supports the fixture
+below, not a general HL7 feed or complete HL7/FHIR profile validation.
+`--self-test` runs the mapping, stable-ID and reference checks offline.
 """
 import argparse
 import copy
 import hashlib
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path
@@ -16,7 +19,7 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 from uuid import NAMESPACE_URL, uuid5
 
-BASE = "http://localhost:8080/"
+BASE = os.environ.get("FHIR_SOURCE_URL", "http://localhost:8080").rstrip("/") + "/"
 ACCEPT = {"Accept": "application/fhir+json; fhirVersion=4.0"}
 MRN_SYSTEM = "https://example.org/training/mrn"
 APPT_SYSTEM = "https://example.org/training/appointment"
