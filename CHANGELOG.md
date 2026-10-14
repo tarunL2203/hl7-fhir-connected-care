@@ -2,9 +2,12 @@
 
 Notable changes to the Connected Care Data Platform. The build itself, from 30 September to 11 October 2026, is described in the [project history](docs/project-history.md), and every commit from that period is dated to when the work happened.
 
-## [Unreleased]
+## [1.1.0] – 2026-10-14
+
+Documentation release: the Snowflake Cortex features, and an easier-to-navigate README.
 
 ### Documentation
+- **README navigation:** a clickable contents table at the top, grouped into Overview, Evidence, Use it and Background, with links to each in-depth document. Sections now follow that order, the architecture diagram has its own section, and every section ends with a link back to the contents.
 - **Cortex Analyst** ([page](docs/cortex-analyst.md)): what it answered over the 265-patient coverage model and how that compares with the offline benchmarks, who benefits without writing SQL, what developers gain, why it matters now, and its limits.
 - **Cortex Code** ([page](docs/cortex-code.md)): explaining, checking and tracing the coverage pipeline, with an exact match to the link check, plus one session in which it answered for the wrong patient and the guardrail that addresses it.
 - **README:** a new "Answers without code" section, two new rows in the results table, and the Streamlit appointment-details screenshot. The screenshot previously labelled "Cortex Analyst" was a Cortex Code session and is now labelled as one.
