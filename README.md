@@ -7,7 +7,7 @@
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
 ![HL7 v2 · FHIR R4](https://img.shields.io/badge/HL7%20v2%20%C2%B7%20FHIR-R4-E31B23)
 ![AWS](https://img.shields.io/badge/AWS-RDS%20%C2%B7%20S3%20%C2%B7%20IAM-232F3E?logo=amazonwebservices&logoColor=white)
-![Snowflake](https://img.shields.io/badge/Snowflake-Cortex%20Analyst-29B5E8?logo=snowflake&logoColor=white)
+![Snowflake](https://img.shields.io/badge/Snowflake-Cortex%20Analyst%20%C2%B7%20Cortex%20Code%20%C2%B7%20Streamlit-29B5E8?logo=snowflake&logoColor=white)
 ![Data](https://img.shields.io/badge/data-100%25%20synthetic-2E7D32)
 
 ## The problem
@@ -29,11 +29,28 @@ For a high-frequency case (*is the required lab result on file before the visit?
 2. **Assesses every booked appointment** against configurable pre-visit rules. The answer is one of four: *complete*, *gap*, *unable to assess* or *no rule*. A gap is never reported unless retrieval was complete.
 3. **Routes the right work to the right team.** Genuine gaps go to records staff with a due time; data and interface faults go to the integration team; every resolution is recorded.
 4. **Gives clinicians a secure review view**: OIDC + PKCE sign-in, scoped FHIR access, and documents released only after patient and checksum verification.
-5. **Delivers analytics-ready data to Snowflake.** RAW and typed layers, reports, a Streamlit dashboard and Cortex Analyst. Loads are **reconciled row by row** against their source and re-checked in CI.
+5. **Delivers analytics-ready data to Snowflake.** RAW and typed layers, reports and a Streamlit dashboard. Loads are **reconciled row by row** against their source and re-checked in CI.
+6. **Answers questions in plain English.** Cortex Analyst gives non-technical staff governed answers from a semantic model, and Cortex Code explains, checks and traces the pipeline on request. Both were checked against independent benchmarks.
 
 **Who it serves:** records and front-desk staff (a worklist with owners and due times), clinicians (a trustworthy pre-visit view), integration teams (faults routed to them, not to the front desk), and operations leaders (readiness across visits).
 
 ![Architecture](docs/architecture.png)
+
+## Answers without code: Cortex Analyst, Cortex Code and Streamlit
+
+After the architecture, these are the platform's most important features. The people who most need its answers (operations leaders, records staff, quality and audit teams) don't write SQL. Three Snowflake features let them get those answers anyway, and the answers shown here were checked against the project's own benchmarks and definitions.
+
+| Feature | Who it's for | What they do | In this project |
+|---|---|---|---|
+| **Streamlit dashboard** | Staff who ask the same questions every day | Click, filter, download a CSV | Appointment information status, patient details and a data-quality review queue |
+| [**Cortex Analyst**](docs/cortex-analyst.md) | Anyone with a new question | Type it in English; get a table, the tool's reading of the question, and the SQL | Record coverage for 265 patients. Asked whether "zero allergy records" means "no allergies", it explains why the data can't say |
+| [**Cortex Code**](docs/cortex-code.md) | Reviewers, auditors, product owners, engineers | Ask how a number is made, or whether to trust it | Re-derived the observation count layer by layer (531 in, 503 resolved, 28 excluded with reasons), exactly matching the benchmark |
+
+| Cortex Analyst: a clinical caveat built into the model | Cortex Code: auditing the pipeline on request |
+|---|---|
+| ![Cortex Analyst declines a clinical conclusion the data can't support](docs/images/cortex-analyst/zero-is-not-absence.png) | ![Cortex Code checks the coverage report for duplicates and impossible values](docs/images/cortex-code/trust-checks.png) |
+
+**Why it matters now.** Language models became far more reliable at SQL once they worked from a semantic layer of agreed definitions, and usable for regulated data once they ran inside the platform's own access controls. Governed self-service answers have become a deciding factor in how organizations choose a data platform. For developers, it means business meaning and clinical caveats are defined once and reused by every front end. The [Cortex Analyst](docs/cortex-analyst.md) and [Cortex Code](docs/cortex-code.md) pages explain who benefits, what developers gain, and where the limits are, including the one time Cortex Code answered for the wrong patient.
 
 ## Results
 
@@ -46,6 +63,8 @@ For a high-frequency case (*is the required lab result on file before the visit?
 | 30-patient failure-case catalogue | **30 / 30** outcomes as expected; **6 / 6** broken records flagged for review | [results](results/2026-10-07-30-patient-batch/) |
 | Visit-rule edge cases | **9 / 9** window and status tests pass in Snowflake | [rule checks](results/2026-10-06-typed-analytics/04-rule-checks.csv) |
 | Reference integrity, 933 official FHIR examples | **609 / 641** clinical resources resolve to a patient, matching the offline benchmark exactly | [link check](results/2026-10-08-fhir-r4-examples/patient-link-check.csv) |
+| Cortex Analyst answers vs offline benchmarks | 265 patients, 15 with observations, and the one patient with medication orders but no allergy record: **all match**. A clinical conclusion the data can't support is declined | [Cortex Analyst](docs/cortex-analyst.md#what-it-answered) |
+| Cortex Code's independent lineage trace | **531 → 503** observations resolved; 12 + 10 + 6 exclusions explained; 0 duplicates, 0 join fan-out. Matches the link check exactly | [Cortex Code](docs/cortex-code.md#what-it-did-here) |
 | Automated checks | **51** tests, 4 load reconciliations, the 30-patient outcome check and 2 reproducibility checks, all in CI | [CI workflow](.github/workflows/ci.yml) |
 
 ## One appointment, end to end
@@ -69,17 +88,22 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 | A healthcare or business reviewer | [Business overview](docs/business-overview.md): users, rules, scenarios, requirement traceability. Then the [HL7 → FHIR mapping spec](docs/hl7-to-fhir-mapping.md) |
 | A data or Snowflake reviewer | [Snowflake design](docs/snowflake-design.md): layers, idempotent loads, validation, semantic model, roadmap. Then the [SQL](analytics/snowflake/) |
 | An architect or engineer | [Architecture](docs/architecture.md), [decisions](docs/decisions.md) and [Getting started](#getting-started) |
+| Someone who wants answers without writing SQL | [Cortex Analyst](docs/cortex-analyst.md) for questions in plain English, and [Cortex Code](docs/cortex-code.md) for how the numbers are made and whether to trust them |
 | New to healthcare data | [Background: HL7 v2 and FHIR](docs/background-hl7-fhir.md) and the [walkthrough](docs/walkthrough.md) |
 
 ## Screenshots
 
-| Reviewer portal | Readiness dashboard (Streamlit in Snowflake) | Cortex Analyst |
+| Reviewer portal | Readiness dashboard (Streamlit in Snowflake) | Appointment details (Streamlit in Snowflake) |
 |---|---|---|
-| ![Reviewer portal](docs/images/reviewer-portal-patient-assessment.png) | ![Dashboard](docs/images/appointment-readiness-dashboard.png) | ![Cortex Analyst](docs/images/cortex-analyst-question.png) |
+| ![Reviewer portal](docs/images/reviewer-portal-patient-assessment.png) | ![Dashboard status chart](docs/images/streamlit/appointment-status-chart.png) | ![Dashboard appointment details](docs/images/streamlit/appointment-details.png) |
 
-| Firely Auth client (public, no secret) | PKCE required | Semantic view |
+| Cortex Analyst | Cortex Code | Semantic view |
 |---|---|---|
-| ![Client](docs/images/firely-auth-client.png) | ![PKCE](docs/images/firely-auth-pkce.png) | ![Semantic view](docs/images/snowflake-semantic-view.png) |
+| ![Cortex Analyst](docs/images/cortex-analyst/coverage-by-batch.png) | ![Cortex Code](docs/images/cortex-code/explain-coverage-view.png) | ![Semantic view](docs/images/snowflake-semantic-view.png) |
+
+| Firely Auth client (public, no secret) | PKCE required |
+|---|---|
+| ![Client](docs/images/firely-auth-client.png) | ![PKCE](docs/images/firely-auth-pkce.png) |
 
 ## Repository layout
 
@@ -94,7 +118,7 @@ samples/           Synthetic HL7 messages and their FHIR output
 datasets/          30-patient failure cases · official FHIR R4 examples · migration snapshot
 documents/         Synthetic PDF/PNG fixture served by the document gate
 results/           Downloaded Snowflake results and verification evidence, by date
-docs/              Architecture, decisions, business overview, mapping spec, Snowflake design, history
+docs/              Architecture, decisions, business overview, Cortex Analyst and Cortex Code, mapping spec, Snowflake design, history
 infra/             Docker trust-store builds · sanitized Firely Auth client configuration
 archive/           Working records and one-time scripts from the build
 Makefile           `make check` = everything CI runs
@@ -138,7 +162,7 @@ make reconcile PYTHON=python                             # re-check every Snowfl
 | 6 Oct | Typed tables, three reports, 9/9 rule tests · 30-patient failure-case dataset |
 | 7 Oct | SIU^S12 bridge · local secure portal · authenticated batch export · Streamlit dashboard |
 | 8 Oct | AssumeRole root cause found and fixed · 933 FHIR R4 examples loaded directly from S3 · Cortex Analyst |
-| 13 Oct | v1.0.0: shared FHIR client, converter tests, CI, architecture and decision records |
+| 13 Oct | v1.0.0: shared FHIR client, converter tests, CI, architecture and decision records · Cortex Analyst and Cortex Code reviews of the coverage model |
 
 The [project history](docs/project-history.md) has the full story and lessons learned, and the [changelog](CHANGELOG.md) lists the v1.0.0 release. The Git history follows the same timeline: it was rebuilt from the project's dated checkpoints, so each commit shows the code as it was on that day.
 
@@ -168,6 +192,8 @@ The [project history](docs/project-history.md) has the full story and lessons le
 | [Decisions](docs/decisions.md) | Nine architecture decision records |
 | [HL7 → FHIR mapping](docs/hl7-to-fhir-mapping.md) | Field-level interface spec for ADT, ORU and SIU |
 | [Snowflake design](docs/snowflake-design.md) | Objects, RAW and typed layers, idempotency, proofs, security, cost, roadmap |
+| [Cortex Analyst](docs/cortex-analyst.md) | Questions in plain English: who benefits, what developers gain, why it matters now, limits |
+| [Cortex Code](docs/cortex-code.md) | An AI engineer inside Snowflake: explaining, auditing and tracing the pipeline, and one lesson learned |
 | [Project history](docs/project-history.md) | Phase-by-phase build log and lessons learned |
 | [Background](docs/background-hl7-fhir.md) | HL7 v2, FHIR, SMART, LOINC and UCUM for newcomers |
 | [HIPAA considerations](docs/hipaa-considerations.md) | Safeguards mapped to the project, and their limits |

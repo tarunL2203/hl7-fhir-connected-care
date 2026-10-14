@@ -71,7 +71,7 @@ The same rule, evaluated in SQL over the loaded rows ([result](../results/2026-1
 
 The Streamlit dashboard shows the same appointment alongside the 30-patient failure-case batch:
 
-![Dashboard](images/appointment-readiness-dashboard.png)
+![Dashboard](images/streamlit/appointment-status-chart.png)
 
 ## 7. A new result arrives
 
