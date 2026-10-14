@@ -140,8 +140,9 @@ Nine predicate tests pin the edge cases: inclusive start, exclusive appointment 
 
 ## Semantic layer and apps
 
-- **Cortex Analyst.** The `PATIENT_RECORD_COVERAGE` semantic view models the coverage view, and its description states that zero linked records in a batch is not the clinical absence of a condition. The [metric catalogue](../datasets/phase1-fhir-examples/METRIC_CATALOGUE.md) defines grain, exclusions and 15 evaluation questions. [`Snowflake-Coverage-Demo.sql`](../analytics/snowflake/Snowflake-Coverage-Demo.sql) holds the read-only demo questions and the queries behind them.
+- **Cortex Analyst** ([details](cortex-analyst.md)). The `PATIENT_RECORD_COVERAGE` semantic view models the coverage view, and its description states that zero linked records in a batch is not the clinical absence of a condition. The [metric catalogue](../datasets/phase1-fhir-examples/METRIC_CATALOGUE.md) defines grain, exclusions and 15 evaluation questions. [`Snowflake-Coverage-Demo.sql`](../analytics/snowflake/Snowflake-Coverage-Demo.sql) holds the read-only demo questions and the queries behind them.
 - **Streamlit in Snowflake.** [`firely_streamlit_app.py`](../analytics/dashboard/firely_streamlit_app.py) runs on the warehouse runtime with Snowpark and no external credentials. It shows the HL7 bridge patient, labs and appointment, plus the failure-case analytics: status chart, records needing review, missing birth dates.
+- **Cortex Code** ([details](cortex-code.md)). Used under a standing read-only instruction to explain the coverage view, check it for duplicates and impossible values, and trace the observation count from RAW to the report.
 
 The coverage views and the semantic view were created in the Snowflake workspace. Their DDL and YAML are not exported to this repository yet; that is the first item on the roadmap below.
 
@@ -154,6 +155,7 @@ The coverage views and the semantic view were created in the Snowflake workspace
 | Rerun of typed `MERGE`s | First load 2/3/2, every rerun inserted 0 | [query history](../results/2026-10-06-typed-analytics/05-merge-query-history.csv) |
 | Typed layer vs RAW | 0 review rows, 0 broken links, 0 payload mismatches | [validation](../results/2026-10-06-typed-analytics/00-typed-validation.csv) |
 | 30-patient expected vs actual | 30/30 outcomes match; 6/6 broken records flagged | `python analytics/compare_fc30_outcomes.py` |
+| Cortex Code's independent lineage trace (Observation) | 531 in RAW, 503 resolved, 28 excluded (12 unresolved, 10 other format, 6 no reference); 0 duplicate IDs, 0 join fan-out. Matches the link check | [Cortex Code](cortex-code.md#what-it-did-here) |
 | Phase 1 reference integrity vs an offline benchmark | Exact match: 609 of 641 clinical resources resolve to a Patient (95.0%); 15 unresolved, 10 other formats, 7 with no reference | [link check](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv) |
 
 ## Security and cost
@@ -175,3 +177,4 @@ The coverage views and the semantic view were created in the Snowflake workspace
 5. **Data quality.** Data metric functions (null, duplicate and freshness counts) on the typed tables, with alerts. `needs_review` rows routed to the integration team's worklist.
 6. **PHI governance, for real data.** Classification and tags on identifiers, names and birth dates; masking policies by role; row access policies by facility; access-history auditing.
 7. **Environments.** Development and test databases created as zero-copy clones, with schema changes deployed through CI (schemachange or Terraform). A resource monitor on every warehouse.
+8. **Natural-language access for operations.** A second semantic view over `APPOINTMENT_FC30_REPORT`, so Cortex Analyst can answer appointment-readiness questions. An *Ask a question* box in the Streamlit dashboard through the Cortex Analyst REST API. Cortex Agents once several semantic views are in play.

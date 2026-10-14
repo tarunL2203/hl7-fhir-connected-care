@@ -21,7 +21,7 @@ Chart preparation by hand is slow, and it hides an important distinction. An emp
 | Records / front-desk staff | A worklist of visits with a genuine information gap, each with a due time, an owner and the evidence behind it |
 | Reviewer (clinician or nurse) | A signed-in, read-only view of the patient, qualifying results, the appointment and permitted documents |
 | Integration / IT team | Problems that are data or interface faults (identity, retrieval, invalid data), routed to them instead of to records staff |
-| Operations / analytics lead | Readiness across visits in Snowflake: reports, a dashboard and natural-language questions |
+| Operations / analytics lead | Readiness across visits in Snowflake: reports, a dashboard and natural-language questions ([Cortex Analyst](cortex-analyst.md)) |
 
 ## How the workflow runs
 
