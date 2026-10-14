@@ -2,6 +2,8 @@
 
 For anyone who needs numbers from the platform but doesn't write SQL (operations leaders, records staff, quality and compliance teams) and for the engineers who make that possible. All data is from the official HL7 FHIR R4 examples. Nothing here is a clinical decision.
 
+**On this page:** [In one paragraph](#in-one-paragraph) · [Why this project uses it](#why-this-project-uses-it) · [What it answered](#what-it-answered) · [Who benefits, without writing code](#who-benefits-without-writing-code) · [What it gives developers](#what-it-gives-developers) · [Where the Streamlit dashboard fits](#where-the-streamlit-dashboard-fits) · [Why it matters now](#why-it-matters-now) · [Why it has become a deciding factor](#why-it-has-become-a-deciding-factor) · [Limits and guardrails](#limits-and-guardrails) · [References](#references)
+
 ## In one paragraph
 
 Cortex Analyst is Snowflake's built-in, fully managed text-to-SQL service. You type a question in ordinary English. It reads a **semantic view**, a model that records what the tables *mean*: what counts as a patient record, how coverage is calculated, which caveats apply. From that it writes SQL, runs it in your own warehouse under your own role, and returns the result together with its reading of your question and the SQL it used. It stays inside Snowflake's governance boundary. It does not train on customer data, it follows role-based access control, and with the default Snowflake-hosted models no data or prompts leave Snowflake.<sup>[1](#references)</sup>

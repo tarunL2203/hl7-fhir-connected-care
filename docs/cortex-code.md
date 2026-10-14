@@ -2,6 +2,8 @@
 
 For anyone who needs to understand, check or explain the data platform without writing the queries themselves (reviewers, auditors, product owners, new team members) and for the engineers who build it. All data is from the official HL7 FHIR R4 examples. Nothing here is a clinical decision.
 
+**On this page:** [In one paragraph](#in-one-paragraph) · [Why this project uses it](#why-this-project-uses-it) · [What it did here](#what-it-did-here) · [Who benefits, without writing code](#who-benefits-without-writing-code) · [What it gives developers](#what-it-gives-developers) · [Why it matters now](#why-it-matters-now) · [Why it has become a deciding factor](#why-it-has-become-a-deciding-factor) · [Limits and guardrails](#limits-and-guardrails) · [References](#references)
+
 ## In one paragraph
 
 Cortex Code is Snowflake's agentic AI assistant, built into Snowsight and Workspaces and also available as a command-line tool. It became generally available in Snowsight on 9 March 2026.<sup>[1](#references)</sup> You describe a task in English. It finds the relevant tables using catalog metadata and lineage, writes and runs SQL or Python, explains existing code, and suggests fixes when a statement fails. Before applying any change, it shows the proposed edit as a diff for review. It can also answer governance and cost questions, such as who can access what, or which queries drive credit spend. Throughout, it works within the account's existing policies and role-based access.<sup>[1](#references)</sup>
