@@ -61,11 +61,11 @@ Names are never used for matching.
 | SCH-2 filler appointment ID (EI) | ID and authority (`DEMO`) both required | `identifier[0]` (system `https://example.org/training/appointment`) |
 | (fixed) | – | `meta.tag` = `synthetic`, `description` = "Synthetic glucose review" |
 
-**Identity.** The ID is `siu-appointment-` + UUID5 over [MSH-3, MSH-4, SCH-2.1, SCH-2.2]. The bridge writes the Appointment to Firely with an idempotent `PUT` on that ID, then reads it back and compares it with the conversion before exporting anything. An offline self-test covers the mapping, stable IDs, timestamps and references: `python converters/appointment_bridge.py --self-test`.
+**Identity.** The ID is `siu-appointment-` + UUID5 over [MSH-3, MSH-4, SCH-2.1, SCH-2.2]. The bridge creates the Appointment in Firely with a `PUT` on that ID only if it doesn't exist yet (an existing one is left unchanged), then reads it back and compares it with the conversion before exporting anything. An offline self-test covers the mapping, stable IDs, timestamps and references: `python converters/appointment_bridge.py --self-test`.
 
 ## Rejections at a glance
 
-Every converter fails closed, raising an error that names the problem rather than producing a partial resource. [`converters/test_converters.py`](../converters/test_converters.py) runs these cases in CI:
+Every converter fails closed, raising an error that names the problem rather than producing a partial resource. The converter unit tests ([`converters/test_converters.py`](../converters/test_converters.py)) and the bridge's `--self-test`, both run in CI, cover some of these cases; the rest are enforced in the code without a dedicated test:
 
 - Unsupported message type, version, sender or segment structure.
 - An identifier authority or patient outside the configured mapping, or a duplicate identifier match.

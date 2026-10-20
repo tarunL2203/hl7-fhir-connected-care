@@ -8,7 +8,7 @@ Most hospital systems still exchange events as **HL7 version 2** messages. A mes
 
 | Message | Event | Key segments |
 |---|---|---|
-| ADT^A01 | A patient is admitted or registered | `MSH` header, `EVN` event, `PID` patient identity, `PV1` visit |
+| ADT^A01 | A patient is admitted (admit/visit notification) | `MSH` header, `EVN` event, `PID` patient identity, `PV1` visit |
 | ORU^R01 | A result is reported | `PID`, `OBR` order, `OBX` result (test code, value, unit, status) |
 | SIU^S12 | A new appointment is booked | `SCH` schedule, `PID`, `RGS` resource group, `AIS` service |
 
@@ -43,7 +43,7 @@ In the United States, the ONC Cures Act Final Rule requires certified EHRs to of
 |---|---|---|
 | Source of clinical events | EHR (for example Epic, Oracle Health, MEDITECH) and lab systems | Synthetic HL7 v2 messages in [`samples/`](../samples/) |
 | Routing and transformation | Interface engine (Mirth Connect, Rhapsody, InterSystems) | [`converters/`](../converters/): strict, validated HL7 → FHIR mapping |
-| FHIR API and storage | FHIR server | Firely Server, with storage on Amazon RDS for SQL Server |
+| FHIR API and storage | FHIR server | Firely Server, with storage on Amazon RDS for SQL Server (2–7 Oct), then a protected local snapshot |
 | Identity and access | Authorization server, SMART on FHIR | Firely Auth: OIDC with PKCE and scoped tokens |
 | Operational review | Chart preparation, pre-visit planning | The reviewer portal, the visit rule and the worklist |
 | Analytics | Data warehouse fed by bulk export | Snowflake: RAW and typed layers, reports, dashboard, Cortex Analyst |

@@ -42,13 +42,14 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 ## 3. Reviewer milestone and repeatable verification (3 Oct)
 
 - **Two login failures, kept separate.** Firely Auth rejected admin accounts requesting the `openid` scope. Separately, the provider was running in the ASP.NET `Development` environment, which redirected sign-in to an absent UI on port 3000. It was rerun in `Production` mode using the same volumes, and the old container was kept stopped for rollback.
-- **Live result: 15/15 checks** ([report](../archive/milestone-reports/2026-10-03-reviewer-milestone.md)):
+- **First live run** ([report](../archive/milestone-reports/2026-10-03-reviewer-milestone.md)). Sign-in, records, documents, assessments, resolution history and logout all worked against the running services. Two negative checks, old-cookie replay and the authenticated wrong-document denial, were covered only by simulated tests at that point.
+- **Repeatable tooling, and 15/15 live.** [`demo_check.py`](../worklist/demo_check.py) adds `preflight`, `start`, `smoke` and `reviewer` modes. Its real sign-in run that afternoon passed 15/15 live checks, alongside 6/6 infrastructure checks and 34/34 offline tests ([report](../archive/milestone-reports/2026-10-03-repeatable-verification.md)):
   - Anonymous requests get 401.
   - Wrong-patient and unregistered documents get 403.
   - Logout with a bad CSRF token or wrong origin gets 403 and keeps the session; a valid logout gets 200.
-  - A replayed session cookie is rejected.
+  - The old session cookie, replayed after logout, is rejected.
   - The worklist database was unchanged.
-- **Repeatable tooling.** [`demo_check.py`](../worklist/demo_check.py) adds `preflight`, `start`, `smoke` and `reviewer` modes. The final verification passed 15/15 live checks, 6/6 infrastructure checks and 34/34 offline tests ([report](../archive/milestone-reports/2026-10-03-repeatable-verification.md)).
+  - The rest are health, readiness and data checks.
 - **Security incident.** A broad diagnostic search printed private RSA signing material. The key was rotated to a new 3072-bit RS256 key and the old key was removed from the published JWKS. Configuration files, keys and checkpoints from that period are excluded from this repository.
 
 ## 4. Authenticated export and S3 landing (4 Oct)
@@ -61,13 +62,13 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 
 ## 5. Snowflake RAW through an internal stage (5 Oct)
 
-- **Setup.** With the external route blocked, the three exported files were uploaded to a Snowflake internal stage and loaded into a dedicated X-Small warehouse (`FIRELY_DEMO_WH`, auto-suspend 60 s).
+- **Setup.** With the external route blocked, the three exported files were uploaded to a Snowflake internal stage and loaded into the RAW table `FHIR_RESOURCE_INTERNAL`, using a dedicated X-Small warehouse (`FIRELY_DEMO_WH`, auto-suspend 60 s).
 - **First COPY:** 7 rows loaded, 0 errors. **Repeat COPY:** every file `LOAD_SKIPPED`, 0 rows added.
-- **Reconciliation.** The RAW rows were downloaded twice and checked independently with [`reconcile_csv.py`](../analytics/reconcile_csv.py): IDs, complete payloads, filenames, file row numbers and load timestamps all match, all 5 patient links resolve, and there are 0 duplicates ([report](../archive/milestone-reports/2026-10-05-snowflake-internal-stage.md), [results](../results/2026-10-05-internal-stage/)).
+- **Reconciliation.** The RAW rows were downloaded twice and checked independently with [`reconcile_csv.py`](../analytics/reconcile_csv.py): IDs, complete payloads, filenames and file row numbers match, the two downloads are identical, all 5 patient links resolve, and there are 0 duplicates ([report](../archive/milestone-reports/2026-10-05-snowflake-internal-stage.md), [results](../results/2026-10-05-internal-stage/)).
 
 ## 6. Typed analytics (6 Oct)
 
-- **Typed tables.** `PATIENT_TYPED`, `OBSERVATION_TYPED` and `APPOINTMENT_TYPED` are loaded with an insert-only `MERGE` on batch ID + resource ID. The first loads inserted 2/3/2 rows and every serial rerun inserted 0. The tables keep full source JSON, batch identity, file row numbers and timezone-aware timestamps. Questionable shapes are flagged `needs_review`, never dropped.
+- **Typed tables.** `PATIENT_TYPED`, `OBSERVATION_TYPED` and `APPOINTMENT_TYPED` are loaded with an insert-only `MERGE` on batch ID + resource ID. The first loads inserted 2/3/2 rows. The Observation and Appointment reruns inserted 0 (query history); the Patient rerun was checked in the session but not exported. The tables keep full source JSON, batch identity, file row numbers and timezone-aware timestamps. Questionable shapes are flagged `needs_review`, never dropped.
 - **Three reports** ([`firely-demo-reports.sql`](../analytics/snowflake/firely-demo-reports.sql)): cohort resource presence, glucose timeline and appointment-linked information availability. Both demo appointments were `information_complete`.
 - **Rule tests.** 9/9 time-window and status predicate tests pass ([results](../results/2026-10-06-typed-analytics/), [report](../archive/milestone-reports/2026-10-06-typed-analytics.md)).
 - **Failure-case dataset.** A 30-patient synthetic batch was generated with deliberately invalid timestamps and missing data, to exercise RAW ingestion and review handling ([`datasets/fc30-failure-cases`](../datasets/fc30-failure-cases/)).
@@ -75,7 +76,7 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 ## 7. HL7 scheduling bridge and local secure portal (7 Oct)
 
 - **30-patient batch:** loaded with 30 Patient, 87 Observation and 30 Appointment resources. Appointment information availability: 11 complete, 13 gaps, 2 not applicable, 2 not configured, 2 unable to assess. **All 30 outcomes match the generator's expected outcomes, and all 6 deliberately broken observations were flagged for review** ([results](../results/2026-10-07-30-patient-batch/), [`compare_fc30_outcomes.py`](../analytics/compare_fc30_outcomes.py)).
-- **SIU^S12 → Appointment.** [`appointment_bridge.py`](../converters/appointment_bridge.py) converts a scheduling message to a FHIR Appointment, writes it to Firely and reads it back. The RAW rows downloaded from Snowflake reconcile 4/4 against the Firely export (3/3 for the earlier lab-only bridge), and repeat loads were skipped. The downloads are included, so the reconciliation can be rerun ([results](../results/2026-10-07-hl7-bridge/), [walkthrough](../archive/demo-notes/2026-10-07-appointment-bridge.md)).
+- **SIU^S12 → Appointment.** [`appointment_bridge.py`](../converters/appointment_bridge.py) converts a scheduling message to a FHIR Appointment, writes it to Firely and reads it back. The RAW rows downloaded from Snowflake reconcile 4/4 against the Firely export (3/3 for the earlier lab-only bridge), and the repeat load of the lab-only bridge was skipped. The downloads are included, so the reconciliation can be rerun ([results](../results/2026-10-07-hl7-bridge/), [walkthrough](../archive/demo-notes/2026-10-07-appointment-bridge.md)).
 - **Local secure portal.**
   - The reviewer portal was pointed at a protected local Firely snapshot, with document downloads deferred in this mode.
   - A synthetic lab update ([`samples/lab-portal-update-004.hl7`](../samples/lab-portal-update-004.hl7)) was converted and refreshed through the portal.
@@ -87,10 +88,10 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 ## 8. S3 → Snowflake fixed, and Phase 1 examples (8 Oct)
 
 - **Root cause.**
-  - The AWS account sits in AWS's free-plan "Projects" experience, which applies a managed, non-editable resource control policy (`DenyAnyoneOutsideMyOrgAndAWS`) that denies `sts:*` and `s3:*` to principals outside the organization.
-  - Snowflake's IAM principal is outside it, so `AssumeRole` is denied whatever the role's trust policy says. The trust principal and external ID had been verified to match Snowflake exactly, and the denial persisted after a paid-plan upgrade.
+  - The AWS account was created in AWS's free-plan "Projects" experience, which applies a managed, non-editable resource control policy (`DenyAnyoneOutsideMyOrgAndAWS`) that denies `sts:*` and `s3:*` to principals outside the organization.
+  - Snowflake's IAM principal is outside it, so `AssumeRole` is denied whatever the role's trust policy says. The trust principal and external ID had been verified to match Snowflake exactly, and the denial persisted after the account was upgraded to a paid plan on 7 October.
   - The block was lifted at the AWS organization level on 8 October. Reference: [SCPs and RCPs for AWS projects](https://docs.aws.amazon.com/accounts/latest/reference/scps-and-rcps-for-projects.html).
-- **Phase 1 examples, loaded directly from S3.** The official HL7 FHIR R4 example archive was profiled: 14,044 JSON objects across 139 resource types, with a full reference audit. A 933-record slice across 11 types (265 Patients) was landed in S3 and loaded through the storage integration's external stage. A fail-closed block rejects the batch unless the count, IDs and payloads all check out ([`datasets/phase1-fhir-examples`](../datasets/phase1-fhir-examples/), [metric catalogue](../datasets/phase1-fhir-examples/METRIC_CATALOGUE.md)).
+- **Phase 1 examples, loaded directly from S3.** The official HL7 FHIR R4 example archive was profiled: 14,044 JSON objects across 139 resource types, with a full reference audit. A 933-record slice across 11 types (265 Patients) was landed in S3 and loaded through the storage integration's external stage. The files were read from their own prefix through the same storage integration; the change that allowed that prefix is not recorded in this repository. A fail-closed block rejects the batch unless the count, IDs and payloads all check out ([`datasets/phase1-fhir-examples`](../datasets/phase1-fhir-examples/), [metric catalogue](../datasets/phase1-fhir-examples/METRIC_CATALOGUE.md)).
 - **Reference integrity.** The Snowflake link check matches the offline benchmark exactly: 609 of 641 clinical resources (95.0%) resolve to a Patient in the batch, with 15 unresolved, 10 in other reference formats and 7 with no reference ([results](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv)).
 - **Cortex Analyst.** Coverage views and a `PATIENT_RECORD_COVERAGE` semantic view let Cortex Analyst answer questions such as "how many linked observation and allergy records does this patient have?". A zero is reported as "no linked records in this batch", never as clinical absence ([demo SQL](../analytics/snowflake/Snowflake-Coverage-Demo.sql)).
 
@@ -104,16 +105,17 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 - **Release v1.0.0 (13 Oct).**
   - Extracted a shared FHIR client.
   - Restructured the converters into testable functions with 8 unit tests.
-  - Added CI that runs Black, pyflakes, 51 tests, the load reconciliations and the reproducibility checks on every push.
+  - Added CI that runs Black, pyflakes, 51 tests, the load reconciliations and the reproducibility checks on every push to main and every pull request.
   - Wrote the architecture description, decision records and walkthrough.
   - Moved one-time scripts and working records to `archive/`. See the [changelog](../CHANGELOG.md).
+- **Cortex sessions (13 Oct).** The Cortex Analyst questions and the Cortex Code explanation, trust checks and lineage trace were run over the coverage model.
 - **Release v1.1.0 (14 Oct).** Pages on [Cortex Analyst](cortex-analyst.md) and [Cortex Code](cortex-code.md), including the session in which Cortex Code answered for the wrong patient, and a README with a clickable contents table.
 
 ## Lessons learned
 
 - **Separate "absent" from "not retrieved".** An information gap is only reported after a complete, successful retrieval. Anything else is `unable_to_assess`.
 - **Prove each claim with live evidence.** A generated SQL file or a passing unit test was never counted as a cloud result; every milestone above links to downloaded query results and reconciliation output.
-- **Prefer reversible, scoped access.** Single /32 ingress, a disabled-first storage integration, a single-prefix read role and no long-lived keys. A broader trust policy was rejected rather than used as a shortcut.
+- **Prefer reversible, scoped access.** Single /32 ingress, a disabled-first storage integration, a prefix-scoped read role and no long-lived keys. A broader trust policy was rejected rather than used as a shortcut.
 - **Diagnose before buying a fix.** A paid-plan upgrade alone did not change the AssumeRole denial. Finding the governing organization-level policy did.
 - **Keep secrets out of tool output.** The signing-key exposure on 3 October led to an immediate rotation and to this repository's redaction rules.
 

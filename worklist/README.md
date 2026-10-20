@@ -19,13 +19,14 @@ The pre-visit rules engine, the follow-up worklist and the authenticated reviewe
 | [`viewer.html`](viewer.html), [`viewer_server.py`](viewer_server.py) | The reviewer page |
 | `assess_demo_patient.py`, `assess_missing_demo.py`, `load_missing_demo.py`, `register_documents.py`, `sync_demo_worklist.py` | Scripts that load and assess the two demo patients against a running Firely server |
 
-Configuration lives in [`spec/v2/`](spec/v2/): the policy, visit assignments, the document registry, test scenarios and the local-mode switch. Offline assessment cases are in [`fixtures/v2/`](fixtures/v2/).
+Configuration lives in [`spec/v2/`](spec/v2/): the policy, visit assignments, the document registry, test scenarios and the local-mode switch (currently on, which defers document downloads). Offline assessment cases are in [`fixtures/v2/`](fixtures/v2/).
 
 ## Tests
 
 All offline, with no network access, Docker or cloud accounts:
 
 ```sh
+cd worklist
 python -B -m unittest test_viewer_auth test_demo_check   # 26 auth, route and startup guardrail tests
 python -B test_worklist.py                               # 9 workflow tests
 ```
@@ -37,7 +38,7 @@ The authentication tests use real RS256 signatures against a simulated provider,
 With Firely Server, Firely Auth and the local TLS certificates in `auth/certs/` in place (see the [sanitized Firely Auth configuration](../infra/firely-auth/appsettings.instance.example.json)):
 
 ```sh
-python worklist/demo_check.py preflight   # read-only checks of containers, database access and FHIR readiness
+python worklist/demo_check.py preflight   # read-only checks of the containers, AWS login and database access (FHIR readiness is in `smoke`)
 python worklist/authenticated_viewer_server.py
 ```
 

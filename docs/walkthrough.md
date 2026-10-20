@@ -10,12 +10,14 @@ Two lab results and a booking arrive as HL7 v2 messages:
 |---|---|---|
 | ORU^R01 | [`lab-002.hl7`](../samples/lab-002.hl7) | Glucose **95 mg/dL**, final, measured 1 Oct 09:00 (UTC−4) |
 | ORU^R01 | [`lab-003.hl7`](../samples/lab-003.hl7) | Glucose **102 mg/dL**, final, measured 1 Oct 10:00 (UTC−4), different order number |
-| SIU^S12 | [`appointment-bridge-001.hl7`](../samples/appointment-bridge-001.hl7) | Booked 30-minute glucose review, 6 Oct 13:00–13:30 UTC |
+| SIU^S12 | [`appointment-bridge-001.hl7`](../samples/appointment-bridge-001.hl7) | Booked 30-minute glucose review, 6 Oct 13:00–13:30 UTC (message sent 7 Oct) |
 
 ```
 SCH|SYN-PLACER-BRIDGE-001^DEMO|SYN-APPT-BRIDGE-001^DEMO||||demo-glucose-review^Glucose review^L|...
 PID|1||SYN002^^^DEMO^MR||Demo^Ravi||19850512|M
 ```
+
+The demonstration ran on 7 October, after the visit's date. That doesn't change the answer: the rule's window is measured back from the appointment time, not from when the check runs.
 
 ## 2. They become FHIR resources
 
@@ -41,7 +43,7 @@ Had nothing qualified after a complete retrieval, the visit would have been `inf
 
 ## 4. The patient's records are exported
 
-The batch [`hl7-appointment-bridge-20261007T162957465413Z`](../analytics/batches/hl7-appointment-bridge-20261007T162957465413Z/) holds 1 Patient, 2 Observations and 1 Appointment as NDJSON. Its [manifest](../analytics/batches/hl7-appointment-bridge-20261007T162957465413Z/manifest.json) records the SHA-256 of every file and of the HL7 and FHIR sources it came from.
+The batch [`hl7-appointment-bridge-20261007T162957465413Z`](../analytics/batches/hl7-appointment-bridge-20261007T162957465413Z/) holds 1 Patient, 2 Observations and 1 Appointment as NDJSON. It was read from the local source server twice, and written only because both reads matched. Its [manifest](../analytics/batches/hl7-appointment-bridge-20261007T162957465413Z/manifest.json) records the SHA-256 of every file and of the HL7 and FHIR sources it came from.
 
 ## 5. Snowflake loads it, and the load is proven
 
@@ -59,7 +61,7 @@ PASS: all 4 payloads and source rows match the Firely export.
 PASS: available HL7 and converted source files match manifest hashes.
 ```
 
-This check runs in CI on every push.
+This check runs in CI on every push to main.
 
 ## 6. The answer, in Snowflake
 
@@ -69,7 +71,7 @@ The same rule, evaluated in SQL over the loaded rows ([result](../results/2026-1
 |---|---|---|---|---:|---|
 | demo-patient-002 | siu-appointment-17d6d563… | booked | 2026-10-06 13:00 | 2 | **information_complete** |
 
-The Streamlit dashboard shows the same appointment alongside the 30-patient failure-case batch:
+The Streamlit dashboard applies the same rule to the 30-patient failure-case batch (this capture is from the version deployed on 7 October, whose labels differ from the committed app file):
 
 ![Dashboard](images/streamlit/appointment-status-chart.png)
 

@@ -10,11 +10,11 @@ For data platform and Snowflake readers: how FHIR data lands, how it is modeled,
 | RAW | One row per FHIR resource per batch: `PAYLOAD VARIANT` plus resource type, resource ID, batch ID, source file, file row number and load time |
 | Load safety | Explicit `FILES=` lists (manifests never loaded), `ON_ERROR = ABORT_STATEMENT`, `FORCE = FALSE`, fail-closed validation before merging |
 | Idempotency | COPY load metadata skips already-loaded files; insert-only `MERGE` on batch + resource ID; reruns insert 0 rows |
-| Typed layer | Patient, Observation and Appointment tables with timezone-aware timestamps, full source JSON and a `quality_status` of `valid` or `needs_review`. Rows are never dropped |
+| Typed layer | Patient, Observation and Appointment tables with timezone-aware timestamps and full source JSON. Observations and appointments carry a `quality_status` of `valid` or `needs_review`, patients a `birth_date_status`. Rows are never dropped |
 | Business rules | Visit requirements held as data (`APPOINTMENT_FC30_REQUIREMENTS`), evaluated in SQL views |
 | Consumption | SQL reports, a Streamlit-in-Snowflake dashboard, and a Cortex Analyst semantic view |
-| Compute | Dedicated X-Small warehouse `FIRELY_DEMO_WH`: auto-suspend 60 s, auto-resume, created suspended |
-| Access to S3 | Storage integration trusting exactly one Snowflake IAM principal with an external ID, and a read-only role scoped to one prefix. No long-lived keys |
+| Compute | Dedicated X-Small warehouse `FIRELY_DEMO_WH` for loading: auto-suspend 60 s, auto-resume, created suspended. The semantic-view and Cortex sessions used the account's existing `CHATGPT_WH` |
+| Access to S3 | Storage integration trusting exactly one Snowflake IAM principal with an external ID, and a read-only role scoped to batch prefixes. No long-lived keys |
 
 ## Data flow
 
@@ -57,7 +57,7 @@ Database `CHATGPT_LAB` (an existing lab database in the account).
 | `FHIR_HL7_EXAMPLES` | `HL7_JSON`, `HL7_EXAMPLES_S3` → `RESOURCE_RAW` | File format, external S3 stage, RAW table | Phase 1: official FHIR R4 examples | 933 |
 | `FHIR_STANDARDIZED` | `HL7_PATIENT_LINK_CHECK` | View | Resolves each clinical resource's patient reference | 641 |
 | `FHIR_ANALYTICS` | `HL7_PATIENT_COVERAGE` | View | Linked-record counts per patient across nine categories | 265 |
-| (workspace) | `PATIENT_RECORD_COVERAGE` | Semantic view | Cortex Analyst model over the coverage view | – |
+| `FHIR_SEMANTIC` | `PATIENT_RECORD_COVERAGE` | Semantic view (YAML built in the workspace) | Cortex Analyst model over the coverage view | – |
 
 Keeping each experiment's batch in its own RAW table, created `LIKE` the first one, keeps cohorts from mixing while preserving one column contract. Phase 1 instead uses a single RAW table keyed by `SOURCE_DATASET` + `BATCH_ID`, which is the shape a multi-source platform would standardize on.
 
@@ -136,7 +136,7 @@ The information-availability rule from the application is reimplemented in SQL:
 - Same patient, LOINC 2345-7, status final, amended or corrected, `quality_status = 'valid'`.
 - `effective_time >= start - 7 days AND effective_time < start`.
 
-Nine predicate tests pin the edge cases: inclusive start, exclusive appointment instant, status handling, timezone equivalence and missing time ([results](../results/2026-10-06-typed-analytics/04-rule-checks.csv)). For the 30-patient batch the rule configuration lives in a table (`APPOINTMENT_FC30_REQUIREMENTS`: code, window, unit, enabled). The report view therefore distinguishes `requirements_not_configured` from a real gap, and `not_applicable` for cancelled visits.
+Nine predicate tests pin the edge cases: inclusive start, exclusive appointment instant, status handling, timezone equivalence and missing time ([results](../results/2026-10-06-typed-analytics/04-rule-checks.csv)). For the 30-patient batch the rule configuration lives in a table (`APPOINTMENT_FC30_REQUIREMENTS`: appointment, window and accepted unit; the LOINC code and accepted statuses are fixed in the view). The report view therefore distinguishes `requirements_not_configured` from a real gap, and `not_applicable` for cancelled visits.
 
 ## Semantic layer and apps
 
@@ -150,9 +150,9 @@ The coverage views and the semantic view were created in the Snowflake workspace
 
 | Check | Result | Evidence |
 |---|---|---|
-| RAW rows vs exported files: IDs, full payloads, file row numbers, source hashes | 7/7, 3/3, 4/4 and 5/5 match, 0 duplicates | [reproduce](../results/README.md#reproduce-the-reconciliation) |
+| RAW rows vs exported files: IDs, full payloads, file names and row numbers (plus export-file hashes for the HL7-derived batches) | 7/7, 3/3, 4/4 and 5/5 match, 0 duplicates | [reproduce](../results/README.md#reproduce-the-reconciliation) |
 | Repeat COPY of identical files | Every file `LOAD_SKIPPED`, 0 rows added | [portal refresh](../results/2026-10-07-portal-refresh/repeat-copy.csv), [HL7 bridge](../results/2026-10-07-hl7-bridge/repeat-load.csv) |
-| Rerun of typed `MERGE`s | First load 2/3/2, every rerun inserted 0 | [query history](../results/2026-10-06-typed-analytics/05-merge-query-history.csv) |
+| Rerun of typed `MERGE`s | First load 2/3/2; the Observation and Appointment reruns inserted 0 (the Patient rerun was not exported) | [query history](../results/2026-10-06-typed-analytics/05-merge-query-history.csv) |
 | Typed layer vs RAW | 0 review rows, 0 broken links, 0 payload mismatches | [validation](../results/2026-10-06-typed-analytics/00-typed-validation.csv) |
 | 30-patient expected vs actual | 30/30 outcomes match; 6/6 broken records flagged | `python analytics/compare_fc30_outcomes.py` |
 | Cortex Code's independent lineage trace (Observation) | 531 in RAW, 503 resolved, 28 excluded (12 unresolved, 10 other format, 6 no reference); 0 duplicate IDs, 0 join fan-out. Matches the link check | [Cortex Code](cortex-code.md#what-it-did-here) |
@@ -160,10 +160,10 @@ The coverage views and the semantic view were created in the Snowflake workspace
 
 ## Security and cost
 
-- **Storage integration, created the safe way.** The integration was first created **disabled**, which made `DESC INTEGRATION` return Snowflake's exact IAM principal and external ID. The AWS role was then created trusting only that principal with an `sts:ExternalId` condition, and with `GetBucketLocation`, prefix-limited `ListBucket`, `GetObject` and `GetObjectVersion` on one batch prefix ([policy](../analytics/sql/synthetic-20261004T225801Z-5dd08717/iam-read-policy.json), [trust](../analytics/sql/synthetic-20261004T225801Z-5dd08717/snowflake-trust.json)). A proposed broader temporary trust was rejected.
+- **Storage integration, created the safe way.** The integration was first created **disabled**, which made `DESC INTEGRATION` return Snowflake's exact IAM principal and external ID. The AWS role was then created trusting only that principal with an `sts:ExternalId` condition, and with `GetBucketLocation`, prefix-limited `ListBucket`, `GetObject` and `GetObjectVersion` on one batch prefix. The Phase 1 load on 8 Oct read a second prefix through the same integration; the change that allowed it is not recorded in this repository ([policy](../analytics/sql/synthetic-20261004T225801Z-5dd08717/iam-read-policy.json), [trust](../analytics/sql/synthetic-20261004T225801Z-5dd08717/snowflake-trust.json)). A proposed broader temporary trust was rejected.
 - **The 3167 error.** `LIST` failed from 4 to 7 Oct with `sts:AssumeRole` denied, even though the trust and external ID matched exactly. The cause was an AWS-managed resource control policy on free-plan "project" accounts that denies principals outside the organization. It was fixed at the organization level on 8 Oct, and Phase 1 then loaded directly from S3. While blocked, the internal stage kept the work moving without weakening any control.
 - **Cost.** A dedicated X-Small warehouse with 60-second auto-suspend, kept separate from existing workloads, and no resizing.
-- **Known gaps.** Objects were created with `ACCOUNTADMIN` because the existing lab role lacked `CREATE TABLE`. There is no resource monitor. There are no masking or tagging policies, which is acceptable only because the data is synthetic.
+- **Known gaps.** Objects were created with `ACCOUNTADMIN` because the existing lab role lacked `CREATE TABLE`. The Cortex sessions ran as `CHATGPT_ROLE`, which can create objects: they stayed read-only because of their standing instruction, not their role. There is no resource monitor. There are no masking or tagging policies, which is acceptable only because the data is synthetic.
 
 ## Production roadmap
 

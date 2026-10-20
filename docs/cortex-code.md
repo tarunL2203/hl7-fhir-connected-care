@@ -48,7 +48,7 @@ It ran seven queries and produced a lineage trace:
 | 3 | `HL7_PATIENT_LINK_CHECK` | 531, of which 503 resolved | 28 excluded: **12** unresolved in the batch, **10** other reference formats, **6** with no literal reference |
 | 4 | `HL7_PATIENT_COVERAGE` | 503 | Matches layer 3 exactly |
 
-It also confirmed there were no duplicate resource IDs and no join fan-out, so nothing was counted twice. Every figure matches the project's offline [link check](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv) (Observation: 503 resolved, 12 unresolved, 10 other format, 6 no literal reference). Just as useful, it listed what it **could not** verify:
+It also confirmed there were no duplicate resource IDs and no join fan-out, so nothing was counted twice. Every figure matches Snowflake's [link check](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv), which itself matches the offline benchmark (Observation: 503 resolved, 12 unresolved, 10 other format, 6 no literal reference). Just as useful, it listed what it **could not** verify:
 - whether every source file reached `RESOURCE_RAW`, which needs the load logs;
 - the semantic view's own definition, which its role could not read;
 - reference formats the matching rule would silently classify as "other".
@@ -88,7 +88,7 @@ Everyone below types a request in English. Cortex Code writes and runs the queri
 - **Many queries become one conversation.** The lineage trace in session 3 took seven queries and a structured write-up, delivered in a single turn. The developer's time goes into deciding what to check, not typing the checks.
 - **Beyond SQL.** It also scaffolds dbt models and tests, runs ML work in notebooks, and investigates cost,<sup>[1](#references)</sup> so the same assistant covers most of a data team's day.
 
-**What this means for someone's working day.** An auditor preparing for a review doesn't wait for an engineer to explain the pipeline. They paste the project's standing instruction, ask *"can we trust this report?"*, and file the queries and results it returns. The developer's contribution came earlier: the instruction, the benchmarks to compare against, and a role that can only read.
+**What this means for someone's working day.** An auditor preparing for a review doesn't wait for an engineer to explain the pipeline. They paste the project's standing instruction, ask *"can we trust this report?"*, and file the queries and results it returns. The developer's contribution came earlier: the instruction and the benchmarks to compare against. A role that can only read is the next step; this project's sessions ran under a role that could also create objects.
 
 ## Why it matters now
 
@@ -103,7 +103,7 @@ Teams choosing a data platform now ask whether AI help is **built in and governe
 ## Limits and guardrails
 
 - **It can be confidently wrong, or answer a different question.** Session 4 shows how. Read its interpretation and its SQL for anything that matters, and compare the answer with a benchmark when one exists.
-- **Keep writes behind review.** Use read-only roles for exploration and keep approvals on for changes. This project's sessions used read-only queries only.
+- **Keep writes behind review.** Use read-only roles for exploration and keep approvals on for changes. This project's sessions used read-only queries only, because the instruction said so: the role itself could create objects.
 - **Outputs and terms.** Snowflake treats Cortex Code's outputs as customer data. Where a configuration uses a model under Snowflake's pass-through terms, that model's terms also apply.<sup>[1](#references)</sup>
 - **Real patient data needs more.** Confirm that the business associate agreement and approved workflows cover AI features before any PHI reaches a prompt or a result. See [HIPAA considerations](hipaa-considerations.md).
 

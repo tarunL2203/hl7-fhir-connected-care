@@ -16,7 +16,7 @@ More: [business overview](business-overview.md)
 
 ![Architecture](architecture.png)
 
-HL7 v2 feeds are converted to FHIR R4 on Firely Server. A secured Firely server feeds the rules engine, the worklist and a reviewer portal with Firely Auth sign-in. Authenticated batch exports land in Amazon S3 and load into Snowflake for reports, a Streamlit dashboard, Cortex Analyst and Cortex Code.
+HL7 v2 feeds are converted to FHIR R4 on Firely Server. A secured Firely server feeds the rules engine, the worklist and a reviewer portal with Firely Auth sign-in. Batch exports load into Snowflake for reports, a Streamlit dashboard, Cortex Analyst and Cortex Code: through an internal stage while the S3 integration was blocked, and directly from Amazon S3 once it was fixed.
 
 More: [architecture](architecture.md) · [decisions](decisions.md)
 
@@ -58,7 +58,7 @@ The FHIR Observation it produces ([`samples/lab-003.fhir.json`](../samples/lab-0
 
 Admissions (ADT^A01) become Patients and bookings (SIU^S12) become Appointments the same way.
 
-**Proof:** replaying a message gives the same ID, so nothing is duplicated. CI regenerates every converter output and fails if one changes.
+**Proof:** replaying a message gives the same ID, so nothing is duplicated. CI regenerates the lab converter's outputs and fails if one changes; the admission converter has unit tests and the SIU bridge a self-test.
 
 More: [HL7 → FHIR mapping spec](hl7-to-fhir-mapping.md) · [walkthrough](walkthrough.md)
 
@@ -76,7 +76,7 @@ Reviewers sign in through Firely Auth with OpenID Connect and PKCE. The portal i
 |---|---|
 | ![Client](images/firely-auth-client.png) | ![PKCE](images/firely-auth-pkce.png) |
 
-**Proof:** 15 of 15 live security checks. Anonymous requests get 401, wrong-patient documents and bad CSRF tokens get 403, and a replayed session is rejected ([reviewer milestone](../archive/milestone-reports/2026-10-03-reviewer-milestone.md)).
+**Proof:** 15 of 15 live checks in one real sign-in run ([repeatable verification](../archive/milestone-reports/2026-10-03-repeatable-verification.md)). Anonymous requests got 401; wrong-patient and unregistered documents, and logouts with a bad CSRF token or origin, got 403; and the old session cookie was rejected after logout. The rest were health, readiness and data checks.
 
 More: [architecture: trust boundaries](architecture.md#trust-boundaries-and-controls) · [sanitized Firely Auth configuration](../infra/firely-auth/appsettings.instance.example.json)
 
@@ -97,7 +97,7 @@ The rule is configuration, not code ([`worklist/spec/v2/policy.json`](../worklis
 }
 ```
 
-Every visit gets one of four outcomes: `information_complete`, `information_gap`, `unable_to_assess` or `requirements_not_configured`. A gap is reported only after a complete, successful retrieval; a failed or partial read is `unable_to_assess`.
+Every visit gets one of four outcomes: `information_complete`, `information_gap`, `unable_to_assess` or `requirements_not_configured`. A gap is reported only after a complete, successful retrieval. In the rules engine a failed or partial read is `unable_to_assess`; the live portal shows an error instead of an outcome. The Snowflake report adds a fifth value, `not_applicable`, for cancelled visits.
 
 The signed-in reviewer sees the result for the synthetic patient Ravi Demo: two qualifying glucose results, so the visit is complete.
 
@@ -128,29 +128,32 @@ A genuine gap becomes a work item for records staff, with a due time and the evi
 }
 ```
 
-Data and interface faults go to the integration team instead. Resolving an item needs an actor, a reason and a fresh passing reassessment.
+Data and interface faults go to the integration team instead. Resolving an item needs an actor, a reason and a fresh passing reassessment. Work items live in a SQLite worklist and the portal shows their history; a staff-facing screen for working them is not built yet.
 
-Documents never leave as S3 links. The portal releases a synthetic PDF or image only after an authorized DocumentReference read for the same patient, a registry check, and a SHA-256 match after download; anything else returns 403 or 502.
+Documents never leave as S3 links. The portal releases a synthetic PDF or image only after a registry check for the same patient, an authorized DocumentReference read that matches the registry, and a SHA-256 match after download; anything else returns 403 or 502. Since 7 October the portal has run in local mode, which defers document downloads.
 
 More: [architecture: review flow](architecture.md#2-review-sign-in-assessment-and-documents) · [decisions ADR-005](decisions.md)
 
 ## 7. Export and landing in Amazon S3
 
-The portal exports a cohort through the reviewer's verified session, reads it twice, and proceeds only if both reads match. Each batch carries a manifest with row counts and SHA-256 hashes ([example](../analytics/batches/hl7-appointment-bridge-20261007T162957465413Z/manifest.json), abridged):
+On 4 October the portal exported the two demo patients through the reviewer's verified session. It read the cohort twice and went ahead only because both reads matched. The batch carries a manifest with counts, IDs and SHA-256 hashes ([manifest](../analytics/batches/synthetic-20261004T225801Z-5dd08717/manifest.json), abridged):
 
 ```json
 {
-  "batch_id": "hl7-appointment-bridge-20261007T162957465413Z",
-  "consistency": "two matching reads; not a locked snapshot",
-  "files": {
-    "Patient.ndjson":     { "rows": 1, "sha256": "d3f83861…" },
-    "Observation.ndjson": { "rows": 2, "sha256": "aeba6df2…" },
-    "Appointment.ndjson": { "rows": 1, "sha256": "0ee067f7…" }
-  }
+  "batch_id": "synthetic-20261004T225801Z-5dd08717",
+  "source": "http://localhost:8081",
+  "counts": { "Patient": 2, "Observation": 3, "Appointment": 2 },
+  "files": [
+    { "filename": "patient.ndjson",     "sha256": "64c90a58…" },
+    { "filename": "observation.ndjson", "sha256": "97b8b6f2…" },
+    { "filename": "appointment.ndjson", "sha256": "9aa8185e…" }
+  ],
+  "source_comparison": { "second_authorized_read_identical": true },
+  "snapshot_consistency": "Two matching reads; not a transactionally locked FHIR snapshot"
 }
 ```
 
-Batches land in a private S3 prefix with AES-256 encryption and no-overwrite conditional writes, and every object is downloaded again and hash-checked. Snowflake reads them through an IAM role that trusts one Snowflake principal with an external ID, and can only list and read that one prefix ([policy](../analytics/sql/synthetic-20261004T225801Z-5dd08717/iam-read-policy.json), abridged):
+The batch was landed in a private S3 prefix with AES-256 encryption and no-overwrite conditional writes, and every object was downloaded again and hash-checked. Snowflake was to read it through an IAM role that trusts one Snowflake principal with an external ID, and can only list and read that batch's prefix ([policy](../analytics/sql/synthetic-20261004T225801Z-5dd08717/iam-read-policy.json), abridged):
 
 ```json
 {
@@ -160,6 +163,8 @@ Batches land in a private S3 prefix with AES-256 encryption and no-overwrite con
   "Condition": { "StringLike": { "s3:prefix": ["analytics-demo/synthetic-20261004T225801Z-5dd08717/*"] } }
 }
 ```
+
+That route stayed blocked until 8 October ([step 11](#11-the-s3-route-blocked-diagnosed-fixed)). So this batch, and the three batches of 7 October, were loaded through Snowflake internal stages instead (step 8). Of those three, the portal-refresh batch was exported through the reviewer's session again, and the two HL7 bridge batches were read twice from the local source server.
 
 More: [Snowflake design: security](snowflake-design.md#security-and-cost) · [S3 landing evidence](../results/2026-10-04-s3-landing/)
 
@@ -180,7 +185,7 @@ FILE_FORMAT = (TYPE = JSON) ON_ERROR = 'ABORT_STATEMENT' FORCE = FALSE;
 
 The first load, on 5 October, in Snowsight:
 
-| Files in the internal stage | Rows loaded, by resource type |
+| Files in the internal stage | The count query over RAW ([results](../results/2026-10-05-internal-stage/internal-final-counts-20261005.csv)) |
 |---|---|
 | ![LIST of the internal stage](../results/2026-10-05-internal-stage/internal-stage-list-20261005.png) | ![Record counts in RAW](../results/2026-10-05-internal-stage/internal-final-counts-20261005.png) |
 
@@ -195,7 +200,7 @@ PASS: all 4 payloads and source rows match the Firely export.
 PASS: available HL7 and converted source files match manifest hashes.
 ```
 
-Running the identical `COPY` again adds nothing ([result](../results/2026-10-07-portal-refresh/repeat-copy.csv)):
+For the portal-refresh batch, running the identical `COPY` again added nothing ([result](../results/2026-10-07-portal-refresh/repeat-copy.csv)):
 
 | File | Status | Rows loaded |
 |---|---|---:|
@@ -203,13 +208,13 @@ Running the identical `COPY` again adds nothing ([result](../results/2026-10-07-
 | Observation.ndjson | `LOAD_SKIPPED` | 0 |
 | Appointment.ndjson | `LOAD_SKIPPED` | 0 |
 
-**Proof:** four loads reconcile 7/7, 3/3, 4/4 and 5/5 with 0 duplicates, re-checked in CI on every push.
+**Proof:** the four exported batches' loads reconcile 7/7, 3/3, 4/4 and 5/5 with 0 duplicates, re-checked in CI on every push to main.
 
 More: [Snowflake design: RAW layer](snowflake-design.md#raw-layer) · [reproduce the reconciliation](../results/README.md#reproduce-the-reconciliation)
 
 ## 9. Typed tables and the rule in SQL
 
-Insert-only `MERGE` builds typed Patient, Observation and Appointment tables. Questionable rows are flagged `needs_review`, never dropped. The application's rule is reimplemented in SQL ([`fc30-load-and-report.sql`](../analytics/snowflake/fc30-load-and-report.sql), abridged):
+For the first batch, insert-only `MERGE` builds typed Patient, Observation and Appointment tables ([`typed-analytics.sql`](../analytics/snowflake/typed-analytics.sql)); the 30-patient batch's typed tables are created once from RAW. Questionable rows are flagged for review, never dropped: with a `needs_review` status in the first batch's tables, and with a review reason in the 30-patient batch's. The application's rule is reimplemented in SQL ([`fc30-load-and-report.sql`](../analytics/snowflake/fc30-load-and-report.sql), abridged). The SQL version is stricter in one way, requiring the unit mg/dL, and it marks cancelled visits `not_applicable`:
 
 ```sql
 COUNT_IF(
@@ -222,7 +227,7 @@ COUNT_IF(
 ) AS qualifying_glucose_count
 ```
 
-**Proof:** reruns insert 0 rows; the typed layer has 0 review rows, 0 broken patient links and 0 payload mismatches against RAW; 9 of 9 window and status edge cases pass ([rule checks](../results/2026-10-06-typed-analytics/04-rule-checks.csv)).
+**Proof:** the Observation and Appointment `MERGE` reruns insert 0 rows; the typed layer has 0 review rows, 0 broken patient links and 0 payload mismatches against RAW; 9 of 9 window and status edge cases pass ([rule checks](../results/2026-10-06-typed-analytics/04-rule-checks.csv)).
 
 More: [Snowflake design: typed layer](snowflake-design.md#typed-layer)
 
@@ -238,9 +243,11 @@ A generated batch of 30 synthetic patients, 87 observations and 30 appointments 
 | `requirements_not_configured` | 2 |
 | `unable_to_assess` | 2 |
 
+Two of the 13 gaps are results linked to an unknown patient. They are held for reference review rather than treated as final.
+
 **Proof:** all 30 outcomes match the generator's expected outcomes, and all 6 deliberately broken records are flagged for review ([results](../results/2026-10-07-30-patient-batch/)).
 
-The Streamlit-in-Snowflake dashboard shows the same picture to staff who ask the same questions every day ([`firely_streamlit_app.py`](../analytics/dashboard/firely_streamlit_app.py)):
+The Streamlit-in-Snowflake dashboard shows the same picture to staff who ask the same questions every day. These captures are from the version deployed on 7 October; its labels and layout differ from the committed [`firely_streamlit_app.py`](../analytics/dashboard/firely_streamlit_app.py):
 
 | Appointment information status | Appointment details |
 |---|---|
@@ -270,6 +277,8 @@ More: [project history: the fix](project-history.md#8-s3--snowflake-fixed-and-ph
 A semantic view, `PATIENT_RECORD_COVERAGE`, records what the coverage data means, including its main caveat: zero linked records in a batch is not the clinical absence of a condition.
 
 ![Semantic view](images/snowflake-semantic-view.png)
+
+*Captured on 8 October while the model was being built, so the editor's footer shows a validation error in the draft. Cortex Analyst queried the deployed view, `CHATGPT_LAB.FHIR_SEMANTIC.PATIENT_RECORD_COVERAGE`, on 13 October.*
 
 | Coverage by dataset and batch | Medication orders without an allergy record | A conclusion the data can't support |
 |---|---|---|
@@ -305,14 +314,14 @@ More: [Cortex Code](cortex-code.md#4-a-lesson-for-patient-id-example-how-many-li
 
 [![CI](https://github.com/tarunL2203/hl7-fhir-connected-care/actions/workflows/ci.yml/badge.svg)](https://github.com/tarunL2203/hl7-fhir-connected-care/actions/workflows/ci.yml)
 
-`make check` runs on every push, offline, with no servers or cloud accounts ([workflow](../.github/workflows/ci.yml)):
+`make check` runs on every push to main and every pull request, offline, with no servers or cloud accounts ([workflow](../.github/workflows/ci.yml)):
 
 | Step | What it checks |
 |---|---|
 | Lint | Black and pyflakes |
 | Tests | 51 unit and workflow tests: converters, export and reconciliation, sign-in, document gate, worklist |
 | Reconcile | The four Snowflake loads against their exported batches, and the 30-patient outcomes |
-| Reproduce | Converter outputs and the 30-patient dataset regenerate byte for byte |
+| Reproduce | The lab converter's outputs and the 30-patient dataset regenerate byte for byte |
 
 ## What it doesn't do yet
 

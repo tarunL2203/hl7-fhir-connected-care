@@ -21,7 +21,7 @@
 
 **Read the whole project:** the [project tour](docs/tour.md) puts every step, screenshot, code snippet and proof on one page, in the order the platform runs. Each document then ends with a *Next →* link, so you can read straight through.
 
-**Deep dives:** [Project tour](docs/tour.md) · [Business overview](docs/business-overview.md) · [Walkthrough](docs/walkthrough.md) · [Architecture](docs/architecture.md) · [Cortex Analyst](docs/cortex-analyst.md) · [Cortex Code](docs/cortex-code.md) · [Snowflake design](docs/snowflake-design.md) · [HL7 → FHIR mapping](docs/hl7-to-fhir-mapping.md) · [Decisions](docs/decisions.md) · [Results](results/README.md)
+**Deep dives:** [Project tour](docs/tour.md) · [Business overview](docs/business-overview.md) · [Walkthrough](docs/walkthrough.md) · [Architecture](docs/architecture.md) · [Decisions](docs/decisions.md) · [HL7 → FHIR mapping](docs/hl7-to-fhir-mapping.md) · [Snowflake design](docs/snowflake-design.md) · [Cortex Analyst](docs/cortex-analyst.md) · [Cortex Code](docs/cortex-code.md) · [Results](results/README.md)
 
 ## The problem
 
@@ -30,7 +30,7 @@ In a JAMA study of 32 U.S. primary care clinics, clinicians reported important c
 - **44%** were at least somewhat likely to harm the patient;
 - in **36%** of cases they spent five minutes or more searching without finding it.
 
-More than half of the missing information existed, just outside the clinic's own system.<sup>[1](#references)</sup> And today, only **43%** of U.S. acute care hospitals routinely send, receive, find and integrate patient data from outside organizations.<sup>[2](#references)</sup>
+More than half of the missing information existed, just outside the clinic's own system.<sup>[1](#references)</sup> And in 2023, only **43%** of U.S. acute care hospitals routinely send, receive, find and integrate patient data from outside organizations.<sup>[2](#references)</sup>
 
 So the information often exists. It just hasn't arrived where the visit happens, in a form anyone can trust. Staff also can't tell "the test was never done" from "the result is stuck somewhere": the first needs an order, the second needs a records request or an interface fix.
 
@@ -41,10 +41,10 @@ So the information often exists. It just hasn't arrived where the visit happens,
 For a high-frequency case (*is the required lab result on file before the visit?*), the platform runs the whole path end to end:
 
 1. **Converts HL7 v2 feeds** (admissions, lab results, scheduling) into **FHIR R4** resources, with strict validation and replay-safe IDs.
-2. **Assesses every booked appointment** against configurable pre-visit rules. The answer is one of four: *complete*, *gap*, *unable to assess* or *no rule*. A gap is never reported unless retrieval was complete.
+2. **Assesses every booked appointment** against configurable pre-visit rules. The application gives one of four answers: *complete*, *gap*, *unable to assess* or *no rule*, and the Snowflake report adds *not applicable* for cancelled visits. A gap is never reported unless retrieval was complete.
 3. **Routes the right work to the right team.** Genuine gaps go to records staff with a due time; data and interface faults go to the integration team; every resolution is recorded.
 4. **Gives clinicians a secure review view**: OIDC + PKCE sign-in, scoped FHIR access, and documents released only after patient and checksum verification.
-5. **Delivers analytics-ready data to Snowflake.** RAW and typed layers, reports and a Streamlit dashboard. Loads are **reconciled row by row** against their source and re-checked in CI.
+5. **Delivers analytics-ready data to Snowflake.** RAW and typed layers, reports and a Streamlit dashboard. Each exported batch's load is **reconciled row by row** against its source and re-checked in CI; the 30-patient and Phase 1 loads are checked against expected outcomes and a fail-closed validation gate.
 6. **Answers questions in plain English.** Cortex Analyst gives non-technical staff governed answers from a semantic model, and Cortex Code explains, checks and traces the pipeline on request. Both were checked against independent benchmarks.
 
 **Who it serves:** records and front-desk staff (a worklist with owners and due times), clinicians (a trustworthy pre-visit view), integration teams (faults routed to them, not to the front desk), and operations leaders (readiness across visits).
@@ -53,7 +53,7 @@ For a high-frequency case (*is the required lab result on file before the visit?
 
 ## Architecture
 
-Converters turn HL7 v2 feeds into FHIR on Firely Server. A secured Firely server (on Amazon RDS, later a protected local snapshot) feeds the rules engine, the worklist and a reviewer portal with Firely Auth sign-in. Authenticated batch exports land in Amazon S3 and load into Snowflake for reports, the Streamlit dashboard and Cortex. Components, runtime flows and trust boundaries are in [the architecture document](docs/architecture.md).
+Converters turn HL7 v2 feeds into FHIR on Firely Server. A secured Firely server (on Amazon RDS, later a protected local snapshot) feeds the rules engine, the worklist and a reviewer portal with Firely Auth sign-in. Batch exports load into Snowflake for reports, the Streamlit dashboard and Cortex: through an internal stage while the S3 integration was blocked (4–7 Oct), and directly from Amazon S3 once it was fixed (8 Oct). Components, runtime flows and trust boundaries are in [the architecture document](docs/architecture.md).
 
 ![Architecture](docs/architecture.png)
 
@@ -81,15 +81,15 @@ Converters turn HL7 v2 feeds into FHIR on Firely Server. A secured Firely server
 
 | What was verified | Result | Evidence |
 |---|---|---|
-| Live reviewer security checks | **15 / 15**: 401 anonymous, 403 wrong patient or bad CSRF, replayed session rejected | [reviewer milestone](archive/milestone-reports/2026-10-03-reviewer-milestone.md) |
-| Snowflake loads vs the exported source | **7/7, 3/3, 4/4, 5/5** rows match on ID, payload, file and row; **0** duplicates. Re-run in CI on every push | [reproduce](results/README.md#reproduce-the-reconciliation) |
-| Repeat loads | **0** rows added (`LOAD_SKIPPED`); typed `MERGE` reruns insert **0** | [query history](results/2026-10-06-typed-analytics/05-merge-query-history.csv) |
+| Live reviewer checks | **15 / 15** in one real sign-in run: anonymous requests 401; wrong-patient and unregistered documents 403; bad CSRF or origin on logout 403; old session cookie rejected after logout; plus health and readiness checks | [repeatable verification](archive/milestone-reports/2026-10-03-repeatable-verification.md) |
+| Snowflake loads vs the exported source | **7/7, 3/3, 4/4, 5/5** rows match on ID, payload, file and row; **0** duplicates. Rerun in CI on every push to main | [reproduce](results/README.md#reproduce-the-reconciliation) |
+| Repeat loads | Repeat `COPY`: every file `LOAD_SKIPPED`, **0** rows added. Typed `MERGE` reruns: **0** inserted (Observation and Appointment; the Patient rerun was not exported) | [repeat COPY](results/2026-10-07-portal-refresh/repeat-copy.csv) · [MERGE history](results/2026-10-06-typed-analytics/05-merge-query-history.csv) |
 | Typed layer vs RAW | **0** review rows, **0** broken patient links, **0** payload mismatches | [validation](results/2026-10-06-typed-analytics/00-typed-validation.csv) |
 | 30-patient failure-case catalogue | **30 / 30** outcomes as expected; **6 / 6** broken records flagged for review | [results](results/2026-10-07-30-patient-batch/) |
 | Visit-rule edge cases | **9 / 9** window and status tests pass in Snowflake | [rule checks](results/2026-10-06-typed-analytics/04-rule-checks.csv) |
 | Reference integrity, 933 official FHIR examples | **609 / 641** clinical resources resolve to a patient, matching the offline benchmark exactly | [link check](results/2026-10-08-fhir-r4-examples/patient-link-check.csv) |
 | Cortex Analyst answers vs offline benchmarks | 265 patients, 15 with observations, and the one patient with medication orders but no allergy record: **all match**. A clinical conclusion the data can't support is declined | [Cortex Analyst](docs/cortex-analyst.md#what-it-answered) |
-| Cortex Code's independent lineage trace | **531 → 503** observations resolved; 12 + 10 + 6 exclusions explained; 0 duplicates, 0 join fan-out. Matches the link check exactly | [Cortex Code](docs/cortex-code.md#what-it-did-here) |
+| Cortex Code's independent lineage trace | **531 → 503** observations resolved; 28 exclusions explained (12 unresolved, 10 other format, 6 no reference); 0 duplicates, 0 join fan-out. Matches the link check exactly | [Cortex Code](docs/cortex-code.md#what-it-did-here) |
 | Automated checks | **51** tests, 4 load reconciliations, the 30-patient outcome check and 2 reproducibility checks, all in CI | [CI workflow](.github/workflows/ci.yml) |
 
 <sub>[↑ Back to contents](#contents)</sub>
@@ -112,11 +112,11 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 
 ## Screenshots
 
-| Reviewer portal | Readiness dashboard (Streamlit in Snowflake) | Appointment details (Streamlit in Snowflake) |
+| Reviewer portal | Readiness dashboard (Streamlit in Snowflake)¹ | Appointment details (Streamlit in Snowflake)¹ |
 |---|---|---|
 | ![Reviewer portal](docs/images/reviewer-portal-patient-assessment.png) | ![Dashboard status chart](docs/images/streamlit/appointment-status-chart.png) | ![Dashboard appointment details](docs/images/streamlit/appointment-details.png) |
 
-| Cortex Analyst | Cortex Code | Semantic view |
+| Cortex Analyst | Cortex Code | Semantic view² |
 |---|---|---|
 | ![Cortex Analyst](docs/images/cortex-analyst/coverage-by-batch.png) | ![Cortex Code](docs/images/cortex-code/explain-coverage-view.png) | ![Semantic view](docs/images/snowflake-semantic-view.png) |
 
@@ -124,9 +124,11 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 |---|---|---|---|
 | ![Sign in with Firely](results/2026-10-03-reviewer-verification/repeatable-verification-complete.jpg) | ![Consent](results/2026-10-03-reviewer-verification/repeatable-consent-review.jpg) | ![Client](docs/images/firely-auth-client.png) | ![PKCE](docs/images/firely-auth-pkce.png) |
 
-| Snowflake: files in the internal stage | Snowflake: rows loaded into RAW |
+| Snowflake: files in the internal stage | Snowflake: the count query over RAW ([results](results/2026-10-05-internal-stage/internal-final-counts-20261005.csv)) |
 |---|---|
 | ![Stage listing](results/2026-10-05-internal-stage/internal-stage-list-20261005.png) | ![RAW record counts](results/2026-10-05-internal-stage/internal-final-counts-20261005.png) |
+
+<sub>¹ From the dashboard version deployed in Snowflake on 7 Oct; its labels and layout differ from the committed [`firely_streamlit_app.py`](analytics/dashboard/firely_streamlit_app.py). ² Captured on 8 Oct while the model was being built: the editor footer shows a validation error in the draft. Cortex Analyst queried the deployed view on 13 Oct.</sub>
 
 Every screenshot appears in context, with the code and the proof for its step, in the [project tour](docs/tour.md). The Cortex pages have the full sessions.
 
@@ -147,10 +149,13 @@ Every screenshot appears in context, with the code and the proof for its step, i
 
 ## Documentation
 
+The first twelve documents are in reading order, and each one ends with a link to the next.
+
 | Document | Contents |
 |---|---|
 | [Project tour](docs/tour.md) | The whole project on one page: every step with its screenshot, code and proof |
 | [Business overview](docs/business-overview.md) | Problem, users, workflow, rules, outcomes, tested scenarios, requirement traceability |
+| [Background](docs/background-hl7-fhir.md) | HL7 v2, FHIR, SMART, LOINC and UCUM for newcomers |
 | [Walkthrough](docs/walkthrough.md) | One appointment from HL7 message to Snowflake report, with real artifacts |
 | [Architecture](docs/architecture.md) | Components, runtime flows, trust boundaries and controls |
 | [Decisions](docs/decisions.md) | Nine architecture decision records |
@@ -158,11 +163,10 @@ Every screenshot appears in context, with the code and the proof for its step, i
 | [Snowflake design](docs/snowflake-design.md) | Objects, RAW and typed layers, idempotency, proofs, security, cost, roadmap |
 | [Cortex Analyst](docs/cortex-analyst.md) | Questions in plain English: who benefits, what developers gain, why it matters now, limits |
 | [Cortex Code](docs/cortex-code.md) | An AI engineer inside Snowflake: explaining, auditing and tracing the pipeline, and one lesson learned |
-| [Project history](docs/project-history.md) | Phase-by-phase build log and lessons learned |
-| [Background](docs/background-hl7-fhir.md) | HL7 v2, FHIR, SMART, LOINC and UCUM for newcomers |
 | [HIPAA considerations](docs/hipaa-considerations.md) | Safeguards mapped to the project, and their limits |
-| [Requirements document](docs/BRD-FRD-and-Progress.docx) | Original BRD/FRD and delivery plan (Word) |
-| [Presentations](docs/presentations/) | Platform deck, consulting edition, analytics demo (PowerPoint) |
+| [Project history](docs/project-history.md) | Phase-by-phase build log and lessons learned |
+| [Requirements document](docs/BRD-FRD-and-Progress.docx) | The original BRD/FRD and delivery plan, as revised on 3 Oct (Word) |
+| [Presentations](docs/presentations/) | Platform deck and consulting edition (11 Oct), and the 6 Oct analytics demo (PowerPoint) |
 | [Results](results/README.md) | The evidence, and how to reproduce the reconciliation |
 
 Each code and data folder has its own guide: [worklist and portal](worklist/README.md) · [analytics pipeline](analytics/README.md) · [Snowflake SQL](analytics/snowflake/README.md) · [datasets](datasets/README.md) · [results](results/README.md) · [archive](archive/README.md).
@@ -171,7 +175,7 @@ Each code and data folder has its own guide: [worklist and portal](worklist/READ
 
 ## Getting started
 
-**Requirements:** Python 3.11. The full stack also needs Docker, Firely Server and Firely Auth (evaluation licences from [Firely](https://fire.ly)), the AWS CLI and a Snowflake account.
+**Requirements:** Python 3.11. The full stack also needs Docker, Firely Server and Firely Auth (evaluation licenses from [Firely](https://fire.ly)), the AWS CLI and a Snowflake account.
 
 ```sh
 python -m venv .venv && source .venv/bin/activate
@@ -190,7 +194,7 @@ make reconcile PYTHON=python                             # re-check every Snowfl
 
 **Full stack** (Firely Server on 8080/8081, Firely Auth on 5001, reviewer portal on 8082):
 1. Start from [`.env.example`](.env.example) and the [sanitized Firely Auth configuration](infra/firely-auth/appsettings.instance.example.json).
-2. Supply your own licences, TLS certificates (in `auth/certs/`) and signing key.
+2. Supply your own licenses, TLS certificates (in `auth/certs/`) and signing key.
 3. Start the portal with `python worklist/authenticated_viewer_server.py`.
 
 [`worklist/README.md`](worklist/README.md) covers the portal's modules, tests and checks, and the [Snowflake design](docs/snowflake-design.md) covers loading.
@@ -230,10 +234,10 @@ make reconcile PYTHON=python                             # re-check every Snowfl
 | 6 Oct | Typed tables, three reports, 9/9 rule tests · 30-patient failure-case dataset |
 | 7 Oct | SIU^S12 bridge · local secure portal · authenticated batch export · Streamlit dashboard |
 | 8 Oct | AssumeRole root cause found and fixed · 933 FHIR R4 examples loaded directly from S3 · Cortex Analyst |
-| 13 Oct | v1.0.0: shared FHIR client, converter tests, CI, architecture and decision records · Cortex Analyst and Cortex Code reviews of the coverage model |
+| 13 Oct | v1.0.0: shared FHIR client, converter tests, CI, architecture and decision records · Cortex Analyst and Cortex Code sessions over the coverage model |
 | 14 Oct | v1.1.0: Cortex Analyst and Cortex Code documentation · README contents and navigation |
 
-The [project history](docs/project-history.md) has the full story and lessons learned, and the [changelog](CHANGELOG.md) lists each release. The Git history follows the same timeline: it was rebuilt from the project's dated checkpoints, so each commit shows the code as it was on that day.
+The [project history](docs/project-history.md) has the full story and lessons learned, and the [changelog](CHANGELOG.md) lists each release. The Git history follows the same timeline: it was rebuilt from the project's dated checkpoints, so each commit shows the code as it was on that day. A few documents that lost their timestamps are placed with the work they belong to.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -251,7 +255,7 @@ The [project history](docs/project-history.md) has the full story and lessons le
 ## Data, privacy and security
 
 - **Synthetic data only.** Every patient is fictional or comes from the official HL7 FHIR R4 examples. "Information availability" is never a clinical judgement. See [HIPAA considerations](docs/hipaa-considerations.md).
-- **No secrets.** Licences, private keys, signing keys, `.env` files and databases are excluded.
+- **No secrets.** Licenses, private keys, signing keys, `.env` files and databases are excluded.
 - **Placeholders.** Account IDs, the external ID, endpoints, IP addresses and bucket names are replaced with placeholders such as `<AWS_ACCOUNT_ID>`, in every commit of the history.
 - **How it was built.** This project was built with AI pair-programming assistants. Every result above is backed by saved evidence in [`results/`](results/), and most of it is re-checked automatically in CI.
 
@@ -266,6 +270,6 @@ The [project history](docs/project-history.md) has the full story and lessons le
 
 ## License and acknowledgements
 
-Code is released under the [MIT License](LICENSE). The Phase 1 dataset is derived from the [official FHIR R4 examples](https://hl7.org/fhir/R4/downloads.html) and remains under the [FHIR licence](https://hl7.org/fhir/R4/license.html). FHIR® and HL7® are registered trademarks of Health Level Seven International. Firely Server and Firely Auth are products of [Firely](https://fire.ly) and are not redistributed here. Parsing uses [hl7apy](https://github.com/crs4/hl7apy).
+Code is released under the [MIT License](LICENSE). The Phase 1 dataset is derived from the [official FHIR R4 examples](https://hl7.org/fhir/R4/downloads.html) and remains under the [FHIR license](https://hl7.org/fhir/R4/license.html). FHIR® and HL7® are registered trademarks of Health Level Seven International. Firely Server and Firely Auth are products of [Firely](https://fire.ly) and are not redistributed here. Parsing uses [hl7apy](https://github.com/crs4/hl7apy).
 
 <sub>[↑ Back to contents](#contents)</sub>

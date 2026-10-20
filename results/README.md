@@ -5,8 +5,8 @@ Downloaded Snowflake query results, verification runs and reconciliation inputs,
 | Folder | What it shows |
 |---|---|
 | [`2026-10-02-worklist-assessment/`](2026-10-02-worklist-assessment/) | Baseline reads, offline assessment cases, the missing-result scenario, document-link tests, and the exported worklist history (created → in review → resolved) |
-| [`2026-10-03-reviewer-verification/`](2026-10-03-reviewer-verification/) | Live reviewer milestone (15/15) and the repeatable preflight, start, smoke and reviewer runs, with sign-in and consent screenshots |
-| [`2026-10-04-connection-checks/`](2026-10-04-connection-checks/) | Preflight and smoke runs on 4–5 Oct after AWS session renewal and a Firely restart |
+| [`2026-10-03-reviewer-verification/`](2026-10-03-reviewer-verification/) | The first live reviewer run, and the repeatable preflight, start, smoke and reviewer runs (15/15 live), with sign-in and consent screenshots |
+| [`2026-10-04-connection-checks/`](2026-10-04-connection-checks/) | Preflight and smoke runs on 4–5 Oct: the failures before the AWS session renewal and Firely restart, and the passing runs after |
 | [`2026-10-04-s3-landing/`](2026-10-04-s3-landing/) | Two-read export summary, S3 upload with SHA-256 download check, source preservation, offline reconciler tests |
 | [`2026-10-04-snowflake-external-stage/`](2026-10-04-snowflake-external-stage/) | IAM role and trust read-back, policy simulation, Snowflake grants, and the failed external-stage `LIST` (error 3167) |
 | [`2026-10-05-internal-stage/`](2026-10-05-internal-stage/) | First and repeat COPY, both RAW downloads (identical), reconciliation (7/7 rows, 0 duplicates), warehouse state |
@@ -20,7 +20,7 @@ Downloaded Snowflake query results, verification runs and reconciliation inputs,
 
 ## Reproduce the reconciliation
 
-The RAW downloads above can be checked against the exported batches without any cloud account. CI does this on every push. Locally, run `make reconcile`, or the individual commands from the repository root with `requirements.txt` installed:
+The RAW downloads above can be checked against the exported batches without any cloud account. CI does this on every push to main and every pull request. Locally, run `make reconcile`, or the individual commands from the repository root with `requirements.txt` installed:
 
 ```sh
 # 5 Oct internal-stage load: 7 rows
@@ -37,7 +37,7 @@ python $R analytics/batches/hl7-portal-refresh-20261007T183326824850Z results/20
 python analytics/compare_fc30_outcomes.py
 ```
 
-Each check confirms every resource ID, the full JSON payload, the source file and row number, and the SHA-256 of every exported file, and ends with `PASS`. For example:
+The bridge reconciler confirms every resource ID, the full JSON payload, the source file and row number, and the SHA-256 of every exported file, and ends with `PASS`. The 5 Oct reconciler checks IDs, payloads, files, row numbers, counts and duplicates and prints its evidence as JSON; the 30-patient check compares outcomes. For example:
 
 ```
 MATCH: Appointment/siu-appointment-17d6d563-4f77-5aac-b49b-2367195f7423

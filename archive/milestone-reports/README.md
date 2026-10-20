@@ -4,8 +4,8 @@ Contemporaneous working reports, written during the build to record exactly what
 
 | Report | Milestone |
 |---|---|
-| [2026-10-03 reviewer milestone](2026-10-03-reviewer-milestone.md) | Live authenticated reviewer demonstration: 15/15 checks |
-| [2026-10-03 repeatable verification](2026-10-03-repeatable-verification.md) | Preflight, start, smoke and reviewer tooling; 34/34 offline checks |
+| [2026-10-03 reviewer milestone](2026-10-03-reviewer-milestone.md) | First live authenticated reviewer demonstration (two negative checks still simulated) |
+| [2026-10-03 repeatable verification](2026-10-03-repeatable-verification.md) | Preflight, start, smoke and reviewer tooling; 15/15 live reviewer checks and 34/34 offline checks |
 | [2026-10-04 connection check](2026-10-04-connection-check.md) | Recovery after AWS session expiry and the Firely evaluation uptime limit |
 | [2026-10-04 S3 → Snowflake RAW](2026-10-04-s3-snowflake-raw.md) | Export and S3 landing; the external stage blocked at `sts:AssumeRole` |
 | [2026-10-05 connection check](2026-10-05-connection-check.md) | Infrastructure and smoke checks before the internal-stage load |

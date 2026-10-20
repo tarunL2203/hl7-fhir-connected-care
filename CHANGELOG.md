@@ -1,6 +1,6 @@
 # Changelog
 
-Notable changes to the Connected Care Data Platform. The build itself, from 30 September to 11 October 2026, is described in the [project history](docs/project-history.md), and every commit from that period is dated to when the work happened.
+Notable changes to the Connected Care Data Platform. The build itself, from 30 September to 11 October 2026, is described in the [project history](docs/project-history.md), and every commit from that period is dated to when the work happened (a few documents that lost their timestamps are placed with the work they belong to).
 
 ## [Unreleased]
 
@@ -12,6 +12,20 @@ Documentation: one connected path through the whole project.
 - **Analytics guide** rewritten for the current pipeline. It previously described the 5 October state, said the S3 route was still blocked, and pointed to a file that isn't in the repository.
 - **README:** the repository layout is now a linked table, so every folder guide can be reached (the analytics, datasets and archive guides had no links to them). The screenshots now include reviewer sign-in, the consent screen and the first Snowflake load, all of which were committed but not shown.
 - **Project history** covers v1.1.0, and a link labelled with an old file name now shows the file it opens.
+
+### Corrected
+A claim-by-claim review against the code, SQL and evidence files corrected these statements:
+- **The S3 route.** No reviewer export was ever loaded from S3: the 4–7 Oct batches went through internal stages, and the S3 integration loaded only the Phase 1 examples. The README, tour, architecture and decisions now say so. They also note that Phase 1 read a second prefix through the integration, a change the repository does not record.
+- **The 15/15 live checks** come from the repeatable sign-in run on 3 Oct, not the first reviewer run, and they include health and readiness checks.
+- **Exports:** only the 4 Oct and portal-refresh batches were read through the reviewer's session; the HL7 bridge batches were read from the local source server.
+- **Not yet built:** handling for corrections, cancellations and out-of-order updates (declared in the policy only), and a staff-facing worklist screen. Since 7 Oct, local mode has deferred document downloads.
+- **Rules:** the Snowflake report has a fifth value, `not_applicable`, and the SQL rule differs slightly from the application's. The requirements table holds only the window and the unit.
+- **Typed layer:** only the Observation and Appointment `MERGE` reruns are evidenced; patients carry `birth_date_status`; the 30-patient tables are created once from RAW.
+- **Screenshots:** the Streamlit captures come from the deployed dashboard version, not the committed file. The semantic-view capture shows a draft with a validation error. A Snowflake count capture is captioned as the query rather than the counts.
+- **Cortex:** the semantic view lives in `FHIR_SEMANTIC`; the sessions ran under a role that could create objects; the percentage came back unrounded; the link-check file is Snowflake's output, not the offline benchmark.
+- **Package notes** for the Phase 1 examples, the metric catalogue, the 30-patient dataset and the typed-analytics results now record that the work was done. The metric catalogue's window now excludes the appointment instant.
+- **Wording:** ADT^A01 is an admission, not a registration. The appointment bridge creates the Appointment only if it is absent. Sessions last at most 15 minutes, with `SameSite=Lax` cookies. CI runs on pushes to main and on pull requests. The HIPAA page's sources now point to files in the repository.
+- **Diagram:** the architecture page's sign-in and review sequence diagram failed to render (a semicolon in a label), and its document checks now appear in the order the code runs them.
 
 ## [1.1.0] – 2026-10-14
 

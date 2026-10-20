@@ -8,7 +8,7 @@ Before many appointments, someone has to confirm that the information the clinic
 
 | Source event | Typical HL7 v2 message | What it carries |
 |---|---|---|
-| Registration / admission | ADT^A01 | Patient identity and demographics |
+| Admission | ADT^A01 | Patient identity and demographics |
 | Lab result | ORU^R01 | The test, value, unit, status and time |
 | Scheduling | SIU^S12 | The appointment, its service and its time |
 
@@ -18,7 +18,7 @@ Chart preparation by hand is slow, and it hides an important distinction. An emp
 
 | Role | What they get |
 |---|---|
-| Records / front-desk staff | A worklist of visits with a genuine information gap, each with a due time, an owner and the evidence behind it |
+| Records / front-desk staff | A worklist of visits with a genuine information gap, each with a due time, an owner and the evidence behind it (kept in a SQLite store; a staff-facing screen is not built yet) |
 | Reviewer (clinician or nurse) | A signed-in, read-only view of the patient, qualifying results, the appointment and permitted documents |
 | Integration / IT team | Problems that are data or interface faults (identity, retrieval, invalid data), routed to them instead of to records staff |
 | Operations / analytics lead | Readiness across visits in Snowflake: reports, a dashboard and natural-language questions ([Cortex Analyst](cortex-analyst.md)) |
@@ -30,7 +30,7 @@ flowchart LR
     A["HL7 v2 message<br/>ADT / ORU / SIU"] --> B["Convert to FHIR<br/>validate, stable IDs"]
     B --> C[("FHIR server<br/>Firely")]
     C --> D{"Assess each visit<br/>against its rule"}
-    D -->|information_complete| E["Ready for the visit"]
+    D -->|information_complete| E["Information complete"]
     D -->|information_gap| F["Work item for<br/>records staff"]
     D -->|unable_to_assess| G["Work item for<br/>integration team"]
     D -->|requirements_not_configured| H["No rule applies"]
@@ -64,15 +64,15 @@ Rules are configuration, not code. A new visit type means a new profile with its
 | `unable_to_assess` | Identity, retrieval or required data was incomplete or invalid | Integration team | FC30 patients whose results carry an impossible timestamp |
 | `requirements_not_configured` | No visit profile applies | Nobody acts until a rule exists | FC30 appointments deliberately left without a rule |
 
-The UI label is always **"Information availability, not clinical clearance."**
+The Snowflake report adds a fifth value, `not_applicable`, for cancelled visits. The UI label is always **"Information availability, not clinical clearance."**
 
 ## Guardrails built into the rules
 
 - **Identity by identifier, never by name.** Patients match on identifier system + value. Name-only matching is disabled, ambiguous mappings go to manual review, and unresolved references are quarantined, not relinked.
-- **Partial results never prove absence.** Every result page must be retrieved before a gap is reported. A failed page makes the visit `unable_to_assess`.
+- **Partial results never prove absence.** Every result page must be retrieved before a gap is reported. In the rules engine a failed page makes the visit `unable_to_assess`; the live portal stops with an error (HTTP 502) instead of showing an outcome.
 - **Zero is not a clinical fact.** "No linked allergy records in this batch" never means "the patient has no allergies".
-- **Replays and corrections are safe.** Replaying a message creates no extra record or work item. A correction updates the same record and keeps its history. A cancellation triggers reassessment. Out-of-order or conflicting updates go to manual review.
-- **Work items carry evidence and history.** Each item records its policy, evidence, owner, permitted action and due time. Resolving needs an authorized actor, a reason and a fresh passing reassessment, and a reappearing issue reopens the same item ([exported history](../results/2026-10-02-worklist-assessment/worklist-history.json)).
+- **Replays are safe.** Replaying a message creates no extra record or work item. The policy also declares how corrections, cancellations and out-of-order updates should be handled, but the converters don't implement them yet: the lab converter accepts only final results, and the appointment bridge rejects cancellations (SIU^S15).
+- **Work items carry evidence and history.** Each item records its policy, evidence, owner, permitted action and due time. Resolving needs an actor in the owning role, a reason and a fresh passing reassessment, and a reappearing issue reopens the same item ([exported history](../results/2026-10-02-worklist-assessment/worklist-history.json)).
 - **A link is not access.** Documents are released only through the authorized document service after patient, registry and SHA-256 checks.
 
 ## What was tested
@@ -107,19 +107,19 @@ Business requirements and the AWS/Snowflake functional requirements from the [re
 | BR01 Reliable healthcare record foundation | Firely FHIR server on Amazon RDS for SQL Server with enforced TLS | Done | [project history §2](project-history.md#2-cloud-database-worklist-documents-and-login-2-oct) |
 | BR02 Correct patient and laboratory identity | Identifier-based matching, deterministic resource IDs, unknown-patient rejection | Done | [mapping spec](hl7-to-fhir-mapping.md) |
 | BR03 Useful supported visit information | Patient, lab results, appointments and documents in one reviewer view | Done | [reviewer milestone](../archive/milestone-reports/2026-10-03-reviewer-milestone.md) |
-| BR04 Controlled reviewer access | OIDC + PKCE login; 15/15 live security checks | Done | [repeatable verification](../archive/milestone-reports/2026-10-03-repeatable-verification.md) |
+| BR04 Controlled reviewer access | OIDC + PKCE login; 15/15 live reviewer checks, including the access denials | Done | [repeatable verification](../archive/milestone-reports/2026-10-03-repeatable-verification.md) |
 | BR05 Traceable pre-visit follow-up | Worklist with owners, due times, resolution rules and history | Done | [worklist history](../results/2026-10-02-worklist-assessment/worklist-history.json) |
 | BR06 Protect the demo and retain evidence | Read-only exports, checkpoints, dated evidence for every milestone | Done | [results](../results/) |
 | FR30 Bounded extract with manifest | Two-read authenticated export, SHA-256 manifest | Done | [S3 landing](../results/2026-10-04-s3-landing/) |
 | FR31 Private, encrypted S3 landing | Conditional AES-256 writes, re-download hash check | Done | [S3 landing](../results/2026-10-04-s3-landing/) |
-| FR32 Snowflake storage integration and external stage | Scoped integration and single-prefix role. Blocked by an AWS-managed policy from 4 to 7 Oct; fixed on 8 Oct and used for the Phase 1 load | Done (8 Oct) | [project history §8](project-history.md#8-s3--snowflake-fixed-and-phase-1-examples-8-oct) |
+| FR32 Snowflake storage integration and external stage | Scoped integration and prefix-scoped role. Blocked by an AWS-managed policy from 4 to 7 Oct; fixed on 8 Oct and used for the Phase 1 load | Done (8 Oct) | [project history §8](project-history.md#8-s3--snowflake-fixed-and-phase-1-examples-8-oct) |
 | FR33 COPY JSON into RAW `VARIANT` with metadata | Every batch loaded with file, row, batch and load-time metadata | Done | [internal stage](../results/2026-10-05-internal-stage/) |
 | FR34 Typed tables and visit view | Typed Patient, Observation and Appointment tables; availability computed per appointment in SQL | Done; no separate assessment-snapshot table | [typed SQL](../analytics/snowflake/typed-analytics.sql) |
 | FR35 Three SQL outputs | Visit information availability ✓ · laboratory history (glucose timeline) ✓ · cohort record presence, in place of the planned worklist summary | Partly: worklist summary not built in Snowflake | [reports](../results/2026-10-06-typed-analytics/) |
 | FR36 Counts, IDs, links and duplicate-free replay | Independent reconciliation; repeat loads add 0 rows | Done | [reconciliation](../results/README.md#reproduce-the-reconciliation) |
 | FR37 Evidence, README and walkthrough | This repository: README, an end-to-end [walkthrough](walkthrough.md), dated milestone reports and evidence re-checked in CI | Done | [README](../README.md) |
 
-Deferred by design in version 3.0: cloud hosting of the application, the 10-patient fixture expansion, broad HL7 support, orchestration and scale testing.
+FR30–FR35 deliver BR07 (land synthetic data in AWS and analyze it in Snowflake), and FR36–FR37 deliver BR08 (repeatable, bounded acceptance). Deferred by design in version 3.0: cloud hosting of the application, the 10-patient fixture expansion, broad HL7 support, orchestration and scale testing.
 
 ## What the data model makes measurable
 
@@ -132,7 +132,7 @@ These measures are supported by the tables and worklist history. They were not m
 
 ## What production would add
 
-This is a demonstration on synthetic data. A real deployment would also need an enterprise master patient index rather than a single identifier rule, an interface engine (for example Mirth Connect or Rhapsody) for feeds and replay, terminology mapping for local codes and units, a production Firely licence and hosting, audit logging, consent handling, business associate agreements and a formal HIPAA risk assessment. See [HIPAA considerations](hipaa-considerations.md).
+This is a demonstration on synthetic data. A real deployment would also need an enterprise master patient index rather than a single identifier rule, an interface engine (for example Mirth Connect or Rhapsody) for feeds and replay, terminology mapping for local codes and units, a production Firely license and hosting, audit logging, consent handling, business associate agreements and a formal HIPAA risk assessment. See [HIPAA considerations](hipaa-considerations.md).
 
 ---
 
