@@ -122,3 +122,7 @@ Everything ran on one workstation (Docker Desktop) against AWS us-east-2 and a S
 - **Interfaces.** The converters would sit behind an interface engine. Identity would come from an enterprise master patient index rather than a single identifier rule.
 
 The [Snowflake roadmap](snowflake-design.md#production-roadmap) covers the analytics side.
+
+---
+
+<sub>**Reading order 5 of 12** · ← [Walkthrough](walkthrough.md) · [Decisions](decisions.md) → · [README](../README.md)</sub>

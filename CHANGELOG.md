@@ -2,6 +2,17 @@
 
 Notable changes to the Connected Care Data Platform. The build itself, from 30 September to 11 October 2026, is described in the [project history](docs/project-history.md), and every commit from that period is dated to when the work happened.
 
+## [Unreleased]
+
+Documentation: one connected path through the whole project.
+
+### Documentation
+- **Project tour** ([page](docs/tour.md)): the platform in fourteen steps, from an HL7 message to a Cortex answer, each with its screenshot or key code, the number that proves it, and a link to the in-depth page.
+- **Reading order:** every page in `docs/` ends with numbered *previous* and *next* links and a link back to the README, and the folder guides link back too.
+- **Analytics guide** rewritten for the current pipeline. It previously described the 5 October state, said the S3 route was still blocked, and pointed to a file that isn't in the repository.
+- **README:** the repository layout is now a linked table, so every folder guide can be reached (the analytics, datasets and archive guides had no links to them). The screenshots now include reviewer sign-in, the consent screen and the first Snowflake load, all of which were committed but not shown.
+- **Project history** covers v1.1.0, and a link labelled with an old file name now shows the file it opens.
+
 ## [1.1.0] – 2026-10-14
 
 Documentation release: the Snowflake Cortex features, and an easier-to-navigate README.

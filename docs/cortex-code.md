@@ -113,3 +113,7 @@ See also: [Cortex Analyst](cortex-analyst.md) and the [Snowflake design](snowfla
 
 1. Snowflake release notes. [Cortex Code in Snowsight: general availability](https://docs.snowflake.com/en/release-notes/2026/other/2026-03-09-cortex-code-snowsight-ga), 9 March 2026: capabilities, diff review, governance, cost, legal notes.
 2. Snowflake. [Build Faster with Cortex Code — Now More Widely Available and Ready for Bigger Tasks](https://www.snowflake.com/en/blog/cortex-code-snowsight/), March 2026.
+
+---
+
+<sub>**Reading order 10 of 12** · ← [Cortex Analyst](cortex-analyst.md) · [HIPAA considerations](hipaa-considerations.md) → · [README](../README.md)</sub>

@@ -19,7 +19,9 @@
 | [Architecture](#architecture) | [Screenshots](#screenshots) | [Getting started](#getting-started) | [Data, privacy and security](#data-privacy-and-security) |
 | [Answers without code](#answers-without-code) |  | [Repository layout](#repository-layout) | [References](#references) · [License](#license-and-acknowledgements) |
 
-**Deep dives:** [Business overview](docs/business-overview.md) · [Walkthrough](docs/walkthrough.md) · [Architecture](docs/architecture.md) · [Cortex Analyst](docs/cortex-analyst.md) · [Cortex Code](docs/cortex-code.md) · [Snowflake design](docs/snowflake-design.md) · [HL7 → FHIR mapping](docs/hl7-to-fhir-mapping.md) · [Decisions](docs/decisions.md) · [Results](results/README.md)
+**Read the whole project:** the [project tour](docs/tour.md) puts every step, screenshot, code snippet and proof on one page, in the order the platform runs. Each document then ends with a *Next →* link, so you can read straight through.
+
+**Deep dives:** [Project tour](docs/tour.md) · [Business overview](docs/business-overview.md) · [Walkthrough](docs/walkthrough.md) · [Architecture](docs/architecture.md) · [Cortex Analyst](docs/cortex-analyst.md) · [Cortex Code](docs/cortex-code.md) · [Snowflake design](docs/snowflake-design.md) · [HL7 → FHIR mapping](docs/hl7-to-fhir-mapping.md) · [Decisions](docs/decisions.md) · [Results](results/README.md)
 
 ## The problem
 
@@ -118,9 +120,15 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 |---|---|---|
 | ![Cortex Analyst](docs/images/cortex-analyst/coverage-by-batch.png) | ![Cortex Code](docs/images/cortex-code/explain-coverage-view.png) | ![Semantic view](docs/images/snowflake-semantic-view.png) |
 
-| Firely Auth client (public, no secret) | PKCE required |
+| Reviewer sign-in | Consent to read-only FHIR scopes | Firely Auth client (public, no secret) | PKCE required |
+|---|---|---|---|
+| ![Sign in with Firely](results/2026-10-03-reviewer-verification/repeatable-verification-complete.jpg) | ![Consent](results/2026-10-03-reviewer-verification/repeatable-consent-review.jpg) | ![Client](docs/images/firely-auth-client.png) | ![PKCE](docs/images/firely-auth-pkce.png) |
+
+| Snowflake: files in the internal stage | Snowflake: rows loaded into RAW |
 |---|---|
-| ![Client](docs/images/firely-auth-client.png) | ![PKCE](docs/images/firely-auth-pkce.png) |
+| ![Stage listing](results/2026-10-05-internal-stage/internal-stage-list-20261005.png) | ![RAW record counts](results/2026-10-05-internal-stage/internal-final-counts-20261005.png) |
+
+Every screenshot appears in context, with the code and the proof for its step, in the [project tour](docs/tour.md). The Cortex pages have the full sessions.
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -128,6 +136,7 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 
 | If you are… | Start with |
 |---|---|
+| Someone who wants the whole story | The [project tour](docs/tour.md): fourteen steps from HL7 message to Cortex answer, then *Next →* through every document |
 | A healthcare or business reviewer | [Business overview](docs/business-overview.md): users, rules, scenarios, requirement traceability. Then the [HL7 → FHIR mapping spec](docs/hl7-to-fhir-mapping.md) |
 | A data or Snowflake reviewer | [Snowflake design](docs/snowflake-design.md): layers, idempotent loads, validation, semantic model, roadmap. Then the [SQL](analytics/snowflake/) |
 | An architect or engineer | [Architecture](docs/architecture.md), [decisions](docs/decisions.md) and [Getting started](#getting-started) |
@@ -140,6 +149,7 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 
 | Document | Contents |
 |---|---|
+| [Project tour](docs/tour.md) | The whole project on one page: every step with its screenshot, code and proof |
 | [Business overview](docs/business-overview.md) | Problem, users, workflow, rules, outcomes, tested scenarios, requirement traceability |
 | [Walkthrough](docs/walkthrough.md) | One appointment from HL7 message to Snowflake report, with real artifacts |
 | [Architecture](docs/architecture.md) | Components, runtime flows, trust boundaries and controls |
@@ -154,6 +164,8 @@ The full story, with the actual messages, JSON and outputs, is in [**the walkthr
 | [Requirements document](docs/BRD-FRD-and-Progress.docx) | Original BRD/FRD and delivery plan (Word) |
 | [Presentations](docs/presentations/) | Platform deck, consulting edition, analytics demo (PowerPoint) |
 | [Results](results/README.md) | The evidence, and how to reproduce the reconciliation |
+
+Each code and data folder has its own guide: [worklist and portal](worklist/README.md) · [analytics pipeline](analytics/README.md) · [Snowflake SQL](analytics/snowflake/README.md) · [datasets](datasets/README.md) · [results](results/README.md) · [archive](archive/README.md).
 
 <sub>[↑ Back to contents](#contents)</sub>
 
@@ -187,22 +199,22 @@ make reconcile PYTHON=python                             # re-check every Snowfl
 
 ## Repository layout
 
-```
-converters/        HL7 v2 → FHIR R4: admissions, lab results, appointments (+ unit tests)
-worklist/          Rules engine, worklist, reviewer portal, OIDC/PKCE sign-in, FHIR client, tests
-analytics/         Export → S3 / stage → Snowflake pipeline, reconcilers, tests
-  snowflake/       Typed layer, reports, batch loads, coverage demo (SQL)
-  dashboard/       Streamlit-in-Snowflake app
-  batches/         Exported NDJSON batches with SHA-256 manifests
-samples/           Synthetic HL7 messages and their FHIR output
-datasets/          30-patient failure cases · official FHIR R4 examples · migration snapshot
-documents/         Synthetic PDF/PNG fixture served by the document gate
-results/           Downloaded Snowflake results and verification evidence, by date
-docs/              Architecture, decisions, business overview, Cortex Analyst and Cortex Code, mapping spec, Snowflake design, history
-infra/             Docker trust-store builds · sanitized Firely Auth client configuration
-archive/           Working records and one-time scripts from the build
-Makefile           `make check` = everything CI runs
-```
+| Folder | Contents |
+|---|---|
+| [`converters/`](converters/) | HL7 v2 → FHIR R4: admissions, lab results, appointments (+ unit tests) |
+| [`worklist/`](worklist/README.md) | Rules engine, worklist, reviewer portal, OIDC/PKCE sign-in, FHIR client, tests |
+| [`analytics/`](analytics/README.md) | Export → S3 / stage → Snowflake pipeline, reconcilers, tests |
+| [`analytics/snowflake/`](analytics/snowflake/README.md) | Typed layer, reports, batch loads, coverage demo (SQL) |
+| [`analytics/dashboard/`](analytics/dashboard/) | Streamlit-in-Snowflake app |
+| [`analytics/batches/`](analytics/batches/) | Exported NDJSON batches with SHA-256 manifests |
+| [`samples/`](samples/) | Synthetic HL7 messages and their FHIR output |
+| [`datasets/`](datasets/README.md) | 30-patient failure cases · official FHIR R4 examples · migration snapshot |
+| [`documents/`](documents/fixture-v2-p02/) | Synthetic PDF/PNG fixture served by the document gate |
+| [`results/`](results/README.md) | Downloaded Snowflake results and verification evidence, by date |
+| [`docs/`](docs/) | Project tour, architecture, decisions, business overview, Cortex Analyst and Cortex Code, mapping spec, Snowflake design, history |
+| [`infra/`](infra/) | Docker trust-store builds · sanitized Firely Auth client configuration |
+| [`archive/`](archive/README.md) | Working records and one-time scripts from the build |
+| [`Makefile`](Makefile) | `make check` = everything CI runs |
 
 <sub>[↑ Back to contents](#contents)</sub>
 

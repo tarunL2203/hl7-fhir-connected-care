@@ -17,3 +17,7 @@ Batch-specific SQL lives next to each batch:
 - **Phase 1:** [`datasets/phase1-fhir-examples/`](../../datasets/phase1-fhir-examples/), a direct S3 external-stage load with a fail-closed validation block.
 
 The Streamlit dashboard is in [`../dashboard/`](../dashboard/).
+
+---
+
+<sub>[← README](../../README.md) · [Project tour](../../docs/tour.md)</sub>

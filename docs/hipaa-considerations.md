@@ -67,3 +67,7 @@ Reviewed 10 October 2026. Project evidence is in 06_Project_Notes_and_Runbooks; 
 Additional HHS references reviewed for the qualifications:
 - Minimum necessary: https://www.hhs.gov/hipaa/for-professionals/privacy/guidance/minimum-necessary-requirement/index.html
 - Risk analysis: https://www.hhs.gov/hipaa/for-professionals/security/guidance/final-guidance-risk-analysis/index.html
+
+---
+
+<sub>**Reading order 11 of 12** · ← [Cortex Code](cortex-code.md) · [Project history](project-history.md) → · [README](../README.md)</sub>

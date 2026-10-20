@@ -47,3 +47,7 @@ MATCH: Patient/demo-patient-002
 PASS: all 4 payloads and source rows match the Firely export.
 PASS: available HL7 and converted source files match manifest hashes.
 ```
+
+---
+
+<sub>[← README](../README.md) · [Project tour](../docs/tour.md)</sub>

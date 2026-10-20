@@ -1,6 +1,6 @@
 # Project history
 
-How the Connected Care Data Platform was built, from the first HL7 converter on 30 September 2026 to the packaged demonstration on 11 October 2026. Each phase links to the dated milestone report or evidence that records it. All times are US Eastern unless stated.
+How the Connected Care Data Platform was built, from the first HL7 converter on 30 September 2026 to the packaged demonstration and its public releases on 13 and 14 October 2026. Each phase links to the dated milestone report or evidence that records it. All times are US Eastern unless stated.
 
 The Git history of this repository mirrors the same timeline. It was reconstructed from the project's dated local checkpoints and file timestamps, so each commit shows the files as they existed at that moment. A few documents lost their original timestamps during packaging; those are placed in the commit for the work they belong to.
 
@@ -17,7 +17,7 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 | 6 Oct | Typed analytics | Typed tables, three reports, 9/9 rule tests; 30-patient failure-case dataset generated |
 | 7 Oct | HL7 bridge and local portal | SIU^S12 → Appointment bridge; 30-patient and bridge batches loaded; local secure portal with authenticated batch export |
 | 8 Oct | S3 route fixed, Phase 1 | AssumeRole denial traced to an AWS-managed policy and fixed; 933 official FHIR R4 examples loaded directly from S3 and explored with Cortex Analyst |
-| 10–13 Oct | Packaging | HIPAA considerations, requirements document, presentations, this repository |
+| 10–14 Oct | Packaging | HIPAA considerations, requirements document, presentations, this repository (v1.0.0 and v1.1.0) |
 
 ## 1. HL7 v2 → FHIR conversion (30 Sep – 1 Oct)
 
@@ -94,9 +94,9 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 - **Reference integrity.** The Snowflake link check matches the offline benchmark exactly: 609 of 641 clinical resources (95.0%) resolve to a Patient in the batch, with 15 unresolved, 10 in other reference formats and 7 with no reference ([results](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv)).
 - **Cortex Analyst.** Coverage views and a `PATIENT_RECORD_COVERAGE` semantic view let Cortex Analyst answer questions such as "how many linked observation and allergy records does this patient have?". A zero is reported as "no linked records in this batch", never as clinical absence ([demo SQL](../analytics/snowflake/Snowflake-Coverage-Demo.sql)).
 
-## 9. Packaging (10–13 Oct)
+## 9. Packaging (10–14 Oct)
 
-- **Documents.** HIPAA considerations ([`hipaa-considerations.md`](hipaa-considerations.md)), the requirements and delivery plan ([`BRD-FRD-and-Progress.docx`](BRD-FRD-and-Progress.docx)), an HL7/FHIR primer ([`hl7-fhir-explained.md`](../archive/hl7-fhir-learning-notes.md)) and the presentations in [`presentations/`](presentations/).
+- **Documents.** HIPAA considerations ([`hipaa-considerations.md`](hipaa-considerations.md)), the requirements and delivery plan ([`BRD-FRD-and-Progress.docx`](BRD-FRD-and-Progress.docx)), an HL7/FHIR primer ([`hl7-fhir-learning-notes.md`](../archive/hl7-fhir-learning-notes.md), since replaced by the [background guide](background-hl7-fhir.md)) and the presentations in [`presentations/`](presentations/).
 - **Fixes from the repository review.**
   - Worklist code now finds its configuration relative to the repository instead of a fixed home-directory path.
   - The document-gate tests, written on 2 October, now run in document mode, with a new test proving that local mode defers downloads. Before this they failed against the 7 October local-mode configuration.
@@ -107,6 +107,7 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
   - Added CI that runs Black, pyflakes, 51 tests, the load reconciliations and the reproducibility checks on every push.
   - Wrote the architecture description, decision records and walkthrough.
   - Moved one-time scripts and working records to `archive/`. See the [changelog](../CHANGELOG.md).
+- **Release v1.1.0 (14 Oct).** Pages on [Cortex Analyst](cortex-analyst.md) and [Cortex Code](cortex-code.md), including the session in which Cortex Code answered for the wrong patient, and a README with a clickable contents table.
 
 ## Lessons learned
 
@@ -115,3 +116,7 @@ The Git history of this repository mirrors the same timeline. It was reconstruct
 - **Prefer reversible, scoped access.** Single /32 ingress, a disabled-first storage integration, a single-prefix read role and no long-lived keys. A broader trust policy was rejected rather than used as a shortcut.
 - **Diagnose before buying a fix.** A paid-plan upgrade alone did not change the AssumeRole denial. Finding the governing organization-level policy did.
 - **Keep secrets out of tool output.** The signing-key exposure on 3 October led to an immediate rotation and to this repository's redaction rules.
+
+---
+
+<sub>**Reading order 12 of 12** · ← [HIPAA considerations](hipaa-considerations.md) · [README](../README.md)</sub>

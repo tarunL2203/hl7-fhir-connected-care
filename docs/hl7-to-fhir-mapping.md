@@ -81,3 +81,7 @@ A production interface would add:
 - Repeating OBX groups and ORC/OBR order context.
 - Message acknowledgements (ACK/NAK) and replay from an interface engine.
 - Additional SIU events (S13 reschedule, S15 cancel), mapped to Appointment updates under the policy's correction and cancellation rules.
+
+---
+
+<sub>**Reading order 7 of 12** · ← [Decisions](decisions.md) · [Snowflake design](snowflake-design.md) → · [README](../README.md)</sub>
