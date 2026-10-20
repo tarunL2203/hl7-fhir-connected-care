@@ -22,8 +22,8 @@ The semantic view `PATIENT_RECORD_COVERAGE` sits on `HL7_PATIENT_COVERAGE`. That
 
 | Question, typed in English | Cortex Analyst's answer | Checked against |
 |---|---|---|
-| For each dataset and batch, how many patient records, how many with observations, and the coverage percentage? | **265** patient records, **15** with at least one observation, **5.66%** | Offline benchmark: 265 patients, 15 with observations ([demo SQL](../analytics/snowflake/Snowflake-Coverage-Demo.sql)) ✅ |
-| Which patients have at least one medication order but zero linked allergy records? | One patient, `pat1`: **40** medication orders, **0** allergy records | Benchmark: one patient in the medication-order cohort, with no allergy record; 40 resolved MedicationRequests ([link check](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv)) ✅ |
+| For each dataset and batch, how many patient records, how many with observations, and the coverage percentage? | **265** patient records, **15** with at least one observation, **5.66%** (returned unrounded, as 5.660377) | Offline benchmark: 265 patients, 15 with observations ([demo SQL](../analytics/snowflake/Snowflake-Coverage-Demo.sql)) ✅ |
+| Which patients have at least one medication order but zero linked allergy records? | One patient, `pat1`: **40** medication orders, **0** allergy records | Benchmark: one patient in the medication-order cohort, with no allergy record ([demo SQL](../analytics/snowflake/Snowflake-Coverage-Demo.sql)). Snowflake's link check shows 40 resolved MedicationRequests ([link check](../results/2026-10-08-fhir-r4-examples/patient-link-check.csv)) ✅ |
 | Can we conclude that patients with zero allergy records have no allergies and are ready for their appointment? | **No.** The data measures whether records are linked, not clinical status or readiness. It then offers three questions it *can* answer | The semantic view's description ✅ |
 
 ![Coverage by dataset and batch](images/cortex-analyst/coverage-by-batch.png)
@@ -32,7 +32,7 @@ The semantic view `PATIENT_RECORD_COVERAGE` sits on `HL7_PATIENT_COVERAGE`. That
 
 ![Patients with medication orders but no allergy records](images/cortex-analyst/medication-orders-without-allergy-records.png)
 
-*A patient-level list from a one-sentence request. For a records team, this is a ready-made work list.*
+*A patient-level list from a short request in plain English. For a records team, this is a ready-made worklist.*
 
 ![Zero is not absence](images/cortex-analyst/zero-is-not-absence.png)
 
@@ -45,7 +45,7 @@ Each person types a question and gets a table, a plain-English reading of the qu
 | Who | A question they might ask | What they get instead of a report request |
 |---|---|---|
 | Operations or clinic manager | † "How many of next week's diabetes reviews are missing a qualifying glucose result?" | A count and a list in seconds |
-| Records and front-desk leads | "Which patients have a medication order but no allergy record on file?" | A work list they can act on today |
+| Records and front-desk leads | "Which patients have a medication order but no allergy record on file?" | A worklist they can act on today |
 | Quality, compliance and audit | "What share of patient records have at least one linked observation?" | The figure with its numerator, denominator and exact SQL, ready for the audit file |
 | Clinical informatics | "Which record types are thinnest in this source?" | Coverage gaps by category before a new feed goes live |
 | Integration team | "Which batch has the lowest observation coverage?" | A comparison across loads, without writing queries |
@@ -60,7 +60,7 @@ For an engineer, the value of Cortex Analyst isn't that it writes SQL. It's that
 - **Define meaning once.** Metrics (`patient_records`, `patients_with_observations`, `observation_coverage_pct`), dimensions, synonyms and descriptions live in the semantic view. Change a definition and every answer changes with it, with no scattered reports to hunt down.
 - **Build in the domain knowledge.** The description *"zero means no matching linked records… not absence of a clinical condition"* is how a developer makes sure a non-technical user gets the whole answer, including what the data can't tell them. The third screenshot shows it working.
 - **Tune without retraining anything.** Custom instructions for question categorization and SQL generation can fix gaps like the rounding above (for example, "round percentages to two decimal places"). Verified queries steer questions that must be answered one exact way toward the approved SQL.
-- **Test it like code.** The [metric catalogue](../datasets/phase1-fhir-examples/METRIC_CATALOGUE.md) sets out grain, exclusions and 15 evaluation questions, and the demo SQL holds expected results for them. The semantic view editor in Snowsight also has *Evaluations* and *Monitoring* tabs, for measuring accuracy against verified answers and reviewing the questions people actually ask.
+- **Test it like code.** The [metric catalogue](../datasets/phase1-fhir-examples/METRIC_CATALOGUE.md) sets out grain, exclusions and 15 evaluation questions, and the demo SQL holds offline benchmark results for its six demo questions. The semantic view editor in Snowsight also has *Evaluations* and *Monitoring* tabs, for measuring accuracy against verified answers and reviewing the questions people actually ask.
 - **One model, many front ends.** The same semantic view serves the Snowsight playground, a Streamlit app, Slack or Teams through the REST API, and Cortex Agents.<sup>[1](#references)</sup>
 - **Security is inherited, not rebuilt.** The generated SQL runs under the asker's role, so grants, masking and row-access policies still apply.
 

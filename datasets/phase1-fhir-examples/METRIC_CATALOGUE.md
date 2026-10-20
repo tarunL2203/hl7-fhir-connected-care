@@ -1,6 +1,6 @@
 # Phase 1 metric contracts
 
-Dataset: official HL7 R4 examples. No population representativeness or clinical-readiness claim. Batch: hl7-r4-examples-20261008-v1. Raw record grain: source dataset + batch + resource type + ID. No cross-dataset patient matching. This catalogue specifies subsequent SQL/semantic-view development; those objects are not yet deployed.
+Dataset: official HL7 R4 examples. No population representativeness or clinical-readiness claim. Batch: hl7-r4-examples-20261008-v1. Raw record grain: source dataset + batch + resource type + ID. No cross-dataset patient matching. This catalogue specifies subsequent SQL/semantic-view development; those objects were not yet deployed when it was written. By 13 October the link-check view (`HL7_PATIENT_LINK_CHECK`), the coverage view (`HL7_PATIENT_COVERAGE`) and the `PATIENT_RECORD_COVERAGE` semantic view were built; the other semantic views listed here remain planned.
 
 | Metric | Grain and definition | Exclusions / interpretation | Planned semantic view |
 |---|---|---|---|
@@ -12,7 +12,7 @@ Dataset: official HL7 R4 examples. No population representativeness or clinical-
 | Numeric measurement coverage | Observations with usable numeric valueQuantity or numeric component valueQuantity / eligible measurement observations | Code + code system + unit determine comparability; components are child rows | PATIENT_RECORD_COVERAGE |
 | Scheduled appointment count | Appointment rows with usable start/end and patient participant | Report proposed appointments separately; deduplicate patient participants per appointment | APPOINTMENT_INFORMATION |
 | Rule evaluation coverage | Eligible scheduled appointments with explicit configured rule / eligible scheduled appointments | A missing rule is not an information failure | APPOINTMENT_INFORMATION |
-| Information availability rate | Rule-evaluated eligible appointments with >=1 qualifying observation / rule-evaluated eligible appointments | Same patient, approved code/system/status/unit and effective time in [start-window,start]; no inferred rule from visit description | APPOINTMENT_INFORMATION |
+| Information availability rate | Rule-evaluated eligible appointments with >=1 qualifying observation / rule-evaluated eligible appointments | Same patient, approved code/system/status/unit and effective time in [start − window, start); no inferred rule from visit description | APPOINTMENT_INFORMATION |
 | At-visit knowability | Result issued time <= appointment start when available | effective time alone cannot prove the result was available at the visit. Missing issued time gives unknown; source ingestion time is not historic availability | APPOINTMENT_INFORMATION |
 | Medication order count | Count MedicationRequest by subject and status | Does not establish use, adherence, or current medication list | PATIENT_RECORD_COVERAGE |
 | Medication statement count | Count MedicationStatement by subject/status/effective period | Separate from prescriptions; never merge different patient identities | PATIENT_RECORD_COVERAGE |

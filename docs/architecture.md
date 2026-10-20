@@ -35,9 +35,9 @@ flowchart LR
     PORTAL --> SEC
     PORTAL --> WL
     PORTAL --> DOCS
-    PORTAL -->|"authenticated export"| LAND
-    LAND -->|"storage integration"| RAW
-    PORTAL -. "internal stage upload" .-> RAW
+    PORTAL -->|"authenticated export (4 Oct)"| LAND
+    LAND -->|"storage integration (Phase 1, 8 Oct)"| RAW
+    PORTAL -. "internal stage upload (4–7 Oct batches)" .-> RAW
     RAW --> BI
 ```
 
@@ -45,7 +45,7 @@ flowchart LR
 
 | Component | Technology | Where | Responsibility |
 |---|---|---|---|
-| Converters | Python, hl7apy | [`converters/`](../converters/) | Validate supported HL7 v2 messages, map them to FHIR R4 with deterministic IDs, write to the source server |
+| Converters | Python, hl7apy | [`converters/`](../converters/) | Validate supported HL7 v2 messages, map them to FHIR R4 with deterministic IDs; the appointment bridge also writes to the source server |
 | Source FHIR server | Firely Server (Docker) | `localhost:8080` | Receives converted resources |
 | Secured FHIR server | Firely Server with SMART on FHIR authorization (Docker) | `localhost:8081` | Serves the reviewer portal. Backed by Amazon RDS for SQL Server from 2 to 7 Oct, then by a protected local snapshot of the source server ("local mode") |
 | Authorization server | Firely Auth (Docker) | `https://localhost:5001` | Reviewer sign-in, consent, RS256-signed tokens |
@@ -64,7 +64,7 @@ flowchart LR
 
 1. A converter parses the HL7 v2 message and rejects anything outside its supported shape: wrong message type, unknown identifier authority, non-final or non-numeric result, missing timezone.
 2. Identity is resolved by identifier (system + MRN), never by name. Resource IDs are UUID5 hashes of the source keys, so a replayed message overwrites the same resource instead of creating a new one.
-3. The converted resource is saved as FHIR JSON and loaded into the source FHIR server under its stable ID. The appointment bridge writes directly with an idempotent `PUT`, then reads the Appointment back and compares it with the conversion before anything is exported.
+3. The converted resource is saved as FHIR JSON and loaded into the source FHIR server under its stable ID. The appointment bridge creates the Appointment with a `PUT` on its stable ID only if it doesn't exist yet (an existing one is left unchanged), then reads it back and compares it with the conversion before anything is exported.
 
 ### 2. Review: sign-in, assessment and documents
 
@@ -83,23 +83,26 @@ sequenceDiagram
     P->>A: Exchange code + PKCE verifier
     A->>P: ID and access tokens (RS256)
     P->>P: Verify signature, issuer, audience, expiry, nonce, scopes, reviewer
-    P->>R: Session cookie (Secure, HttpOnly, SameSite), 15-minute lifetime
+    P->>R: Session cookie (Secure, HttpOnly, SameSite=Lax), at most 15 minutes
     R->>P: GET /patients/{id}/summary
     P->>F: Patient, Observation, Appointment reads (bearer token, every page)
-    P->>P: Evaluate visit rule → outcome; load worklist history
+    P->>P: Evaluate visit rule → outcome, then load worklist history
     P->>R: Summary with outcome and permitted documents
     R->>P: GET /patients/{id}/documents/{doc}
+    P->>P: Check the registry entry belongs to this patient (403 if not)
     P->>F: Read DocumentReference (bearer token)
-    P->>P: Check patient, registry entry, status, URL, type, size
+    P->>P: Check it matches the registry: patient, status, URL, type, size
     P->>S: Retrieve object server-side
     P->>P: Verify SHA-256
     P->>R: Document, or 403 / 502 if any check fails
 ```
 
+Since 7 October the portal has run in local mode, which answers document requests with 503 (downloads deferred).
+
 ### 3. Analytics: export to Snowflake
 
-1. **Export.** The authenticated export reads the cohort twice through the reviewer's verified session and only proceeds if both reads match. It writes one NDJSON file per resource type and a manifest with counts, IDs and SHA-256 hashes.
-2. **Land.** Batches go to a private S3 prefix (encrypted, conditional writes, re-downloaded and hash-checked) or are uploaded to a Snowflake internal stage.
+1. **Export.** Each export reads the cohort twice and only proceeds if both reads match. The 4 Oct and portal-refresh batches were read through the reviewer's verified session; the two HL7 bridge batches were read from the local source server. It writes one NDJSON file per resource type and a manifest with counts, IDs and SHA-256 hashes.
+2. **Land.** The 4 Oct batch went to a private S3 prefix (encrypted, conditional writes, re-downloaded and hash-checked). With the S3 integration blocked until 8 Oct, it and the 7 Oct batches were loaded through Snowflake internal stages; the S3 route then loaded the Phase 1 examples.
 3. **Load.** `COPY INTO` loads named files only, keeping file and row provenance, with `ON_ERROR = ABORT_STATEMENT` and `FORCE = FALSE`. Insert-only `MERGE` builds the typed tables. Reports, the Streamlit dashboard and the Cortex Analyst semantic view read from those.
 4. **Prove.** The RAW rows are downloaded and reconciled against the exported files ([`make reconcile`](../Makefile)), and the identical load is repeated to show that it adds nothing.
 
@@ -107,13 +110,13 @@ sequenceDiagram
 
 | Boundary | Controls |
 |---|---|
-| Browser ↔ portal | TLS 1.2+; `Host` header pinned to the portal; random session IDs in Secure/HttpOnly/SameSite cookies; 15-minute sessions; CSRF token plus `Origin` check on logout |
+| Browser ↔ portal | TLS 1.2+; `Host` header pinned to the portal; random session IDs in Secure/HttpOnly/SameSite=Lax cookies; sessions of at most 15 minutes; CSRF token plus `Origin` check on logout |
 | Portal ↔ Firely Auth | OIDC authorization code with PKCE for a public client (no secret); browser-bound, single-use, expiring `state`; nonce; RS256 checks on issuer, audience, expiry, client, scopes and reviewer identity; locally trusted CA |
 | Portal ↔ secured FHIR | Per-request bearer token held in a context variable (never shared across threads or written to disk); requests and redirects allow-listed to the configured server; complete pagination with loop and page-count limits |
 | Portal ↔ document store | Retrieval only after an authorized DocumentReference read for the same patient; registry, status, content-type, size and SHA-256 checks; wrong-patient and unregistered requests return 403 |
 | Secured FHIR ↔ RDS | `Encrypt=True`, `TrustServerCertificate=False`, RDS CA bundle in the image's trust store, ingress limited to single-address (/32) rules |
 | Export ↔ S3 | AES-256 server-side encryption, no-overwrite conditional writes, re-download hash verification, public access blocked |
-| S3 ↔ Snowflake | Storage integration trusting one Snowflake principal with an external ID; IAM role limited to read and list on one batch prefix |
+| S3 ↔ Snowflake | Storage integration trusting one Snowflake principal with an external ID; IAM role limited to read and list on batch prefixes (the committed policy covers the first batch's; Phase 1's prefix was read through the same integration, a change not recorded here) |
 
 ## Environments
 

@@ -1,5 +1,7 @@
 # Firely synthetic failure-case batch
 
+> **Status:** loaded into Snowflake on 7 October 2026. All 30 appointment outcomes matched `expected-outcomes.csv` and all 6 deliberately broken observations were flagged for review ([results](../../results/2026-10-07-30-patient-batch/)). The notes below are the package's original instructions, written before that load.
+
 Batch: `synthetic-failure-cases-20261006-v1`
 Generated October 6, 2026. Entirely synthetic: no real patient inputs, names, or identifiers. This is a newly generated analytics fixture, not evidence of HL7 conversion or Firely-server processing. JSON is FHIR-shaped; two deliberately invalid Observation timestamps are included to test RAW ingestion and review handling. No full FHIR profile validation was performed. Do not send the entire dataset directly to Firely as valid clinical resources.
 

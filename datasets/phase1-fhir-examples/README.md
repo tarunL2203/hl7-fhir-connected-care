@@ -1,6 +1,6 @@
 # HL7 FHIR exploration: Phase 1 starter package
 
-Status: profiled and packaged locally; NOT uploaded to AWS or executed in Snowflake.
+Status: packaged locally on 8 October 2026, then uploaded to S3 and loaded into Snowflake the same day (933 records, through the storage integration and the fail-closed gate in `02_load_verify.sql`; see the [project history](../../docs/project-history.md#8-s3--snowflake-fixed-and-phase-1-examples-8-oct)). The steps below are the package's original instructions.
 
 ## What to do now
 1. Unzip this package.
@@ -10,7 +10,7 @@ Status: profiled and packaged locally; NOT uploaded to AWS or executed in Snowfl
 5. Run `02_load_verify.sql` in order in that same session; stop on errors. Expected landing and final raw total: 933. First merge inserts 933; repeated identical batch inserts zero.
 6. Share resource counts before moving to standardized views and semantic views.
 
-This creates a separate schema `CHATGPT_LAB.FHIR_HL7_EXAMPLES`. It does not edit the existing October 7 demo tables or dashboard. Uses the existing warehouse and storage integration. SQL is prepared, not account-executed; account privileges and actual stage access remain to be verified.
+This creates a separate schema `CHATGPT_LAB.FHIR_HL7_EXAMPLES`. It does not edit the existing October 7 demo tables or dashboard. Uses the existing warehouse and storage integration. When this package was written the SQL had not yet been run; it was run on 8 October.
 
 ## Expected selected records
 | File | Records |

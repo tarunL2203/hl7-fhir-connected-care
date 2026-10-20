@@ -31,7 +31,7 @@ The portal's own export route, used for the 7 October batches, is [`worklist/por
 3. **Load** named files only with `COPY INTO`, keeping each payload as `VARIANT` with its file and row (`ON_ERROR = ABORT_STATEMENT`, `FORCE = FALSE`). Manifests are never loaded.
 4. **Prove** it: download the RAW rows, reconcile them against the batch, then run the identical `COPY` again and confirm every file is `LOAD_SKIPPED`.
 
-Snowflake reads S3 through a storage integration that trusts one Snowflake principal with an external ID. Its IAM role can only list and read the one batch prefix: it cannot write, delete or read the document fixtures. The integration was blocked from 4 to 7 October by an AWS-managed policy and fixed on 8 October; the [project history](../docs/project-history.md#8-s3--snowflake-fixed-and-phase-1-examples-8-oct) has the details.
+Snowflake reads S3 through a storage integration that trusts one Snowflake principal with an external ID. Its IAM role can only list and read batch prefixes: it cannot write, delete or read the document fixtures. The committed policy covers the first batch's prefix; the Phase 1 prefix was read through the same integration on 8 October, and that change is not recorded here. The integration was blocked from 4 to 7 October by an AWS-managed policy and fixed on 8 October; the [project history](../docs/project-history.md#8-s3--snowflake-fixed-and-phase-1-examples-8-oct) has the details.
 
 ## Checks
 
