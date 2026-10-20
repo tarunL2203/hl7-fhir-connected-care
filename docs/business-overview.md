@@ -133,3 +133,7 @@ These measures are supported by the tables and worklist history. They were not m
 ## What production would add
 
 This is a demonstration on synthetic data. A real deployment would also need an enterprise master patient index rather than a single identifier rule, an interface engine (for example Mirth Connect or Rhapsody) for feeds and replay, terminology mapping for local codes and units, a production Firely licence and hosting, audit logging, consent handling, business associate agreements and a formal HIPAA risk assessment. See [HIPAA considerations](hipaa-considerations.md).
+
+---
+
+<sub>**Reading order 2 of 12** · ← [Project tour](tour.md) · [Background: HL7 v2 and FHIR](background-hl7-fhir.md) → · [README](../README.md)</sub>

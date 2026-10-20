@@ -62,3 +62,7 @@ FHIR standardizes structure, not truth:
 - [LOINC](https://loinc.org) and [UCUM](https://ucum.org)
 - [hl7apy](https://github.com/crs4/hl7apy), the HL7 v2 parser used by the converters
 - Snowflake [semi-structured data](https://docs.snowflake.com/en/user-guide/semistructured-intro) and [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst)
+
+---
+
+<sub>**Reading order 3 of 12** · ← [Business overview](business-overview.md) · [Walkthrough](walkthrough.md) → · [README](../README.md)</sub>

@@ -178,3 +178,7 @@ The coverage views and the semantic view were created in the Snowflake workspace
 6. **PHI governance, for real data.** Classification and tags on identifiers, names and birth dates; masking policies by role; row access policies by facility; access-history auditing.
 7. **Environments.** Development and test databases created as zero-copy clones, with schema changes deployed through CI (schemachange or Terraform). A resource monitor on every warehouse.
 8. **Natural-language access for operations.** A second semantic view over `APPOINTMENT_FC30_REPORT`, so Cortex Analyst can answer appointment-readiness questions. An *Ask a question* box in the Streamlit dashboard through the Cortex Analyst REST API. Cortex Agents once several semantic views are in play.
+
+---
+
+<sub>**Reading order 8 of 12** · ← [HL7 → FHIR mapping](hl7-to-fhir-mapping.md) · [Cortex Analyst](cortex-analyst.md) → · [README](../README.md)</sub>

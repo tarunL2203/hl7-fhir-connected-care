@@ -55,3 +55,7 @@ The decisions that shape the platform, each with the context that forced it and 
 - **Context.** The platform handles the kind of data HIPAA protects.
 - **Decision.** Use only fictional patients and the official HL7 FHIR R4 examples. Account identifiers are replaced with placeholders throughout the repository and its history.
 - **Consequences.** The repository can be public. Production use would need a HIPAA risk assessment, business associate agreements, audit logging and PHI governance in Snowflake ([HIPAA considerations](hipaa-considerations.md)).
+
+---
+
+<sub>**Reading order 6 of 12** · ← [Architecture](architecture.md) · [HL7 → FHIR mapping](hl7-to-fhir-mapping.md) → · [README](../README.md)</sub>

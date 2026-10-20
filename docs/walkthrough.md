@@ -79,3 +79,7 @@ A third result, 110 mg/dL on 2 Oct ([`lab-portal-update-004.hl7`](../samples/lab
 - The portal's authenticated verification now finds **3 qualifying results**, still `information_complete`, and two reads agree ([verification](../analytics/batches/hl7-portal-refresh-20261007T183326824850Z/portal-verification.json)).
 - The refreshed [batch](../analytics/batches/hl7-portal-refresh-20261007T183326824850Z/) holds 1 Patient, 3 Observations and 1 Appointment, and reconciles 5/5 against Snowflake.
 - Repeating the identical `COPY` loaded nothing: every file returned [`LOAD_SKIPPED`](../results/2026-10-07-portal-refresh/repeat-copy.csv).
+
+---
+
+<sub>**Reading order 4 of 12** · ← [Background: HL7 v2 and FHIR](background-hl7-fhir.md) · [Architecture](architecture.md) → · [README](../README.md)</sub>

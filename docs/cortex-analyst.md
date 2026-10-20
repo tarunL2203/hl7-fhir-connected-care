@@ -110,5 +110,9 @@ See also: [Cortex Code](cortex-code.md), which works on the platform itself rath
 
 1. Snowflake documentation. [Cortex Analyst](https://docs.snowflake.com/en/user-guide/snowflake-cortex/cortex-analyst): semantic views, REST API and integrations, data governance, limitations.
 2. Snowflake. [Cortex Analyst: Paving the Way to Self-Service Analytics with AI](https://www.snowflake.com/en/blog/cortex-analyst-ai-self-service-analytics/) (public preview announcement), August 2024.
-3. Snowflake Engineering. [Snowflake Cortex Analyst: Evaluating Text-to-SQL Accuracy for Real-World Business Intelligence Scenarios](https://www.snowflake.com/en/engineering-blog/cortex-analyst-text-to-sql-accuracy-bi/). Internal evaluation, vendor-reported.
+3. Snowflake Engineering. [Snowflake Cortex Analyst: Evaluating Text-to-SQL Accuracy for Real-World Business Intelligence Scenarios](https://www.snowflake.com/en/blog/engineering/cortex-analyst-text-to-sql-accuracy-bi/). Internal evaluation, vendor-reported.
 4. Snowflake Engineering. [Snowflake's Native Semantic Views: Unlocking Easy, Efficient and Trusted AI-Powered BI for the Enterprise](https://www.snowflake.com/en/blog/engineering/native-semantic-views-ai-bi/), June 2025.
+
+---
+
+<sub>**Reading order 9 of 12** · ← [Snowflake design](snowflake-design.md) · [Cortex Code](cortex-code.md) → · [README](../README.md)</sub>

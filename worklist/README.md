@@ -42,3 +42,7 @@ python worklist/authenticated_viewer_server.py
 ```
 
 Then open `https://localhost:8082` and sign in as the reviewer. Sessions last 15 minutes. Signing out ends the portal session; Firely Auth may keep its own sign-in session.
+
+---
+
+<sub>[← README](../README.md) · [Project tour](../docs/tour.md)</sub>
