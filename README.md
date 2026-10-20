@@ -2,6 +2,8 @@
 
 **Making sure the right patient information is on file before every appointment: from HL7 v2 feeds to FHIR, a secure clinical review, and verified analytics in Snowflake.**
 
+*A working demonstration on synthetic data, built on one workstation against real AWS and Snowflake accounts. It is not a production system and not HIPAA-certified.*
+
 [![CI](https://github.com/tarunL2203/hl7-fhir-connected-care/actions/workflows/ci.yml/badge.svg)](https://github.com/tarunL2203/hl7-fhir-connected-care/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
